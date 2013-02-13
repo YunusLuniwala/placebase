@@ -56,6 +56,9 @@ public class MapActivity extends Activity
         	
         	ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);
             TextView titleUi = (TextView) mWindow.findViewById(R.id.title);
+           
+            //TextView beginJourney = (TextView) mWindow.findViewById(R.id.cta_beginjourney);
+            
             // sense icons 
             // background in view set to: R.drawable.btn_sense_bg_false
             ImageView hear = (ImageView) mWindow.findViewById(R.id.ic_sense_hear);
@@ -64,6 +67,7 @@ public class MapActivity extends Activity
             ImageView taste = (ImageView) mWindow.findViewById(R.id.ic_sense_taste);
             ImageView touch = (ImageView) mWindow.findViewById(R.id.ic_sense_touch);
         	
+            
         	int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
         	 /*if(the row has a URI to a perspective image)  {
         	 	//perspectiveUri = thatresourceURI;
@@ -80,6 +84,9 @@ public class MapActivity extends Activity
              } else {
                  titleUi.setText("");
              }
+         
+             
+             
              
              if(marker.getId().equals("m1")) { // TODO: change to the .hear property of the row. if it equals TRUE..
             	 hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
@@ -92,7 +99,6 @@ public class MapActivity extends Activity
              } else {
             	 see.setBackgroundResource(R.drawable.btn_sense_bg_false);
              } */
-             
              
             return mWindow;
         }

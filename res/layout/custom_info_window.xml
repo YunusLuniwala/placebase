@@ -17,105 +17,123 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
     android:background="@drawable/markerbubble"
     android:orientation="horizontal"
     android:paddingBottom="30dp" >
 
-  <ImageView
-      android:id="@+id/ic_perspective"
-      android:layout_width="50dp"
-      android:layout_height="50dp"
-      android:layout_marginLeft="-5dp"
-      android:layout_marginRight="5dp"
-      android:layout_marginTop="-5dp"
-      android:adjustViewBounds="true"
-      android:background="@drawable/bgimage_launcher"
-      android:scaleType="center" >
+    <ImageView
+        android:id="@+id/ic_perspective"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@android:color/background_light"
+        android:cropToPadding="true"
+        android:padding="3dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bgimage_launcher" />
 
-  </ImageView>
-
-  <LinearLayout
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginBottom="5dp"
-      android:layout_marginLeft="5dp"
-      android:layout_marginTop="10dp"
-      android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/title"
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:text="22 days old"
-        android:textColor="@android:color/background_light"
-        android:textSize="12sp"
-        android:textStyle="bold" />
-
-    <LinearLayout
-        android:id="@+id/cont_senses"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:paddingLeft="0dp"
-        android:paddingRight="5dp"
-        android:paddingTop="5dp" >
+        android:layout_height="wrap_content" >
 
         <ImageView
-            android:id="@+id/ic_sense_hear"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_sense_bg_true"
-            android:src="@drawable/ic_sense_hear" />
+            android:id="@+id/imageView1"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end"
+            android:background="@drawable/btn_record_bg_true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_record_audio" />
 
-        <ImageView
-            android:id="@+id/ic_sense_see"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_sense_bg_true"
-            android:src="@drawable/ic_sense_see" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:paddingTop="10dp" >
 
-        <ImageView
-            android:id="@+id/ic_sense_smell"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_sense_bg_true"
-            android:src="@drawable/ic_sense_smell" />
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|left"
+                android:singleLine="true"
+                android:textColor="@android:color/background_light"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/ic_sense_taste"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_sense_bg_true"
-            android:src="@drawable/ic_sense_taste" />
+            <TextView
+                android:id="@+id/title2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/begin_journey"
+                android:textColor="@android:color/background_light"
+                android:textSize="30sp"
+                android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/ic_sense_touch"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="2dp"
-            android:background="@drawable/btn_sense_bg_true"
-            android:src="@drawable/ic_sense_touch" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-    </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/cont_senses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="5dp" >
 
-    <TextView
-        android:id="@+id/cta_beginjourney"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="10dp"
-        android:gravity="right"
-        android:maxLines="1"
-        android:text="@string/begin_journey"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:typeface="sans" />
+                    <ImageView
+                        android:id="@+id/ic_sense_hear"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginTop="2dp"
+                        android:background="@drawable/btn_sense_bg_true"
+                        android:src="@drawable/ic_sense_hear" />
 
-  </LinearLayout>
+                    <ImageView
+                        android:id="@+id/ic_sense_see"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/btn_sense_bg_true"
+                        android:src="@drawable/ic_sense_see" />
+
+                    <ImageView
+                        android:id="@+id/ic_sense_smell"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/btn_sense_bg_true"
+                        android:src="@drawable/ic_sense_smell" />
+
+                    <ImageView
+                        android:id="@+id/ic_sense_taste"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/btn_sense_bg_true"
+                        android:src="@drawable/ic_sense_taste" />
+
+                    <ImageView
+                        android:id="@+id/ic_sense_touch"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_margin="2dp"
+                        android:background="@drawable/btn_sense_bg_true"
+                        android:src="@drawable/ic_sense_touch" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 </LinearLayout>
