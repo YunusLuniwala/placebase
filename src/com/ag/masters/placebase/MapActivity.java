@@ -414,7 +414,7 @@ public class MapActivity extends Activity
 		// configure map UI settings
 		UiSettings mUiSettings = mMap.getUiSettings();
 		mUiSettings.setZoomControlsEnabled(false);
-		mUiSettings.setCompassEnabled(true);
+		mUiSettings.setCompassEnabled(false);
 		mUiSettings.setTiltGesturesEnabled(true);
 		mUiSettings.setMyLocationButtonEnabled(false); //disable myLocation button. we roll our own
 
@@ -543,7 +543,7 @@ public class MapActivity extends Activity
 				calculateDistanceToTarget();
 				calculateBearingToTarget();
 				
-				setMyLocationMarker(); // TODO: rotate this shit so it appears to be pointing in the right direction
+				setMyLocationMarker();
 			}
 			
 		}
@@ -551,23 +551,29 @@ public class MapActivity extends Activity
 		updateTestValues();
 		
 	}
-	
+	//------------------------------------------------------------------------------------------
 	private float calculateDistanceToTarget() {
 		if(myCurrentLocation != null) {
-		targetDistance = myCurrentLocation.distanceTo(targetLocation);
-		return targetDistance;
+			targetDistance = myCurrentLocation.distanceTo(targetLocation);
+			return targetDistance;
 		} else return 0;
 	}
-
+	//------------------------------------------------------------------------------------------
 	private float calculateBearingToTarget() {
 		if(myCurrentLocation != null) {
-		targetBearing = myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
-		targetBearing = targetBearing - bearing;
-		targetBearing = targetBearing >= 0 ? targetBearing: targetBearing + 360;
-		// and round them to a whole number
-		targetBearing = Math.round(targetBearing);
-		
-		return targetBearing;
+			
+			targetBearing = myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
+			targetBearing = bearing - targetBearing;
+			targetBearing = targetBearing >= 0 ? targetBearing: targetBearing + 360;
+			// CHANGE THESE NUMBERS SO THAT  THEY READ 0 - !*) depending on 
+			// and round them to a whole number
+			targetBearing = Math.round(targetBearing);
+			targetBearing = targetBearing >= 180 ? -(360 - targetBearing): targetBearing;
+			
+
+			updateTestValues();
+			return targetBearing;
+			
 		}
 		else return 0;
 	}
@@ -600,7 +606,8 @@ public class MapActivity extends Activity
 			Drawable mIconDrawable = new BitmapDrawable(getResources(), mIcon);
 			mIconDrawable.setBounds(0,0,size,size);
 			
-			myMarkerCanvas.rotate(targetBearing, size/2, size/2);
+			//myMarkerCanvas.rotate(targetBearing, size/2, size/2);
+			
 			mIconDrawable.draw(myMarkerCanvas);
 
 		} catch (Exception e) {
@@ -730,8 +737,7 @@ public class MapActivity extends Activity
 				int compensation = display.getRotation() * 90;                          
 				azimuth = azimuth+compensation;
 				
-				double myAzimuth = azimuth;
-				setDeviceBearing(myAzimuth);
+				setDeviceBearing(azimuth);
 				
 		
 
@@ -753,7 +759,7 @@ public class MapActivity extends Activity
 
 		if(journeyMode == 1) {
 			calculateBearingToTarget();
-			setMyLocationMarker();
+			//setMyLocationMarker();
 		}
 		
 		rotateMyCamera();
