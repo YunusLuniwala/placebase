@@ -131,7 +131,10 @@ public class MapActivity extends Activity
 	private Criteria myCriteria;
 	
 	// print out test variables to screen
+	private TextView testBearingToTarget;
 	private TextView testMyLocation;
+	private TextView testJourneyMode;
+	private TextView testTargetLat;
 	// TODO: add device bearing test
 	
 	//------------------------------------------------------------------------------------------
@@ -147,11 +150,15 @@ public class MapActivity extends Activity
 		
 		// testPrintouts. Delete when done
 		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
+		testBearingToTarget = (TextView) findViewById(R.id.testTargetBearing);
+		testJourneyMode = (TextView) findViewById(R.id.testJourneyMode);
+		testTargetLat = (TextView) findViewById(R.id.testTargetLat);
 		
 		myCriteria = new Criteria();
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
 		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		
+		testJourneyMode.setText(String.valueOf(journeyMode));
 		
 	}
 	
@@ -385,11 +392,27 @@ public class MapActivity extends Activity
 		
 		journeyMode = true;
 		// TODO: set this to false from a button within the info window that pops up from below
+		testJourneyMode.setText(String.valueOf(journeyMode));
 		
 		setMyLocationMarker(); // maybe only show this if you are in journey mode
 		// TODO: BEGIN the journey process: display partial view with additional information for this place
 		// set boundaries so myLocation and the destination marker are both visible on the screen
 		//CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
+		
+		//****** PROBABLY NEED TO PUT THIS IN ANOTHER FUNCTION AND STORE THE
+		// VALUES FOR THE MARKER'S ENDING LOCATION, so that the bearing can be UPDATED
+		// with the user's LAT and LNG .. so put it in onLOCATIONCHANGED() ***********/
+		// http://android-er.blogspot.com/2013/02/get-bearing-between-two-location-using.html
+		Location startingLocation = mMap.getMyLocation();
+		
+		// grab the position of the marker and create a new Location
+		LatLng target = marker.getPosition();
+		Location endingLocation = new Location("Target");
+		endingLocation.setLatitude(target.latitude);
+		endingLocation.setLongitude(target.longitude);
+		// calculate the bearing from the current location to the marker
+		float targetBearing =  startingLocation.bearingTo(endingLocation);
+		testBearingToTarget.setText("targetBearing: " + targetBearing);
 		
 	}
 //------------------------------------------------------------------------------------------
@@ -416,10 +439,9 @@ public class MapActivity extends Activity
 			// AG: don't do this until you are journeying.
 			LatLng latlng= new LatLng(location.getLatitude(), location.getLongitude());
 			
-			// mMap.animateCamera(CameraUpdateFactory.newLatLng(latlng));
-			if(journeyMode) {
-				setMyLocationMarker(); // maybe only show this if you are in journey mode
-			}
+			
+			// print out test values
+			testJourneyMode.setText(String.valueOf(journeyMode));
 		}
 		
 	}
