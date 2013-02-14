@@ -239,6 +239,7 @@ public class MapActivity extends Activity
 		super.onResume();
 		setUpMapIfNeeded();
 		
+		
 		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		//Register for location updates using a Criteria, and a callback on the specified looper thread.
 		myLocationManager.requestLocationUpdates(
@@ -248,6 +249,7 @@ public class MapActivity extends Activity
 				this, 		// listener
 				null);		// intent
 		
+		mMap.setMyLocationEnabled(true);
 		// replaces the location source of the my-location layer
 		mMap.setLocationSource(this);
 		
