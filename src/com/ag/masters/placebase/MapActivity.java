@@ -122,20 +122,25 @@ public class MapActivity extends Activity
     
 	private GoogleMap mMap;		
 	
+	// journey mode 
 	private Marker myMarker = null; // custom marker for myLocation
+	private static int journeyMode = -1;
+	private static float targetBearing;
+	private static double targetLatitude;
+	private static double targetLongitude;
+	private static float targetDistance;
 	
-	boolean journeyMode; 	// whether we display graphics and behvaiors specific to journey mode
+	// print out test variables to screen
+	private TextView testMyLocation;
+	private TextView testJourneyMode;
+	private TextView testTargetLat;
+	private TextView testTargetLng;
+	private TextView testTargetBearing;
+	private TextView testTargetDistance;
 	
 	private LocationManager myLocationManager;
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
-	
-	// print out test variables to screen
-	private TextView testBearingToTarget;
-	private TextView testMyLocation;
-	private TextView testJourneyMode;
-	private TextView testTargetLat;
-	// TODO: add device bearing test
 	
 	//------------------------------------------------------------------------------------------
 	@Override
@@ -150,16 +155,18 @@ public class MapActivity extends Activity
 		
 		// testPrintouts. Delete when done
 		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
-		testBearingToTarget = (TextView) findViewById(R.id.testTargetBearing);
+		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
 		testJourneyMode = (TextView) findViewById(R.id.testJourneyMode);
 		testTargetLat = (TextView) findViewById(R.id.testTargetLat);
+		testTargetLng = (TextView) findViewById(R.id.testTargetLng);
+		testTargetDistance = (TextView) findViewById(R.id.testTargetDistance);
 		
 		myCriteria = new Criteria();
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
-		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+		//myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		
-		testJourneyMode.setText(String.valueOf(journeyMode));
-		
+		// test
+		updateTestValues();	
 	}
 	
 	//------------------------------------------------------------------------------------------	
@@ -169,6 +176,7 @@ public class MapActivity extends Activity
 		super.onResume();
 		setUpMapIfNeeded();
 		
+		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		//Register for location updates using a Criteria, and a callback on the specified looper thread.
 		myLocationManager.requestLocationUpdates(
 				400L, 		// minTime
@@ -180,11 +188,8 @@ public class MapActivity extends Activity
 		// replaces the location source of the my-location layer
 		mMap.setLocationSource(this);
 		
-		if(journeyMode == true) {
-			setMyLocationMarker();
-			Toast.makeText(this, "JOURNEY MODE", Toast.LENGTH_LONG).show();
-		}
-
+		// test
+		updateTestValues();
 	}
 	//------------------------------------------------------------------------------------------
 	@Override
@@ -212,7 +217,7 @@ public class MapActivity extends Activity
 					CameraPosition position = mMap.getCameraPosition();
 					
 					Builder builder = new CameraPosition.Builder();
-					builder.zoom(15);
+					builder.zoom(10);
 					builder.target(target);
 					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
 				
@@ -239,23 +244,19 @@ public class MapActivity extends Activity
 				
 				Marker melbourne = mMap.addMarker(new MarkerOptions()
 				//.position(new LatLng(lat, lng))  
-				.position(new LatLng(34, -86))
+				.position(new LatLng(33.784, -84.343636))
 				//.icon(BitmapDescriptorFactory.fromBitmap(createIcon(bearing)))
 				.icon(BitmapDescriptorFactory.fromBitmap(createIcon(300f)))
 				//.title(numEncounters.toString() + "encounters")
-				.title("345 days old")
-				//.snippet(calculateAge());
-				.snippet("0 encounters"));
+				.title("345 days old"));
 				
 				Marker newMelbourne = mMap.addMarker(new MarkerOptions()
 				//.position(new LatLng(lat, lng))  
-				.position(new LatLng(30, -90))
+				.position(new LatLng(33.7557, -84.32952))
 				//.icon(BitmapDescriptorFactory.fromBitmap(createIcon(bearing)))
 				.icon(BitmapDescriptorFactory.fromBitmap(createIcon(40.5f)))
 				//.title(numEncounters.toString() + "encounters")
-				.title("6 days old")
-				//.snippet(calculateAge());
-				.snippet("20 encounters"));
+				.title("6 days old"));
 		
 	}
 
@@ -294,28 +295,6 @@ public class MapActivity extends Activity
 		}
 		return bitmap;
 	}
-
-	//------------------------------------------------------------------------------------------
-	private Bitmap createMyMarkerIcon() {
-		Bitmap bitmap = null;
-		try {
-			bitmap = Bitmap.createBitmap(50,50,Config.ARGB_8888);
-			Canvas c = new Canvas(bitmap);		
-			
-			Bitmap mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_compass);
-			Drawable mIconDrawable = new BitmapDrawable(getResources(), mIcon);
-			mIconDrawable.setBounds(0,0,50,50);
-			mIconDrawable.draw(c);
-			
-			// TODO: rotate so that the shit is pointing to the marker we are journeying to.
-			
-
-		} catch (Exception e) {
-
-		}
-		return bitmap;
-	}
-	
 	//------------------------------------------------------------------------------------------
  	private void setUpMapIfNeeded() {
 	    // Do a null check to confirm that we have not already instantiated the map.
@@ -390,11 +369,10 @@ public class MapActivity extends Activity
 	@Override
 	public void onInfoWindowClick(Marker marker) {
 		
-		journeyMode = true;
-		// TODO: set this to false from a button within the info window that pops up from below
-		testJourneyMode.setText(String.valueOf(journeyMode));
+		journeyMode = 1;
+		// TODO: set this to false (0) from a button within the info window that pops up from below
 		
-		setMyLocationMarker(); // maybe only show this if you are in journey mode
+		
 		// TODO: BEGIN the journey process: display partial view with additional information for this place
 		// set boundaries so myLocation and the destination marker are both visible on the screen
 		//CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
@@ -410,53 +388,92 @@ public class MapActivity extends Activity
 		Location endingLocation = new Location("Target");
 		endingLocation.setLatitude(target.latitude);
 		endingLocation.setLongitude(target.longitude);
-		// calculate the bearing from the current location to the marker
-		float targetBearing =  startingLocation.bearingTo(endingLocation);
-		testBearingToTarget.setText("targetBearing: " + targetBearing);
 		
+		// calculate the bearing from the current location to the marker
+		targetLongitude = target.longitude;
+		targetLatitude = target.latitude;
+		
+		targetDistance = startingLocation.distanceTo(endingLocation);
+		targetBearing = startingLocation.bearingTo(endingLocation);
+		
+		setMyLocationMarker(); // maybe only show this if you are in journey mode
+		
+		// test
+		updateTestValues();
+				
 	}
+	
+
+	
 //------------------------------------------------------------------------------------------
 // LOCATION LISTENER
 // http://android-er.blogspot.com/2013/01/implement-locationsource-and.html
 //------------------------------------------------------------------------------------------
-
 	@Override
 	public void onLocationChanged(Location location) {
-		
-		//Toast.makeText(getBaseContext(), "Moved to "+location.toString(), Toast.LENGTH_LONG).show();
 		
 		if (myLocationListener != null) {
 			myLocationListener.onLocationChanged(location);
 			
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
-			
-			testMyLocation.setText(
-					"lat: " + lat + "\n" +
-					"lon: " + lng);
-			
-			// animate to user's location when the location changes.
-			// AG: don't do this until you are journeying.
 			LatLng latlng= new LatLng(location.getLatitude(), location.getLongitude());
+			// you could animate to the user's location
+			// .. but I wouldn't do this unless you are journeying
 			
+			// test
+			testMyLocation.setText(
+					"My lat: " + lat + "\n" +
+					"My lon: " + lng);
 			
-			// print out test values
-			testJourneyMode.setText(String.valueOf(journeyMode));
+			// if we are journeying to a target, update the marker that points there
+			// when the device location has changed
+			if (journeyMode == 1) {
+				setMyLocationMarker();
+			}
+			
 		}
+		
+		updateTestValues();
 		
 	}
 
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
-	//http://androiddev.orkitra.com/?p=3933	
-		// add custom marker location based on Location Changed 
-		removeMyLocationMarker();
-		Location location = mMap.getMyLocation();
-		Bitmap bmp = createMyMarkerIcon();
+		// http://androiddev.orkitra.com/?p=3933	
+		 
+		// remove the old one before you draw another.
+		removeMyLocationMarker(); 
+		
+		// get current Location
+		Location location = mMap.getMyLocation(); 
+
+		// and create myMarker with this icon
 		myMarker = mMap.addMarker(new MarkerOptions()
 			.position(new LatLng(location.getLatitude(), location.getLongitude()))
-			.icon(BitmapDescriptorFactory.fromBitmap(bmp))
+			.icon(BitmapDescriptorFactory.fromBitmap(createMyMarkerIcon()))
 			.anchor(.5f,.5f));
+	}
+	//------------------------------------------------------------------------------------------
+	private Bitmap createMyMarkerIcon() {
+		Bitmap bitmap = null;
+		int size = 50;
+		
+		try {
+			bitmap = Bitmap.createBitmap(size,size,Config.ARGB_8888);
+			Canvas c = new Canvas(bitmap);		
+			
+			Bitmap mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_compass);
+			Drawable mIconDrawable = new BitmapDrawable(getResources(), mIcon);
+			mIconDrawable.setBounds(0,0,size,size);
+			
+			c.rotate(targetBearing, size/2, size/2);
+			mIconDrawable.draw(c);
+
+		} catch (Exception e) {
+			
+		}
+		return bitmap;
 	}
 	//------------------------------------------------------------------------------------------
 	private void removeMyLocationMarker() {
@@ -465,14 +482,44 @@ public class MapActivity extends Activity
 		}
 	}
 	//------------------------------------------------------------------------------------------
+	private void updateTestValues() {
+		if (journeyMode >= -1 && journeyMode <= 1) {
+			testJourneyMode.setText("journey MODE: " + String.valueOf(journeyMode));
+		} else {
+			testJourneyMode.setText("journey MODE: " + "is not acceptable");
+		}
+		if (targetBearing != 0) {
+			testTargetBearing.setText("targetBearing: " + targetBearing);
+		} else {
+			testTargetBearing.setText("targetBearing: " + "is not set");
+		}
+		if (targetLatitude != 0) {
+			testTargetLat.setText("TargetLat: " + targetLatitude);
+		} else {
+			testTargetLat.setText("TargetLat: " + "is not set");
+		}
+		if (targetLongitude != 0) {
+			testTargetLng.setText("TargetLat: " + targetLongitude);	
+		} else {
+			testTargetLng.setText("TargetLat: " + "is not set");
+		}
+		if(targetDistance != 0) {
+			testTargetDistance.setText("TargetDistance: " + targetDistance);
+		} else {
+			testTargetDistance.setText("TargetDistance: " + "is not set");
+		}
+		
+	}
+	
+	//------------------------------------------------------------------------------------------
 	@Override
 	public void onProviderDisabled(String provider) {
 	}
-
+	//------------------------------------------------------------------------------------------
 	@Override
 	public void onProviderEnabled(String provider) {
 	}
-
+	//------------------------------------------------------------------------------------------
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
@@ -484,20 +531,21 @@ public class MapActivity extends Activity
 	public void activate(OnLocationChangedListener listener) {
 		myLocationListener = listener;
 	}
-
+	//------------------------------------------------------------------------------------------
 	@Override
 	public void deactivate() {
 		myLocationListener = null;
-		
 	}
 	
+	
+	
+	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
-	
 	}
-	
+	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
