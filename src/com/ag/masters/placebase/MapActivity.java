@@ -1,33 +1,40 @@
 package com.ag.masters.placebase;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
@@ -41,7 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapActivity extends Activity 
-	implements OnMarkerClickListener, OnInfoWindowClickListener, LocationSource, LocationListener {
+	implements OnMarkerClickListener, OnInfoWindowClickListener, LocationSource, LocationListener, SensorEventListener {
 
 	//------------------------------------------------------------------------------------------
 	// InfoWindowAdapter
@@ -120,15 +127,18 @@ public class MapActivity extends Activity
     //------------------------------------------------------------------------------------------
     public static final String MODE = "journeyMode";
     
-	private GoogleMap mMap;		
+	private GoogleMap mMap;	
+	private CameraPosition myCameraPosition;
 	
 	// journey mode 
 	private Marker myMarker = null; // custom marker for myLocation
+	private Canvas myMarkerCanvas;
+	private Location myCurrentLocation = null;
+	
 	private static int journeyMode = -1;
-	private static float targetBearing;
-	private static double targetLatitude;
-	private static double targetLongitude;
-	private static float targetDistance;
+	private static Location targetLocation;
+	private static float targetBearing = 0;
+	private static float targetDistance = 0;
 	
 	// print out test variables to screen
 	private TextView testMyLocation;
@@ -137,11 +147,42 @@ public class MapActivity extends Activity
 	private TextView testTargetLng;
 	private TextView testTargetBearing;
 	private TextView testTargetDistance;
+	private TextView testGeoX;
+	private TextView testGeoY;
+	private TextView testGeoZ;
+	private TextView testAccelX;
+	private TextView testAccelY;
+	private TextView testAccelZ;
+	private TextView testAzimuth;
+	private TextView testPitch;
+	private TextView testRoll;
 	
 	private LocationManager myLocationManager;
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
 	
+	
+	
+	private SensorManager mySensorManager;
+	private boolean sensorRunning;
+	
+	float[] inR = new float[16];
+    float[] I = new float[16];
+    float[] gravity = new float[3];
+    float[] geomag = new float[3];
+    float[] orientVals = new float[3];
+
+    float bearing = 0; // normalized whole number for raw sensor azimuth input
+    double azimuth = 0;
+    /*double pitch = 0;
+    double roll = 0;*/
+    
+    private boolean rotateView = true;
+    private boolean firstFix = true;
+    private static CameraPosition MYLOCATION;
+            
+    
+    
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,11 +201,33 @@ public class MapActivity extends Activity
 		testTargetLat = (TextView) findViewById(R.id.testTargetLat);
 		testTargetLng = (TextView) findViewById(R.id.testTargetLng);
 		testTargetDistance = (TextView) findViewById(R.id.testTargetDistance);
+		testGeoX = (TextView) findViewById(R.id.geoX);
+		testGeoY = (TextView) findViewById(R.id.geoY);
+		testGeoZ = (TextView) findViewById(R.id.geoZ);
+		testAccelX = (TextView) findViewById(R.id.accelX);
+		testAccelY = (TextView) findViewById(R.id.accelY);
+		testAccelZ = (TextView) findViewById(R.id.accelZ);
+		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
+		testPitch = (TextView) findViewById(R.id.testPitch);
+		testRoll = (TextView) findViewById(R.id.testRoll);
+
+		//testGeoX.setText("0.00");
+		//testGeoY.setText("0.00");
+		//testGeoZ.setText("0.00");
+		//testAccelX.setText("0.00");
+		//testAccelY.setText("0.00");
+		//testAccelZ.setText("0.00");
+		testAzimuth.setText("0.00");
+		//testPitch.setText("0.00");
+		//testRoll.setText("0.00");
+		
+		
 		
 		myCriteria = new Criteria();
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
-		//myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		
+		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
 		// test
 		updateTestValues();	
 	}
@@ -188,44 +251,71 @@ public class MapActivity extends Activity
 		// replaces the location source of the my-location layer
 		mMap.setLocationSource(this);
 		
+		// register sensor listeners
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
+		
+		
 		// test
 		updateTestValues();
 	}
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onPause() {
+		super.onPause();
 		/* Disable the my-location layer (this causes our LocationSource to be automatically deactivated.) */
+		mySensorManager.unregisterListener(this);
+		
+		myLocationManager.removeUpdates(this);
 		mMap.setMyLocationEnabled(false);
 		mMap.setLocationSource(null);
 		
-		myLocationManager.removeUpdates(this);
-		super.onPause();
+		
+		
+		
 	}
 	
 	//------------------------------------------------------------------------------------------
 	private void addCustomMyLocationButton() {
 		//http://stackoverflow.com/questions/14826345/android-maps-api-v2-change-mylocation-icon
-		
+
 		ImageButton btnShowMyLocation = (ImageButton) findViewById(R.id.btnShowMyLocation);
 
 		btnShowMyLocation.setOnClickListener(new OnClickListener() { 
 			@Override
 			public void onClick(final View v) {
+
+				rotateView = false;
+
 				Location myLocation = mMap.getMyLocation();
+
 				if(myLocation != null) {
-					LatLng target = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-					CameraPosition position = mMap.getCameraPosition();
 					
-					Builder builder = new CameraPosition.Builder();
-					builder.zoom(10);
-					builder.target(target);
-					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
-				
+					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
+						@Override
+						public void onFinish() {
+							rotateView = true;
+						}
+
+						@Override
+						public void onCancel() {
+							rotateView = true;
+						}
+					});
+
 				}
-				
+
 			}
 		});
 	}
+	
+
 	
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
@@ -273,21 +363,26 @@ public class MapActivity extends Activity
 			Resources res = getResources();
 			
 			Bitmap mIcon = BitmapFactory.decodeResource(res, R.drawable.ic_map_marker);
-			Bitmap mCompass = BitmapFactory.decodeResource(res, R.drawable.ic_compass);
+			//Bitmap mCompass = BitmapFactory.decodeResource(res, R.drawable.ic_compass);
+			Bitmap mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_audio);
 			
 			Drawable mIconDrawable = new BitmapDrawable(res, mIcon);
-			Drawable mCompassDrawable = new BitmapDrawable(res, mCompass);
+			//Drawable mCompassDrawable = new BitmapDrawable(res, mCompass);
+			Drawable mMediaDrawable = new BitmapDrawable(res, mMedia);
+			
+			
 			
 			mIconDrawable.setBounds(0,0,100,100);
-			mCompassDrawable.setBounds(25,0,75,75);
-			
+			//mCompassDrawable.setBounds(25,0,75,75);
+			mMediaDrawable.setBounds(25,0,75,75);
 			
 			mIconDrawable.draw(c);
+			mMediaDrawable.draw(c);
 			// rotate the canvas before drawing the orientation.
 			// ** may have to convert sensor values from Radians to Degrees before saving them here **
 			//rotate (float degrees, float px, float py)
-			c.rotate(bearing, 50, 40);
-			mCompassDrawable.draw(c);
+			//c.rotate(bearing, 50, 40);
+			//mCompassDrawable.draw(c);
 			
 			
 		} catch (Exception e) {
@@ -372,31 +467,25 @@ public class MapActivity extends Activity
 		journeyMode = 1;
 		// TODO: set this to false (0) from a button within the info window that pops up from below
 		
-		
-		// TODO: BEGIN the journey process: display partial view with additional information for this place
+		// store Location in a globa var
+		LatLng target = marker.getPosition();
+		targetLocation = new Location("Target");
+		targetLocation.setLatitude(target.latitude);
+		targetLocation.setLongitude(target.longitude);
+					
+		// TODO: BEGIN the journey process: 
+		// display partial view with additional information for this place
 		// set boundaries so myLocation and the destination marker are both visible on the screen
-		//CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
+		// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
 		
 		//****** PROBABLY NEED TO PUT THIS IN ANOTHER FUNCTION AND STORE THE
 		// VALUES FOR THE MARKER'S ENDING LOCATION, so that the bearing can be UPDATED
 		// with the user's LAT and LNG .. so put it in onLOCATIONCHANGED() ***********/
 		// http://android-er.blogspot.com/2013/02/get-bearing-between-two-location-using.html
-		Location startingLocation = mMap.getMyLocation();
+		calculateDistanceToTarget();
+		calculateBearingToTarget();
 		
-		// grab the position of the marker and create a new Location
-		LatLng target = marker.getPosition();
-		Location endingLocation = new Location("Target");
-		endingLocation.setLatitude(target.latitude);
-		endingLocation.setLongitude(target.longitude);
-		
-		// calculate the bearing from the current location to the marker
-		targetLongitude = target.longitude;
-		targetLatitude = target.latitude;
-		
-		targetDistance = startingLocation.distanceTo(endingLocation);
-		targetBearing = startingLocation.bearingTo(endingLocation);
-		
-		setMyLocationMarker(); // maybe only show this if you are in journey mode
+		setMyLocationMarker(); // TODO: rotate this shit so it appears to be pointing in the right direction
 		
 		// test
 		updateTestValues();
@@ -415,29 +504,73 @@ public class MapActivity extends Activity
 		if (myLocationListener != null) {
 			myLocationListener.onLocationChanged(location);
 			
-			double lat = location.getLatitude();
-			double lng = location.getLongitude();
-			LatLng latlng= new LatLng(location.getLatitude(), location.getLongitude());
-			// you could animate to the user's location
-			// .. but I wouldn't do this unless you are journeying
-			
+			if(firstFix) { // we have gotten the first fix on myLocation
+				
+				// set the MyLocation button position to a global variable
+				MYLOCATION = new CameraPosition.Builder()
+				.target(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()))
+				.zoom(12)
+				.bearing(mMap.getCameraPosition().bearing)
+				.tilt(0)
+				.build();
+
+				//animate the camera to this place NOT WORKING
+				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
+					@Override
+					public void onFinish() {
+						rotateView = true;
+					}
+
+					@Override
+					public void onCancel() {
+						rotateView = true;
+					}
+				});
+				// set firstFix to false so it runs only once
+				firstFix = false;
+			}
+
+			// save device location to global variable.
+			myCurrentLocation = mMap.getMyLocation();
+
 			// test
 			testMyLocation.setText(
-					"My lat: " + lat + "\n" +
-					"My lon: " + lng);
+					"My lat: " + myCurrentLocation.getLatitude() + "\n" +
+					"My lon: " + myCurrentLocation.getLongitude());
 			
-			// if we are journeying to a target, update the marker that points there
-			// when the device location has changed
+			// if we are journeying. update myMarker's location
 			if (journeyMode == 1) {
-				setMyLocationMarker();
+				calculateDistanceToTarget();
+				calculateBearingToTarget();
+				
+				setMyLocationMarker(); // TODO: rotate this shit so it appears to be pointing in the right direction
 			}
 			
 		}
-		
+		// test
 		updateTestValues();
 		
 	}
+	
+	private float calculateDistanceToTarget() {
+		if(myCurrentLocation != null) {
+		targetDistance = myCurrentLocation.distanceTo(targetLocation);
+		return targetDistance;
+		} else return 0;
+	}
 
+	private float calculateBearingToTarget() {
+		if(myCurrentLocation != null) {
+		targetBearing = myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
+		targetBearing = targetBearing - bearing;
+		targetBearing = targetBearing >= 0 ? targetBearing: targetBearing + 360;
+		// and round them to a whole number
+		targetBearing = Math.round(targetBearing);
+		
+		return targetBearing;
+		}
+		else return 0;
+	}
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
 		// http://androiddev.orkitra.com/?p=3933	
@@ -461,14 +594,14 @@ public class MapActivity extends Activity
 		
 		try {
 			bitmap = Bitmap.createBitmap(size,size,Config.ARGB_8888);
-			Canvas c = new Canvas(bitmap);		
+			myMarkerCanvas = new Canvas(bitmap);
 			
 			Bitmap mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_compass);
 			Drawable mIconDrawable = new BitmapDrawable(getResources(), mIcon);
 			mIconDrawable.setBounds(0,0,size,size);
 			
-			c.rotate(targetBearing, size/2, size/2);
-			mIconDrawable.draw(c);
+			myMarkerCanvas.rotate(targetBearing, size/2, size/2);
+			mIconDrawable.draw(myMarkerCanvas);
 
 		} catch (Exception e) {
 			
@@ -481,33 +614,42 @@ public class MapActivity extends Activity
 			myMarker.remove(); // remove the old one before you draw another.
 		}
 	}
+	
+	//------------------------------------------------------------------------------------------
+	private void rotateMyCamera() {
+		
+		if(mMap.isMyLocationEnabled() && mMap.getMyLocation() != null && rotateView == true) {
+			   
+			        CameraPosition cameraPosition = new CameraPosition.Builder()
+			        	.target(mMap.getCameraPosition().target)      
+			        	.zoom(mMap.getCameraPosition().zoom)               
+			        	.bearing(bearing)                
+			        	.tilt(mMap.getCameraPosition().tilt)                   
+			        		.build();               
+			        
+			        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
+			    
+			
+		}
+	}
 	//------------------------------------------------------------------------------------------
 	private void updateTestValues() {
-		if (journeyMode >= -1 && journeyMode <= 1) {
-			testJourneyMode.setText("journey MODE: " + String.valueOf(journeyMode));
-		} else {
-			testJourneyMode.setText("journey MODE: " + "is not acceptable");
+		if (myCurrentLocation != null) {
+			if (journeyMode >= -1 && journeyMode <= 1) {
+				testJourneyMode.setText("journey MODE: " + String.valueOf(journeyMode));
+			}
+			if (targetLocation != null) {
+				testTargetLat.setText("TargetLat: " + targetLocation.getLatitude());
+				testTargetLng.setText("TargetLng: " + targetLocation.getLongitude());	
+			}
+			if(targetDistance != 0) {
+				testTargetDistance.setText("TargetDistance: " + targetDistance);
+			} 
+			if (targetBearing != 0) {
+				testTargetBearing.setText("targetBearing: " + targetBearing);
+			}
 		}
-		if (targetBearing != 0) {
-			testTargetBearing.setText("targetBearing: " + targetBearing);
-		} else {
-			testTargetBearing.setText("targetBearing: " + "is not set");
-		}
-		if (targetLatitude != 0) {
-			testTargetLat.setText("TargetLat: " + targetLatitude);
-		} else {
-			testTargetLat.setText("TargetLat: " + "is not set");
-		}
-		if (targetLongitude != 0) {
-			testTargetLng.setText("TargetLat: " + targetLongitude);	
-		} else {
-			testTargetLng.setText("TargetLat: " + "is not set");
-		}
-		if(targetDistance != 0) {
-			testTargetDistance.setText("TargetDistance: " + targetDistance);
-		} else {
-			testTargetDistance.setText("TargetDistance: " + "is not set");
-		}
+		
 		
 	}
 	
@@ -536,8 +678,93 @@ public class MapActivity extends Activity
 	public void deactivate() {
 		myLocationListener = null;
 	}
+
+//------------------------------------------------------------------------------------------
+// SENSOR EVENT LISTENER
+//------------------------------------------------------------------------------------------	
+	@Override
+	public void onAccuracyChanged(Sensor arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	//------------------------------------------------------------------------------------------	
+	@Override
+	public void onSensorChanged(SensorEvent event) {
+		// http://stackoverflow.com/questions/4819626/android-phone-orientation-overview-including-compass 
+		// http://stackoverflow.com/questions/4020048/finding-orientation-using-getrotationmatrix-and-getorientation?rq=1
+		// If the sensor data is unreliable return
+		if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
+			return;
+
+		// Gets the value of the sensor that has been changed
+		switch (event.sensor.getType()) {  
+		case Sensor.TYPE_ACCELEROMETER:
+			gravity = event.values.clone();
+			//test
+			/*testAccelX.setText(Float.toString(gravity[0]));
+			testAccelY.setText(Float.toString(gravity[1]));
+			testAccelZ.setText(Float.toString(gravity[2]));*/
+			break;
+		case Sensor.TYPE_MAGNETIC_FIELD:
+			geomag = event.values.clone();
+			// test
+			/*testGeoX.setText(Float.toString(gravity[0]));
+			testGeoY.setText(Float.toString(gravity[1]));
+			testGeoZ.setText(Float.toString(gravity[2]));*/
+			break;
+		}
+
+		 // If gravity and geomag have values then find rotation matrix
+		if (gravity != null && geomag != null) {
+
+			// checks that the rotation matrix is found
+			boolean success = SensorManager.getRotationMatrix(inR, I, gravity, geomag);
+			if (success) {
+				SensorManager.getOrientation(inR, orientVals);
+				azimuth = Math.toDegrees(orientVals[0]);
+				//pitch = Math.toDegrees(orientVals[1]);
+				//roll = Math.toDegrees(orientVals[2]);
+				
+				// compensate for different screen orientations
+				Display display = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+				int compensation = display.getRotation() * 90;                          
+				azimuth = azimuth+compensation;
+				
+				double myAzimuth = azimuth;
+				setDeviceBearing(myAzimuth);
+				
+		
+
+			}
+		}
+
+	}	
+	//------------------------------------------------------------------------------------------	
+	private void setDeviceBearing(double azimuth) {
+		// normalize azimuth values so they range from 0-360
+		bearing = (float) azimuth;
+		if (!rotateView) {
+			//bearing = 0;
+		} else {
+			bearing = bearing >= 0 ? bearing: bearing + 360;
+			// and round them to a whole number
+			bearing = Math.round(bearing);
+		}
+
+		if(journeyMode == 1) {
+			calculateBearingToTarget();
+			setMyLocationMarker();
+		}
+		
+		rotateMyCamera();
+		
+		// test
+		testAzimuth.setText("Bearing: " + bearing);
+				
+	}
 	
 	
+
 	
 	//------------------------------------------------------------------------------------------
 	@Override
@@ -551,4 +778,7 @@ public class MapActivity extends Activity
 		// TODO Auto-generated method stub
 		super.onRestoreInstanceState(savedInstanceState);
 	}
+
+
+
 }
