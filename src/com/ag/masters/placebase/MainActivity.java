@@ -1,5 +1,7 @@
 package com.ag.masters.placebase;
 
+import com.ag.masters.placebase.model.DBAdapter;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +16,11 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		// set up database on splash screen
+		DBAdapter db = new DBAdapter(this);
+		//db.open();
+		
 		
 		Button startBtn = (Button) findViewById(R.id.startapp_btn);
 		startBtn.setOnClickListener(new OnClickListener() {

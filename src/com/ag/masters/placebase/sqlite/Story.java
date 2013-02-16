@@ -5,25 +5,21 @@ public class Story {
 	double _lat;
 	double _lng;
 	float _bearing;
-
+	int _media;
 	int _hear;
 	int _see;
-	int _taste;
 	int _smell;
+	int _taste;
 	int _touch;
-
-	int _media;
-
-	long _timestamp;
-	String _perspective_uri; // or perhaps the unconverted URI?
-
+	String _timestamp;
+	String _perspective_uri; // or perhaps the URI?
 	int _user;
 
 	// Empty constructor
 	public Story() {
 	}
 	// constructor
-	public Story(int id, double lat, double lng, float bearing, int media, int hear, int see, int taste, int smell, int touch, long timestamp, String perspective_uri, int user) {
+	public Story(int id, double lat, double lng, float bearing, int media, int hear, int see, int taste, int smell, int touch, String timestamp, String perspective_uri, int user) {
 		this._id = id;
 		this._lat = lat;
 		this._lng = lng;
@@ -40,7 +36,7 @@ public class Story {
 	}
 
 	// constructor
-	public Story(double lat, double lng, float bearing, int media, int hear, int see, int taste, int smell, int touch, long timestamp, String perspective_uri, int user) {
+	public Story(double lat, double lng, float bearing, int media, int hear, int see, int taste, int smell, int touch, String timestamp, String perspective_uri, int user) {
 		this._lat = lat;
 		this._lng = lng;
 		this._bearing = bearing;
@@ -152,10 +148,10 @@ public class Story {
 		this._touch = touch;
 	}
 	// timestamp
-	public long getTimestamp() {
+	public String getTimestamp() {
 		return this._timestamp;
 	}
-	public void setTimestamp(long timestamp) {
+	public void setTimestamp(String timestamp) {
 		this._timestamp = timestamp;
 	}
 	// perspective_uri
@@ -172,4 +168,13 @@ public class Story {
 	public void setUser(int user) {
 		this._user = user;
 	}
+	
+	/**
+	 * TODO: AS A PARCELLABLE ITEM
+	 * 
+	 * @see http://techdroid.kbeanie.com/2010/06/parcelable-how-to-do-that-in-android.html
+	 * @see http://shri.blog.kraya.co.uk/2010/04/26/android-parcel-data-to-pass-between-activities-using-parcelable-classes/
+	 *
+	 *
+	 */
 }
