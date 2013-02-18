@@ -10,5 +10,7 @@
     <string name="title_activity_map">Map</string>
     <string name="record">Record</string>
     <string name="saved_spaces">Saved Spaces</string>
-	<string name="user_stories">My Traces</string>
+    <string name="user_stories">My Traces</string>
+    <string name="title_activity_video_player">VideoPlayer</string>
+
 </resources>

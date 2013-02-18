@@ -4,10 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="clip_horizontal"
+    android:visibility="visible"
     tools:context=".MapActivity" >
-    
-    <fragment 
-  		android:id="@+id/map"
+
+    <fragment
+        android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
@@ -17,10 +18,59 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
         android:background="#333333"
         android:orientation="vertical" >
+
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/recordBtnLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_mediabuttonlayout"
+        android:visibility="invisible" >
+
+        <RelativeLayout
+            android:id="@+id/recordBtnLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_horizontal" >
+
+            <ImageButton
+                android:id="@+id/btnVideo"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_video" />
+
+            <ImageButton
+                android:id="@+id/btnAudio"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@id/btnVideo"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_audio" />
+
+            <ImageButton
+                android:id="@+id/btnPhoto"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="50dp"
+                android:layout_toRightOf="@id/btnAudio"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_photo" />
+        </RelativeLayout>
+    </FrameLayout>
 
     <ImageButton
         android:id="@+id/btnShowMyLocation"
@@ -156,7 +206,6 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </LinearLayout>
-
     </RelativeLayout>
 
     <android.support.v7.widget.Space
@@ -167,6 +216,7 @@
         android:layout_alignTop="@+id/bottomBar" />
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -184,7 +234,6 @@
             android:maxHeight="60dp"
             android:maxWidth="60dp"
             android:scaleType="centerInside" />
-
     </LinearLayout>
 
 </RelativeLayout>

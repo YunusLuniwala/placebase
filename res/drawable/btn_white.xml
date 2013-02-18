@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <!-- 
+* Custom Button Background
+* 
+* White 
+* pressed, focused, disabled and default states
+* 
+* @tutorial
+* http://developerlife.com/tutorials/?p=1239
+ -->
+ 
+<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:state_pressed="true"
+        android:drawable="@drawable/btn_record_bg_pressed">
+    </item>
+    <item android:state_focused="true"
+        android:drawable="@drawable/btn_record_bg_pressed">
+    </item>
+    <item android:state_enabled="false"
+        android:drawable="@drawable/btn_record_bg_false">
+    </item>
+    <item 
+        android:drawable="@drawable/btn_record_bg_true">
+    </item>
+</selector>

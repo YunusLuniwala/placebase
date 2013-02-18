@@ -1,12 +1,12 @@
 package com.ag.masters.placebase.sqlite;
 
 public class Story {
-	int _id;
-	double _lat;
-	double _lng;
-	float _bearing;
-	int _media;
-	int _hear;
+	int _id;		
+	double _lat;		// perspective taken
+	double _lng;		// perspective taken
+	float _bearing;		// perspective taken
+	int _media;			// passed in from first Bundle
+	int _hear;			// 
 	int _see;
 	int _smell;
 	int _taste;
