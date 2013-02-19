@@ -5,19 +5,27 @@ public class Story {
 	double _lat;		// perspective taken
 	double _lng;		// perspective taken
 	float _bearing;		// perspective taken
-	int _media;			// passed in from first Bundle
-	int _hear;			// 
-	int _see;
-	int _smell;
-	int _taste;
-	int _touch;
-	String _timestamp;
-	String _perspective_uri; // or perhaps the URI?
-	int _user;
+	int _media;			// first created
+	int _hear;			// sense input
+	int _see;			// sense input
+	int _smell;			// sense input
+	int _taste;			// sense input
+	int _touch;			// sense input
+	String _timestamp;	// perspective taken
+	String _perspective_uri; // or perhaps the URI? perspective taken
+	int _user;			// first created
+	
+	String _markerId;	// created dynamically when markers are added to the map
 
 	// Empty constructor
 	public Story() {
 	}
+	
+	public Story(int user, int media) { // likely how its first created
+		this._user = user;
+		this._media = media;
+	}
+	
 	// constructor
 	public Story(int id, double lat, double lng, float bearing, int media, int hear, int see, int taste, int smell, int touch, String timestamp, String perspective_uri, int user) {
 		this._id = id;
@@ -158,7 +166,7 @@ public class Story {
 	public String getPerspectiveUri() {
 		return this._perspective_uri;
 	}
-	public void getPerspectiveUri(String perspective_uri) {
+	public void setPerspectiveUri(String perspective_uri) {
 		this._perspective_uri = perspective_uri;
 	}
 	//user
@@ -168,7 +176,13 @@ public class Story {
 	public void setUser(int user) {
 		this._user = user;
 	}
-	
+	// marker item
+	public void setMarkerId(String markerId) {
+		this._markerId = markerId;
+	}
+	public String getMarkerId() {
+		return this._markerId;
+	}
 	/**
 	 * TODO: AS A PARCELLABLE ITEM
 	 * 

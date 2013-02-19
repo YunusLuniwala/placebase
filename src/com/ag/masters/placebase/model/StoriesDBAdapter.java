@@ -10,12 +10,17 @@
 
 package com.ag.masters.placebase.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.ag.masters.placebase.sqlite.Story;
 
 public class StoriesDBAdapter {
 
@@ -63,7 +68,6 @@ public class StoriesDBAdapter {
 	 * @param context
 	 * the Context within which to work
 	 */
-	
 	public StoriesDBAdapter(Context context) {
 		this.mContext = context;
 	}
@@ -196,4 +200,78 @@ public class StoriesDBAdapter {
     		args.put(USER, user);
     	return this.mDb.update(DATABASE_TABLE, args, ROW_ID + "=" + rowId, null) > 0;
     }
+    
+    
+    
+    /**
+     * Get all stories in the database 
+     * and store them in a List of Story objects
+     * @return List<Story> 
+     */
+    public List<Story> getAllStories() {
+		List<Story>allStories = new ArrayList<Story>();
+		
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + DATABASE_TABLE;
+		
+		// open the database
+		this.open();
+		Cursor cursor = mDb.rawQuery(selectQuery, null);
+		
+		if(cursor.moveToFirst()) {
+			do {
+				Story story = new Story();
+				story.setId(Integer.parseInt(cursor.getString(0)));
+				story.setLat(cursor.getDouble(1));
+				story.setLng(cursor.getDouble(2));
+				story.setBearing(cursor.getFloat(3));
+				story.setMedia(cursor.getInt(4));
+				story.setHear(cursor.getInt(5));
+				story.setSee(cursor.getInt(6));
+				story.setSmell(cursor.getInt(7));
+				story.setTaste(cursor.getInt(8));
+				story.setTouch(cursor.getInt(9));
+				story.setTimestamp(cursor.getString(10));
+				story.setPerspectiveUri(cursor.getString(11));
+				story.setUser(cursor.getInt(12));
+				
+				// add story to the list
+				allStories.add(story);
+				
+			} while (cursor.moveToNext());
+		}
+		
+		// close db connection
+		cursor.close();
+		this.close();
+		
+		// return story list
+		return allStories;
+	}
+    
+    /**
+     * Get a count of all stories
+     * @return int
+     */
+    public int getStoryCount() {
+    	
+    	// Select All Query
+    	String selectQuery = "SELECT * FROM " + DATABASE_TABLE;
+    			
+    	// open the database
+    	this.open();
+    	Cursor cursor = mDb.rawQuery(selectQuery, null);
+    	
+    	// close db connection
+    	cursor.close();
+    	this.close();
+    	
+    	// return count
+    	return cursor.getCount();
+    }
+
+
+
+
+
 }

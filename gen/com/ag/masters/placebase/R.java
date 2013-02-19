@@ -8,13 +8,8 @@
 package com.ag.masters.placebase;
 
 public final class R {
-    public static final class anim {
-        public static final int slide_down=0x7f040000;
-        public static final int slide_up_from_bottom=0x7f040001;
-        public static final int slide_up_halfway_from_bottom=0x7f040002;
-    }
     public static final class animator {
-        public static final int slide_halfway_up=0x7f050000;
+        public static final int slide_halfway_up=0x7f040000;
     }
     public static final class attr {
         /** 
@@ -338,7 +333,7 @@ containing a value of this type.
     public static final class dimen {
         /**  The default gap between components in a layout. 
          */
-        public static final int default_gap=0x7f070000;
+        public static final int default_gap=0x7f060000;
     }
     public static final class drawable {
         public static final int bg_mediabuttonlayout=0x7f020000;
@@ -376,72 +371,72 @@ containing a value of this type.
         public static final int markerbubble=0x7f020020;
     }
     public static final class id {
-        public static final int TextView01=0x7f06002e;
-        public static final int accelX=0x7f06002b;
-        public static final int accelY=0x7f06002c;
-        public static final int accelZ=0x7f06002d;
-        public static final int alignBounds=0x7f060002;
-        public static final int alignMargins=0x7f060003;
-        public static final int bgimage_launcher=0x7f060016;
-        public static final int bottom=0x7f060005;
-        public static final int bottomBar=0x7f06001a;
-        public static final int btnAudio=0x7f06001d;
-        public static final int btnPhoto=0x7f06001e;
-        public static final int btnRecordMain=0x7f060034;
-        public static final int btnShowMyLocation=0x7f06001f;
-        public static final int btnVideo=0x7f06001c;
-        public static final int center=0x7f06000c;
-        public static final int center_horizontal=0x7f06000a;
-        public static final int center_vertical=0x7f060008;
-        public static final int clip_horizontal=0x7f06000f;
-        public static final int clip_vertical=0x7f06000e;
-        public static final int cont_senses=0x7f060039;
-        public static final int end=0x7f060011;
-        public static final int fill=0x7f06000d;
-        public static final int fill_horizontal=0x7f06000b;
-        public static final int fill_vertical=0x7f060009;
-        public static final int geoX=0x7f06002f;
-        public static final int geoY=0x7f060030;
-        public static final int geoZ=0x7f060031;
-        public static final int horizontal=0x7f060000;
-        public static final int ic_perspective=0x7f060035;
-        public static final int ic_sense_hear=0x7f06003a;
-        public static final int ic_sense_see=0x7f06003b;
-        public static final int ic_sense_smell=0x7f06003c;
-        public static final int ic_sense_taste=0x7f06003d;
-        public static final int ic_sense_touch=0x7f06003e;
-        public static final int imageView1=0x7f060036;
-        public static final int left=0x7f060006;
-        public static final int linearLayout1=0x7f060033;
-        public static final int map=0x7f060019;
-        public static final int menu_settings=0x7f06003f;
-        public static final int none=0x7f060012;
-        public static final int normal=0x7f060013;
-        public static final int recordBtnLayout=0x7f06001b;
-        public static final int right=0x7f060007;
-        public static final int satellite=0x7f060014;
-        public static final int saved_spaces=0x7f060040;
-        public static final int space1=0x7f060032;
-        public static final int start=0x7f060010;
-        public static final int startapp_btn=0x7f060018;
-        public static final int tagline=0x7f060017;
-        public static final int terrain=0x7f060015;
-        public static final int testAzimuth=0x7f060022;
-        public static final int testDelete=0x7f060020;
-        public static final int testJourneyMode=0x7f060027;
-        public static final int testMyLocation=0x7f060021;
-        public static final int testPitch=0x7f060028;
-        public static final int testRoll=0x7f060029;
-        public static final int testTargetBearing=0x7f060023;
-        public static final int testTargetDistance=0x7f060024;
-        public static final int testTargetLat=0x7f060025;
-        public static final int testTargetLng=0x7f060026;
-        public static final int textView1=0x7f06002a;
-        public static final int title=0x7f060037;
-        public static final int title2=0x7f060038;
-        public static final int top=0x7f060004;
-        public static final int user_places=0x7f060041;
-        public static final int vertical=0x7f060001;
+        public static final int TextView01=0x7f05002e;
+        public static final int accelX=0x7f05002b;
+        public static final int accelY=0x7f05002c;
+        public static final int accelZ=0x7f05002d;
+        public static final int alignBounds=0x7f050002;
+        public static final int alignMargins=0x7f050003;
+        public static final int bgimage_launcher=0x7f050016;
+        public static final int bottom=0x7f050005;
+        public static final int bottomBar=0x7f05001a;
+        public static final int btnAudio=0x7f05001d;
+        public static final int btnPhoto=0x7f05001e;
+        public static final int btnRecordMain=0x7f050034;
+        public static final int btnShowMyLocation=0x7f05001f;
+        public static final int btnVideo=0x7f05001c;
+        public static final int center=0x7f05000c;
+        public static final int center_horizontal=0x7f05000a;
+        public static final int center_vertical=0x7f050008;
+        public static final int clip_horizontal=0x7f05000f;
+        public static final int clip_vertical=0x7f05000e;
+        public static final int cont_senses=0x7f050039;
+        public static final int end=0x7f050011;
+        public static final int fill=0x7f05000d;
+        public static final int fill_horizontal=0x7f05000b;
+        public static final int fill_vertical=0x7f050009;
+        public static final int geoX=0x7f05002f;
+        public static final int geoY=0x7f050030;
+        public static final int geoZ=0x7f050031;
+        public static final int horizontal=0x7f050000;
+        public static final int ic_perspective=0x7f050035;
+        public static final int ic_sense_hear=0x7f05003a;
+        public static final int ic_sense_see=0x7f05003b;
+        public static final int ic_sense_smell=0x7f05003c;
+        public static final int ic_sense_taste=0x7f05003d;
+        public static final int ic_sense_touch=0x7f05003e;
+        public static final int imageView1=0x7f050036;
+        public static final int left=0x7f050006;
+        public static final int linearLayout1=0x7f050033;
+        public static final int map=0x7f050019;
+        public static final int menu_settings=0x7f05003f;
+        public static final int none=0x7f050012;
+        public static final int normal=0x7f050013;
+        public static final int recordBtnLayout=0x7f05001b;
+        public static final int right=0x7f050007;
+        public static final int satellite=0x7f050014;
+        public static final int saved_spaces=0x7f050040;
+        public static final int space1=0x7f050032;
+        public static final int start=0x7f050010;
+        public static final int startapp_btn=0x7f050018;
+        public static final int tagline=0x7f050017;
+        public static final int terrain=0x7f050015;
+        public static final int testAzimuth=0x7f050022;
+        public static final int testDelete=0x7f050020;
+        public static final int testJourneyMode=0x7f050027;
+        public static final int testMyLocation=0x7f050021;
+        public static final int testPitch=0x7f050028;
+        public static final int testRoll=0x7f050029;
+        public static final int testTargetBearing=0x7f050023;
+        public static final int testTargetDistance=0x7f050024;
+        public static final int testTargetLat=0x7f050025;
+        public static final int testTargetLng=0x7f050026;
+        public static final int textView1=0x7f05002a;
+        public static final int title=0x7f050037;
+        public static final int title2=0x7f050038;
+        public static final int top=0x7f050004;
+        public static final int user_places=0x7f050041;
+        public static final int vertical=0x7f050001;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -450,66 +445,66 @@ containing a value of this type.
         public static final int custom_info_window=0x7f030003;
     }
     public static final class menu {
-        public static final int activity_main=0x7f0a0000;
-        public static final int activity_map=0x7f0a0001;
-        public static final int activity_video_player=0x7f0a0002;
-        public static final int main_menu=0x7f0a0003;
+        public static final int activity_main=0x7f090000;
+        public static final int activity_map=0x7f090001;
+        public static final int activity_video_player=0x7f090002;
+        public static final int main_menu=0x7f090003;
     }
     public static final class string {
-        public static final int app_name=0x7f08000b;
-        public static final int begin_app=0x7f080010;
-        public static final int begin_journey=0x7f08000f;
+        public static final int app_name=0x7f07000b;
+        public static final int begin_app=0x7f070010;
+        public static final int begin_journey=0x7f07000f;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=30] 
          */
-        public static final int common_google_play_services_enable_button=0x7f080006;
+        public static final int common_google_play_services_enable_button=0x7f070006;
         /**  Message in confirmation dialog informing user they need to enable
         Google Play services in application settings [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_enable_text=0x7f080005;
+        public static final int common_google_play_services_enable_text=0x7f070005;
         /**  Title of confirmation dialog informing user they need to enable
         Google Play services in application settings [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_enable_title=0x7f080004;
+        public static final int common_google_play_services_enable_title=0x7f070004;
         /**  Button in confirmation dialog for installing Google Play services [CHAR LIMIT=30] 
          */
-        public static final int common_google_play_services_install_button=0x7f080003;
+        public static final int common_google_play_services_install_button=0x7f070003;
         /**  (For phones) Message in confirmation dialog informing user that
         they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_install_text_phone=0x7f080001;
+        public static final int common_google_play_services_install_text_phone=0x7f070001;
         /**  (For tablets) Message in confirmation dialog informing user that
         they need to install Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_install_text_tablet=0x7f080002;
+        public static final int common_google_play_services_install_text_tablet=0x7f070002;
         /**  Title of confirmation dialog informing user that they need to install
         Google Play services (from Play Store) [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_install_title=0x7f080000;
+        public static final int common_google_play_services_install_title=0x7f070000;
         /**  Message in confirmation dialog informing user there is an unknow issue in Google Player
         services [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_unknown_issue=0x7f080009;
+        public static final int common_google_play_services_unknown_issue=0x7f070009;
         /**  Button in confirmation dialog for updating Google Play services [CHAR LIMIT=20] 
          */
-        public static final int common_google_play_services_update_button=0x7f08000a;
+        public static final int common_google_play_services_update_button=0x7f07000a;
         /**  Message in confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=NONE] 
          */
-        public static final int common_google_play_services_update_text=0x7f080008;
+        public static final int common_google_play_services_update_text=0x7f070008;
         /**  Title of confirmation dialog informing user that they need to update
         Google Play services (from Play Store) [CHAR LIMIT=40] 
          */
-        public static final int common_google_play_services_update_title=0x7f080007;
-        public static final int hello_world=0x7f08000d;
-        public static final int menu_settings=0x7f08000c;
-        public static final int record=0x7f080012;
-        public static final int saved_spaces=0x7f080013;
-        public static final int tagline=0x7f08000e;
-        public static final int title_activity_map=0x7f080011;
-        public static final int title_activity_video_player=0x7f080015;
-        public static final int user_stories=0x7f080014;
+        public static final int common_google_play_services_update_title=0x7f070007;
+        public static final int hello_world=0x7f07000d;
+        public static final int menu_settings=0x7f07000c;
+        public static final int record=0x7f070012;
+        public static final int saved_spaces=0x7f070013;
+        public static final int tagline=0x7f07000e;
+        public static final int title_activity_map=0x7f070011;
+        public static final int title_activity_video_player=0x7f070015;
+        public static final int user_stories=0x7f070014;
     }
     public static final class style {
         /** 
@@ -533,11 +528,11 @@ containing a value of this type.
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f090000;
+        public static final int AppBaseTheme=0x7f080000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f090001;
+        public static final int AppTheme=0x7f080001;
     }
     public static final class styleable {
         /** Attributes that can be used with a GridLayout.

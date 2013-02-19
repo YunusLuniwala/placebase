@@ -1,5 +1,8 @@
 package com.ag.masters.placebase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
@@ -34,6 +37,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ag.masters.placebase.model.StoriesDBAdapter;
+import com.ag.masters.placebase.sqlite.Story;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
@@ -102,10 +107,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				titleUi.setText("");
 			}
 
-
-
-
-			if(marker.getId().equals("m1")) { // TODO: change to the .hear property of the row. if it equals TRUE..
+			// TODO: iterate through each property of the row. if it equals TRUE
+			if(marker.getId().equals("m1")) { 
 				hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
 			} else {
 				hear.setBackgroundResource(R.drawable.btn_sense_bg_false);
@@ -193,7 +196,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	// Animation
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
-	
+
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -207,7 +210,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		addCustomMyLocationButton();
 
 		calculateScreenDimensions();
-		
+
 		// testPrintouts. Delete when done
 		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
 		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
@@ -245,7 +248,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// define media buttons and layouts as globals to apply behaviors
 		layoutRecordMedia = (FrameLayout) findViewById(R.id.recordBtnLayout);
 		btnRecordMedia = (ImageButton) findViewById(R.id.btnRecordMain);
-		
+
 		// http://stackoverflow.com/questions/4969689/android-animation-xml-issues
 		btnRecordMedia.setOnClickListener(new OnClickListener() {
 			@Override
@@ -260,54 +263,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 
 		});
+		
+		ImageButton btnVideo = findViewById(R.id.btnVideo); 
 
 		// test
 		updateTestValues();
 	}
 
-	//------------------------------------------------------------------------------------------
-	@SuppressLint("NewApi")
-	private void calculateScreenDimensions() {
-		// find the width and height of the screen
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		try {
-			display.getSize(size);
-			screenHeight = size.y;
-			screenWidth = size.x;
-		} catch (NoSuchMethodError e) {
-			screenHeight = display.getHeight();
-			screenWidth = display.getWidth();
-		}
-	}
-	//------------------------------------------------------------------------------------------
-	public void showMediaButtons() {
-		layoutRecordMedia.setVisibility(View.VISIBLE);
-		PropertyValuesHolder makeVisible = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
-		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (screenHeight-500));
-		
-		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia, makeVisible, slideUpHalfway)
-		.setDuration(200)
-		.start();
-		
-		isRecordOptionsShowing = true;
-	}
-	//------------------------------------------------------------------------------------------
-	public void hideMediaButtons() {
-		
-		PropertyValuesHolder makeInvisible = PropertyValuesHolder.ofFloat("alpha", 1f,0f);
-		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", (screenHeight-500), screenHeight);
-		
-		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia, makeInvisible, slideDown)
-		.setDuration(200)
-		.start();
-		
-		isRecordOptionsShowing = false;
-	}
-	//------------------------------------------------------------------------------------------
-	
 	//------------------------------------------------------------------------------------------	
 	@Override
 	protected void onResume() {
@@ -390,45 +352,61 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 
 
+	//------------------------------------------------------------------------------------------
+	public List<Story> getallStories() {
+
+		// create a new instance of the database adapter
+		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
+
+		// Generate List from all stories in the database;
+		List<Story> allStories = myStoriesDBAdapter.getAllStories();
+
+		return allStories;
+	}
 
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
-		// get rows from database
-		// dummy LatLngs - should be in database
-		final LatLng MELBOURNE = new LatLng(-37.81319, 144.96298);
-
-		// for each row in database
-		// float bearing = BEARING;
-		// float lat = LAT;
-		// float lng = LNG;
-		// int numEncounters = ENCOUNTERS;
-
-		// Bitmap icon = createIcon(bearing);
+		
+		// store all stories as objects from database
+		List<Story> stories = getallStories();
+		if(stories != null) {
+			for (int i=0; i<stories.size(); i++) {
+				Story s = stories.get(i);
+				
+				LatLng ll = new LatLng(s.getLat(), s.getLng());
+				String t = "" + "days old"; // TODO: calculate days old
+				Bitmap ic = createIcon(s.getMedia());
+				
+				// now, create a marker
+				mMap.addMarker(new MarkerOptions()
+				.position(ll)
+				.icon(BitmapDescriptorFactory.fromBitmap(ic))
+				.title(t));
+				// and store that marker's ID into the story object from which it came
+				// this will link the story in the db to the marker on the map
+			}
+		}
+		
 		// *** another function ***String calculateAge(TIMESTAMP) --> days since message was left from timestamp.....?
-
+		
+		// dummy LatLngs - should be in database
 		Marker melbourne = mMap.addMarker(new MarkerOptions()
-		//.position(new LatLng(lat, lng))  
 		.position(new LatLng(33.784, -84.343636))
-		//.icon(BitmapDescriptorFactory.fromBitmap(createIcon(bearing)))
-		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(300f)))
-		//.title(numEncounters.toString() + "encounters")
+		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(2)))
 		.title("345 days old"));
 
 		Marker newMelbourne = mMap.addMarker(new MarkerOptions()
-		//.position(new LatLng(lat, lng))  
 		.position(new LatLng(33.7557, -84.32952))
-		//.icon(BitmapDescriptorFactory.fromBitmap(createIcon(bearing)))
-		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(40.5f)))
-		//.title(numEncounters.toString() + "encounters")
+		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(0)))
 		.title("6 days old"));
 
 	}
 
 	//------------------------------------------------------------------------------------------
-	// create an marker icon at runtime to show location and orientation of the story
+	// create an marker icon at runtime to show location and type of the story
 	// http://stackoverflow.com/questions/11740362/merge-two-bitmaps-in-android?rq=1
 	// http://stackoverflow.com/questions/14811579/android-map-api-v2-custom-marker-with-imageview
-	private Bitmap createIcon(float bearing) {
+	private Bitmap createIcon(int mediaType) {
 
 		Bitmap bitmap = null;
 		try {
@@ -438,12 +416,26 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 			Bitmap mIcon = BitmapFactory.decodeResource(res, R.drawable.ic_map_marker);
 			//Bitmap mCompass = BitmapFactory.decodeResource(res, R.drawable.ic_compass);
-			Bitmap mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_audio);
+			Bitmap mMedia;
+			switch(mediaType) {
+			case 0:// image
+				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_photo);
+				break;
+			case 1: // video
+				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_video);
+				break;
+			case 2: // audio
+				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_audio);
+				break;
+			default:
+				mMedia = null;
+				break;
+			}
+			 
 
 			Drawable mIconDrawable = new BitmapDrawable(res, mIcon);
 			//Drawable mCompassDrawable = new BitmapDrawable(res, mCompass);
 			Drawable mMediaDrawable = new BitmapDrawable(res, mMedia);
-
 
 
 			mIconDrawable.setBounds(0,0,100,100);
@@ -501,6 +493,48 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		mMap.setOnInfoWindowClickListener(this);
 		mMap.setOnMapClickListener(this);
 
+	}
+
+	//------------------------------------------------------------------------------------------
+	@SuppressLint("NewApi")
+	private void calculateScreenDimensions() {
+		// find the width and height of the screen
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		try {
+			display.getSize(size);
+			screenHeight = size.y;
+			screenWidth = size.x;
+		} catch (NoSuchMethodError e) {
+			screenHeight = display.getHeight();
+			screenWidth = display.getWidth();
+		}
+	}
+	//------------------------------------------------------------------------------------------
+	public void showMediaButtons() {
+		layoutRecordMedia.setVisibility(View.VISIBLE);
+		PropertyValuesHolder makeVisible = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
+		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (screenHeight-500));
+
+		ObjectAnimator
+		.ofPropertyValuesHolder(layoutRecordMedia, makeVisible, slideUpHalfway)
+		.setDuration(200)
+		.start();
+
+		isRecordOptionsShowing = true;
+	}
+	//------------------------------------------------------------------------------------------
+	public void hideMediaButtons() {
+
+		PropertyValuesHolder makeInvisible = PropertyValuesHolder.ofFloat("alpha", 1f,0f);
+		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", (screenHeight-500), screenHeight);
+
+		ObjectAnimator
+		.ofPropertyValuesHolder(layoutRecordMedia, makeInvisible, slideDown)
+		.setDuration(200)
+		.start();
+
+		isRecordOptionsShowing = false;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -577,9 +611,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			//Toast.makeText(getApplicationContext(), "map was clicked", Toast.LENGTH_LONG).show();
 			hideMediaButtons();
 		}
-		
 	}
-
 
 	//------------------------------------------------------------------------------------------
 	// LOCATION LISTENER
