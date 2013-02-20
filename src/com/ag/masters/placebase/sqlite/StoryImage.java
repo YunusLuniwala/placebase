@@ -1,28 +1,28 @@
 package com.ag.masters.placebase.sqlite;
 
-public class Audio {
+public class StoryImage {
 	int _id;
 	int _story;
 	String _uri;
-	
+	String _caption;
 	
 	// empty Constructor
-	public Audio() {
+	public StoryImage() {
 		
 	}
 	// Constructors
-	public Audio(int id, int story, String uri) {
+	public StoryImage(int id, int story, String uri, String caption) {
 		this._id = id;
 		this._story = story;
 		this._uri = uri;
 	}
 	
-	public Audio(int story, String uri) {
+	public StoryImage(int story, String uri, String caption) {
 		this._story = story;
 		this._uri = uri;
 	}
 	
-	public Audio(String uri) {
+	public StoryImage(String uri, String caption) {
 		this._uri = uri;
 	}
 	
@@ -47,4 +47,11 @@ public class Audio {
 	public void setUri(String uri) {
 		this._uri = uri;
 	}
-}	
+	//caption
+	public String getCaption() {
+		return this._caption;
+	}
+	public void setCaption(String caption) {
+		this._caption = caption;
+	}
+}

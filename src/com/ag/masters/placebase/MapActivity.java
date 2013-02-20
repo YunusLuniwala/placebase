@@ -1,13 +1,17 @@
 package com.ag.masters.placebase;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -24,21 +28,30 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.Display;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ag.masters.placebase.model.StoriesDBAdapter;
 import com.ag.masters.placebase.sqlite.Story;
+import com.ag.masters.placebase.sqlite.StoryAudio;
+import com.ag.masters.placebase.sqlite.StoryImage;
+import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
@@ -196,6 +209,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	// Animation
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
+	
+	// intent request codes
+	private static final int IMAGE_CAPTURE = 0;
+	private static final int VIDEO_CAPTURE = 1;
+	private static final int AUDIO_CAPTURE = 2;
 
 	//------------------------------------------------------------------------------------------
 	@Override
@@ -244,11 +262,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
 		isRecordOptionsShowing = false; // initialize the state of media recording
-
-		// define media buttons and layouts as globals to apply behaviors
+		
+		
+		
+		
+		
+		// define journey block and layout
+		RelativeLayout journeyBlock = (RelativeLayout) findViewById(R.id.journeyblock);
+		
+		
+		
+		// define media buttons and layouts as globals
 		layoutRecordMedia = (FrameLayout) findViewById(R.id.recordBtnLayout);
 		btnRecordMedia = (ImageButton) findViewById(R.id.btnRecordMain);
-
 		// http://stackoverflow.com/questions/4969689/android-animation-xml-issues
 		btnRecordMedia.setOnClickListener(new OnClickListener() {
 			@Override
@@ -264,11 +290,139 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		});
 		
-		ImageButton btnVideo = findViewById(R.id.btnVideo); 
+		// set onClickListener for Record buttons
+		ImageButton btnVideo = (ImageButton) findViewById(R.id.btnVideo);
+		ImageButton btnAudio = (ImageButton) findViewById(R.id.btnAudio);
+		ImageButton btnPhoto = (ImageButton) findViewById(R.id.btnPhoto);
+		btnVideo.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startCaptureVideo();
+			}
+		});
+		
+		btnAudio.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startCaptureAudio();
+			}
+		});
+		
+		btnPhoto.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startCaptureImage();
+			}
+		});
+		
+		
 
 		// test
 		updateTestValues();
 	}
+	
+	//------------------------------------------------------------------------------------------
+
+	
+	
+	//------------------------------------------------------------------------------------------
+	private void startCaptureImage() {
+		// TODO: check that there is a camera
+		Intent startCameraActivity = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		
+		// all junk.
+		// look more at this...
+		///http://stackoverflow.com/questions/10042695/how-to-get-camera-result-as-a-uri-in-data-folder/10229228#10229228
+		String filename = "temp.jpg";
+		
+		File out = Environment.getExternalStorageDirectory();
+		out = new File(out, filename);
+		startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(out));
+		
+		ContentValues values = new ContentValues();
+		values.put(MediaStore.Images.Media.TITLE, filename);
+		Uri mCapturedImageURI = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+		
+		//StoryFileHandler myStoryFileHandler = new StoryFileHandler();
+		//String filename = myStoryFileHandler.createFilename(IMAGE_CAPTURE);
+		
+		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
+		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(filename)));
+		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(new File(filename).toString()));
+		
+		startCameraActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+		startActivityForResult(startCameraActivity, IMAGE_CAPTURE); // can add options as a bundle
+
+	}
+
+	private void startCaptureVideo() {
+		// TODO: 
+	}
+
+	private void startCaptureAudio() {
+		// TODO:
+	}
+
+	// handle results from Recording activity
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		Bundle extras = data.getExtras();
+
+		// create the handler object to write files to SD card
+		//StoryFileHandler myStoryFileHandler = new StoryFileHandler();
+		// create a filename for returned object
+		//String filename = myStoryFileHandler.createFilename(requestCode);
+
+		// create new story object
+		Story story = new Story();
+
+		// also check to see that the request code is OK
+		switch(requestCode) {
+		case IMAGE_CAPTURE:
+			if (resultCode == RESULT_OK) {
+				// create a new Image object
+				StoryImage image = new StoryImage();
+				// turn URI into string and store in Image object TODO: figure out this URI key
+				Uri imageUri = data.getData();
+				
+				Bitmap bitmap = null;
+				try {
+					bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+//				// image.setUri(extras.getString("URI"));
+//				myStoryFileHandler.saveStoryImageToFile(filename, bitmap);
+				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setMedia(IMAGE_CAPTURE);
+				break;
+			}
+		case VIDEO_CAPTURE:
+			// create a new Video object
+			StoryVideo video = new StoryVideo();
+			// video.setUri(extras.getString("URI"));
+			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+			story.setMedia(VIDEO_CAPTURE);
+			break;
+		case AUDIO_CAPTURE:
+			StoryAudio audio = new StoryAudio();
+			// String uri = extras.getString("URI"); // WHAT IS THE KEY???
+			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+			story.setMedia(AUDIO_CAPTURE);
+			break;
+		}
+
+		// start SensesActivity,
+		// pass parcellable Story
+		// pass parcellable StoryAudio, StoryVideo, or StoryImage too.
+	}
+
 
 	//------------------------------------------------------------------------------------------	
 	@Override
@@ -372,11 +526,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if(stories != null) {
 			for (int i=0; i<stories.size(); i++) {
 				Story s = stories.get(i);
-				
+
 				LatLng ll = new LatLng(s.getLat(), s.getLng());
 				String t = "" + "days old"; // TODO: calculate days old
 				Bitmap ic = createIcon(s.getMedia());
-				
+
 				// now, create a marker
 				mMap.addMarker(new MarkerOptions()
 				.position(ll)
@@ -418,13 +572,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			//Bitmap mCompass = BitmapFactory.decodeResource(res, R.drawable.ic_compass);
 			Bitmap mMedia;
 			switch(mediaType) {
-			case 0:// image
+			case IMAGE_CAPTURE:// image
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_photo);
 				break;
-			case 1: // video
+			case VIDEO_CAPTURE: // video
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_video);
 				break;
-			case 2: // audio
+			case AUDIO_CAPTURE: // audio
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_audio);
 				break;
 			default:

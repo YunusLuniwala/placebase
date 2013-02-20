@@ -12,5 +12,16 @@
     <string name="saved_spaces">Saved Spaces</string>
     <string name="user_stories">My Traces</string>
     <string name="title_activity_video_player">VideoPlayer</string>
+    <string name="get_message">Get Message</string>
+    <string name="title_activity_sense">SenseActivity</string>
+    <string name="recordsense_title">Sensible Stories</string>
+    <string name="recordsense_instructions">Sensible Stories</string>
+    <string name="perspective_title">Your Perspective</string>
+    <string name="perspective_instructions">Your Perspective</string>
+    <string name="perspective_get_psyched">Get Ready</string>
+    <string name="perspective_record_cta">Record Perspective</string>
+    <string name="story_confirm">Success!</string>
+    <string name="story_confirm_addl">You left a trace.</string>
+    <string name="jouney_distance">METERS AWAY</string>
 
 </resources>

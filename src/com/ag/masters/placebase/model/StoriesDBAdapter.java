@@ -138,7 +138,7 @@ public class StoriesDBAdapter {
     }
     
     /**
-     * Delete record
+     * Delete single story
      * 
      * @param rowId
      * @return true if deleted, false otherwise
@@ -164,7 +164,7 @@ public class StoriesDBAdapter {
     }
     
     /**
-     * Update record
+     * Update a single story with all parameters
      * 
      * @param rowId
      * @param lat

@@ -1,6 +1,6 @@
 package com.ag.masters.placebase.sqlite;
 
-public class Video {
+public class StoryVideo {
 
 	int _id;
 	int _story;
@@ -8,22 +8,22 @@ public class Video {
 	
 	
 	// empty Constructor
-	public Video() {
+	public StoryVideo() {
 		
 	}
 	// Constructors
-	public Video(int id, int story, String uri) {
+	public StoryVideo(int id, int story, String uri) {
 		this._id = id;
 		this._story = story;
 		this._uri = uri;
 	}
 	
-	public Video(int story, String uri) {
+	public StoryVideo(int story, String uri) {
 		this._story = story;
 		this._uri = uri;
 	}
 	
-	public Video(String uri) {
+	public StoryVideo(String uri) {
 		this._uri = uri;
 	}
 	

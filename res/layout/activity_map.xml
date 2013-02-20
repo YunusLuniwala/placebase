@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:gravity="clip_horizontal"
     android:visibility="visible"
@@ -13,6 +13,117 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
 
+    <RelativeLayout
+        android:id="@+id/journeyblock"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="48dp"
+        android:background="@android:color/black" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/btn_hidejourneyblock"
+                style="@android:color/black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:longClickable="true"
+                android:minHeight="18dip" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".4" >
+
+                    <ImageView
+                        android:id="@+id/journey_perspective"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/bgimage_launcher" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".6"
+                    android:background="@android:color/white"
+                    android:orientation="vertical" >
+
+                    <ImageButton
+                        android:id="@+id/journey_mute"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:background="@android:color/transparent"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_mute"
+                        android:layout_weight=".15" />
+
+                    <RelativeLayout
+                        android:id="@+id/block_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:background="@drawable/bg_journey_border"
+                        android:layout_weight=".35" >
+
+                        <TextView
+                            android:id="@+id/txt_metersaway"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:paddingTop="15dp"
+                            android:text="@string/jouney_distance"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:id="@+id/journey_distance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/txt_metersaway"
+                            android:layout_centerHorizontal="true"
+                            android:text="45600"
+                            android:textSize="30sp" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/block_direction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_gravity="center"
+                        android:layout_weight=".35"
+                        android:background="@drawable/ic_align_false" >
+
+                    </RelativeLayout>
+
+                    <Button
+                        android:id="@+id/journey_claim"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight=".15"
+                        android:text="@string/get_message"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
@@ -22,55 +133,6 @@
         android:orientation="vertical" >
 
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/recordBtnLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/bg_mediabuttonlayout"
-        android:visibility="invisible" >
-
-        <RelativeLayout
-            android:id="@+id/recordBtnLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|center_horizontal" >
-
-            <ImageButton
-                android:id="@+id/btnVideo"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="50dp"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_video" />
-
-            <ImageButton
-                android:id="@+id/btnAudio"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_margin="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_toRightOf="@id/btnVideo"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_audio" />
-
-            <ImageButton
-                android:id="@+id/btnPhoto"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="50dp"
-                android:layout_toRightOf="@id/btnAudio"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_photo" />
-        </RelativeLayout>
-    </FrameLayout>
 
     <ImageButton
         android:id="@+id/btnShowMyLocation"
@@ -91,7 +153,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/bottomBar"
         android:layout_alignParentRight="true"
-        android:background="@android:color/darker_gray" >
+        android:background="@android:color/darker_gray"
+        android:visibility="gone" >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -208,12 +271,7 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <android.support.v7.widget.Space
-        android:id="@+id/space1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/bottomBar" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout1"
