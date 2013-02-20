@@ -13,6 +13,55 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.MapFragment" />
 
+    <FrameLayout
+        android:id="@+id/recordBtnLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_mediabuttonlayout"
+        android:visibility="invisible" >
+
+        <RelativeLayout
+            android:id="@+id/recordBtnLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|center_horizontal" >
+
+            <ImageButton
+                android:id="@+id/btnVideo"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_video" />
+
+            <ImageButton
+                android:id="@+id/btnAudio"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_margin="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_toRightOf="@id/btnVideo"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_audio" />
+
+            <ImageButton
+                android:id="@+id/btnPhoto"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="50dp"
+                android:layout_toRightOf="@id/btnAudio"
+                android:background="@drawable/btn_white"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_record_photo" />
+        </RelativeLayout>
+    </FrameLayout>
+
     <RelativeLayout
         android:id="@+id/journeyblock"
         android:layout_width="match_parent"
@@ -65,19 +114,19 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center"
+                        android:layout_weight=".15"
                         android:adjustViewBounds="true"
                         android:background="@android:color/transparent"
                         android:cropToPadding="false"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_mute"
-                        android:layout_weight=".15" />
+                        android:src="@drawable/ic_mute" />
 
                     <RelativeLayout
                         android:id="@+id/block_distance"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:background="@drawable/bg_journey_border"
-                        android:layout_weight=".35" >
+                        android:layout_weight=".35"
+                        android:background="@drawable/bg_journey_border" >
 
                         <TextView
                             android:id="@+id/txt_metersaway"
@@ -96,7 +145,6 @@
                             android:layout_centerHorizontal="true"
                             android:text="45600"
                             android:textSize="30sp" />
-
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -106,7 +154,6 @@
                         android:layout_gravity="center"
                         android:layout_weight=".35"
                         android:background="@drawable/ic_align_false" >
-
                     </RelativeLayout>
 
                     <Button
@@ -116,12 +163,9 @@
                         android:layout_weight=".15"
                         android:text="@string/get_message"
                         android:textSize="14sp" />
-
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
-
     </RelativeLayout>
 
     <LinearLayout
@@ -131,7 +175,6 @@
         android:layout_alignParentBottom="true"
         android:background="#333333"
         android:orientation="vertical" >
-
     </LinearLayout>
 
     <ImageButton
@@ -270,8 +313,6 @@
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
-
-
 
     <LinearLayout
         android:id="@+id/linearLayout1"
