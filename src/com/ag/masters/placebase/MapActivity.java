@@ -72,15 +72,15 @@ import com.google.android.gms.maps.model.VisibleRegion;
 public class MapActivity extends Activity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
-	public static final int ZOOM_LEVEL = 16;
+	public static final int ZOOM_LEVEL = 13;
 
 	private GoogleMap mMap;	
 
 	// journey mode 
 	private static int journeyMode = -1;
-	private Canvas myMarkerCanvas;
 	private Location myCurrentLocation = null;	
 	private Marker myMarker = null; 			// device marker
+	private Canvas myMarkerCanvas;
 	// target information
 	private Marker targetMarker = null;			// story marker
 	private static Location targetLocation;
@@ -571,6 +571,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// breaks everything
 		// store all stories as objects from database
 		
+		/*
 		List<Story> stories = getallStories();
 		
 		if(stories != null) {
@@ -590,7 +591,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// this will link the story in the db to the marker on the map
 			}
 		}
-		
+		*/
 		
 		
 		
@@ -671,7 +672,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		
+
 		setMyLocationMarker();
 		
 		// store marker as global
@@ -861,7 +862,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		if(mMap.isMyLocationEnabled() && mMap.getMyLocation() != null) {
 			if(rotateView && !firstFix) {
-		
 
 			CameraPosition cameraPosition = new CameraPosition.Builder()
 			.target(mMap.getCameraPosition().target)      
@@ -918,8 +918,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
 
 		// Generate List from all stories in the database;
-		//List<Story> allStories = myStoriesDBAdapter.getAllStories();
-
+		List<Story> allStories = myStoriesDBAdapter.getAllStories();
+		
 		return allStories;
 	}
 
