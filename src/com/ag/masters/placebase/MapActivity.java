@@ -33,13 +33,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.Display;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -65,96 +64,25 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.VisibleRegion;
 
 public class MapActivity extends Activity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
-	//------------------------------------------------------------------------------------------
-	// InfoWindowAdapter
-	// customizes the look of the marker's info window
-	//------------------------------------------------------------------------------------------
-
-	class CustomInfoWindowAdapter implements InfoWindowAdapter {
-		// The viewgroup contains an ImageView with id "badge" // TODO: change it.
-		// and two TextViews with id "title" and "snippet".
-		private final View mWindow;
-
-		//------------------------------------------------------------------------------------------
-		CustomInfoWindowAdapter() {
-			// the xml layout file for the window bubble // TODO: change this.
-			mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
-		}
-
-		//------------------------------------------------------------------------------------------
-		@Override
-		public View getInfoWindow(Marker marker) { // called for every Marker
-			// Use the equals() method on a Marker to check for equals.  Do not use ==.
-
-			ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);	// perspective image
-			TextView titleUi = (TextView) mWindow.findViewById(R.id.title); 				// days ago
-
-			// background in view set to: R.drawable.btn_sense_bg_false						// sense icons 
-			ImageView hear = (ImageView) mWindow.findViewById(R.id.ic_sense_hear);
-			ImageView see = (ImageView) mWindow.findViewById(R.id.ic_sense_see);
-			ImageView smell = (ImageView) mWindow.findViewById(R.id.ic_sense_smell);
-			ImageView taste = (ImageView) mWindow.findViewById(R.id.ic_sense_taste);
-			ImageView touch = (ImageView) mWindow.findViewById(R.id.ic_sense_touch);
-
-
-			int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
-			/*if(the row has a URI to a perspective image)  {
-        	 	//perspectiveUri = thatresourceURI;
-        	 	make an image resource from that URI
-             } else {
-                 // Passing 0 to setImageResource will clear the image view.
-                 perspectiveUri = 0;
-             }*/
-			perspective.setImageResource(perspectiveUri);
-
-			String title = marker.getTitle(); // this you will get from the extended marker object, or a call to the databse...
-			if (title != null) {
-				titleUi.setText(title);
-			} else {
-				titleUi.setText("");
-			}
-
-			// TODO: iterate through each property of the row. if it equals TRUE
-			if(marker.getId().equals("m1")) { 
-				hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
-			} else {
-				hear.setBackgroundResource(R.drawable.btn_sense_bg_false);
-			}
-
-			/* if(marker.getSenseSee().equals(true)) {
-            	 see.setBackgroundResource(R.drawable.btn_sense_bg_true);
-             } else {
-            	 see.setBackgroundResource(R.drawable.btn_sense_bg_false);
-             } */
-
-			return mWindow;
-		}
-
-		@Override
-		public View getInfoContents(Marker marker) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	} 
-	//------------------------------------------------------------------------------------------
-	//------------------------------------------------------------------------------------------
-	public static final String MODE = "journeyMode";
+	public static final int ZOOM_LEVEL = 16;
 
 	private GoogleMap mMap;	
-	private CameraPosition myCameraPosition;
 
 	// journey mode 
-	private Marker myMarker = null; // custom marker for myLocation
-	private Canvas myMarkerCanvas;
-	private Location myCurrentLocation = null;
-
 	private static int journeyMode = -1;
+	private Canvas myMarkerCanvas;
+	private Location myCurrentLocation = null;	
+	private Marker myMarker = null; 			// device marker
+	// target information
+	private Marker targetMarker = null;			// story marker
 	private static Location targetLocation;
 	private static float targetBearing = 0;
 	private static float targetDistance = 0;
@@ -175,37 +103,45 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private TextView testAzimuth;
 	private TextView testPitch;
 	private TextView testRoll;
-
+	
+	// device location services (GPS)
 	private LocationManager myLocationManager;
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
-
+	
+	// device dimensions
 	private int screenHeight;
 	private int screenWidth;
+	
+	// Map Camera CancellableCalbacks for animations 
+	private CancelableCallback enableAnimation; 
 
+	// device sensor (accelerometer and magnetic field)
 	private SensorManager mySensorManager;
 	private boolean sensorRunning;
 
-	float[] inR = new float[16];
-	float[] I = new float[16];
-	float[] gravity = new float[3];
-	float[] geomag = new float[3];
-	float[] orientVals = new float[3];
 
-	float bearing = 0; // normalized whole number for raw sensor azimuth input
+
 	double azimuth = 0;
-	/*double pitch = 0;
-    double roll = 0;*/
+	float bearing = 0; // normalized whole number for raw sensor azimuth input
+	
 
 	private boolean rotateView = true;
 	private boolean firstFix = true;
 	private static CameraPosition MYLOCATION;
 
-	// Media Record Btns
+	// Media Record Buttons
 	private ImageButton btnRecordMedia;
-	private FrameLayout layoutRecordMedia;
+	private FrameLayout layoutRecordMedia2;
 	private boolean isRecordOptionsShowing;
-
+	
+	// journey Block Views
+	RelativeLayout journeyBlock;
+	Button btnGetMessage;
+	Button btnCloseJourneyPanel;
+	TextView journeyBearing;
+	TextView journeyDistance;
+	
 	// Animation
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
@@ -221,8 +157,21 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		super.onCreate(savedInstanceState);		
 
 		setContentView(R.layout.activity_map);
+		
+		
 		setUpMapIfNeeded();
-
+		// define a callback for animateCamera
+		// when we have finished an animation, resume rotation
+		enableAnimation = new CancelableCallback() {
+			@Override
+			public void onFinish() {
+				rotateView = true;				
+			}
+			@Override
+			public void onCancel() {
+				rotateView = true;
+			}
+		};
 
 		// UI buttons
 		addCustomMyLocationButton();
@@ -261,19 +210,29 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-		isRecordOptionsShowing = false; // initialize the state of media recording
+		// initialize the state of media recording
+		isRecordOptionsShowing = false; 
+
+		// define views in journey block
+		journeyBlock = (RelativeLayout) findViewById(R.id.journeyblock);
+		journeyBearing = (TextView) findViewById(R.id.journey_bearing); // change to an ImageView of the Bearing Icon
+		journeyDistance = (TextView) findViewById(R.id.journey_distance);
+		btnGetMessage = (Button) findViewById(R.id.journey_claim);
+		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_hidejourneyblock);
 		
-		
-		
-		
-		
-		// define journey block and layout
-		RelativeLayout journeyBlock = (RelativeLayout) findViewById(R.id.journeyblock);
-		
-		
+		// TODO: not the best... a swipe gesture would be better here
+		btnCloseJourneyPanel.setLongClickable(true); 
+		// set up click listener on close button for journey panel
+		btnCloseJourneyPanel.setOnClickListener(new OnClickListener() {	
+			@Override
+			public void onClick(View v) {
+				journeyMode = 0;
+				updateJourneyMode();
+			}
+		});
 		
 		// define media buttons and layouts as globals
-		layoutRecordMedia = (FrameLayout) findViewById(R.id.recordBtnLayout);
+		layoutRecordMedia2 = (FrameLayout) findViewById(R.id.recordBtnLayout2);
 		btnRecordMedia = (ImageButton) findViewById(R.id.btnRecordMain);
 		// http://stackoverflow.com/questions/4969689/android-animation-xml-issues
 		btnRecordMedia.setOnClickListener(new OnClickListener() {
@@ -314,17 +273,66 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaptureImage();
 			}
 		});
-		
-		
 
-		// test
-		updateTestValues();
+
+		// check that we are not in journey mode,
+		// and hide the journey block if we are not.
+		if(journeyMode != 1) {
+			updateJourneyMode();
+		}
+
 	}
 	
 	//------------------------------------------------------------------------------------------
 
+	//------------------------------------------------------------------------------------------	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		setUpMapIfNeeded();
+		
+	
+		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+		//Register for location updates using a Criteria, and a callback on the specified looper thread.
+		myLocationManager.requestLocationUpdates(
+				400L, 		// minTime
+				1.0f,		// minDistance
+				myCriteria,	// criteria
+				this, 		// listener
+				null);		// intent
+	
+		mMap.setMyLocationEnabled(true);
+		// replaces the location source of the my-location layer
+		mMap.setLocationSource(this);
+	
+		// register sensor listeners
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
 	
 	
+		// test
+		updateTestValues();
+	}
+
+	//------------------------------------------------------------------------------------------
+	@Override
+	public void onPause() {
+		super.onPause();
+		/* Disable the my-location layer (this causes our LocationSource to be automatically deactivated.) */
+		mySensorManager.unregisterListener(this);
+	
+		myLocationManager.removeUpdates(this);
+		mMap.setMyLocationEnabled(false);
+		mMap.setLocationSource(null);
+	}
+
 	//------------------------------------------------------------------------------------------
 	private void startCaptureImage() {
 		// TODO: check that there is a camera
@@ -424,143 +432,48 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 
 
-	//------------------------------------------------------------------------------------------	
-	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		setUpMapIfNeeded();
-
-
-		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		//Register for location updates using a Criteria, and a callback on the specified looper thread.
-		myLocationManager.requestLocationUpdates(
-				400L, 		// minTime
-				1.0f,		// minDistance
-				myCriteria,	// criteria
-				this, 		// listener
-				null);		// intent
-
-		mMap.setMyLocationEnabled(true);
-		// replaces the location source of the my-location layer
-		mMap.setLocationSource(this);
-
-		// register sensor listeners
-		mySensorManager.registerListener(this, 
-				mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
-				SensorManager
-				.SENSOR_DELAY_NORMAL);
-		mySensorManager.registerListener(this, 
-				mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-				SensorManager
-				.SENSOR_DELAY_NORMAL);
-
-
-		// test
-		updateTestValues();
-	}
-	//------------------------------------------------------------------------------------------
-	@Override
-	public void onPause() {
-		super.onPause();
-		/* Disable the my-location layer (this causes our LocationSource to be automatically deactivated.) */
-		mySensorManager.unregisterListener(this);
-
-		myLocationManager.removeUpdates(this);
-		mMap.setMyLocationEnabled(false);
-		mMap.setLocationSource(null);
-	}
-
 	//------------------------------------------------------------------------------------------
 	private void addCustomMyLocationButton() {
 		//http://stackoverflow.com/questions/14826345/android-maps-api-v2-change-mylocation-icon
-
 		ImageButton btnShowMyLocation = (ImageButton) findViewById(R.id.btnShowMyLocation);
 
 		btnShowMyLocation.setOnClickListener(new OnClickListener() { 
+		
 			@Override
 			public void onClick(final View v) {
-
+				// stop rotating for a second.
 				rotateView = false;
-
-				Location myLocation = mMap.getMyLocation();
-
-				if(myLocation != null) {
-
-					mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
-						@Override
-						public void onFinish() {
-							rotateView = true;
-						}
-
-						@Override
-						public void onCancel() {
-							rotateView = true;
-						}
-					});
-
+				
+				if(myCurrentLocation != null) {
+					mMap.animateCamera(
+							CameraUpdateFactory.newLatLngZoom(
+									new LatLng(
+											myCurrentLocation.getLatitude(), 
+											myCurrentLocation.getLongitude()), 
+									ZOOM_LEVEL), new CancelableCallback() {
+								@Override
+								public void onFinish() {
+									rotateView = true;				
+								}
+								@Override
+								public void onCancel() {
+									rotateView = true;
+								}
+							});
+					Toast.makeText(MapActivity.this, "Rotate View " + Boolean.toString(rotateView), Toast.LENGTH_LONG).show();
 				}
-
 			}
 		});
 	}
+			
+	
 
-
-	//------------------------------------------------------------------------------------------
-	public List<Story> getallStories() {
-
-		// create a new instance of the database adapter
-		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
-
-		// Generate List from all stories in the database;
-		List<Story> allStories = myStoriesDBAdapter.getAllStories();
-
-		return allStories;
-	}
-
-	//------------------------------------------------------------------------------------------	
-	private void addMarkersToMap() {
-		
-		// store all stories as objects from database
-		List<Story> stories = getallStories();
-		if(stories != null) {
-			for (int i=0; i<stories.size(); i++) {
-				Story s = stories.get(i);
-
-				LatLng ll = new LatLng(s.getLat(), s.getLng());
-				String t = "" + "days old"; // TODO: calculate days old
-				Bitmap ic = createIcon(s.getMedia());
-
-				// now, create a marker
-				mMap.addMarker(new MarkerOptions()
-				.position(ll)
-				.icon(BitmapDescriptorFactory.fromBitmap(ic))
-				.title(t));
-				// and store that marker's ID into the story object from which it came
-				// this will link the story in the db to the marker on the map
-			}
-		}
-		
-		// *** another function ***String calculateAge(TIMESTAMP) --> days since message was left from timestamp.....?
-		
-		// dummy LatLngs - should be in database
-		Marker melbourne = mMap.addMarker(new MarkerOptions()
-		.position(new LatLng(33.784, -84.343636))
-		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(2)))
-		.title("345 days old"));
-
-		Marker newMelbourne = mMap.addMarker(new MarkerOptions()
-		.position(new LatLng(33.7557, -84.32952))
-		.icon(BitmapDescriptorFactory.fromBitmap(createIcon(0)))
-		.title("6 days old"));
-
-	}
 
 	//------------------------------------------------------------------------------------------
 	// create an marker icon at runtime to show location and type of the story
 	// http://stackoverflow.com/questions/11740362/merge-two-bitmaps-in-android?rq=1
 	// http://stackoverflow.com/questions/14811579/android-map-api-v2-custom-marker-with-imageview
-	private Bitmap createIcon(int mediaType) {
+	private Bitmap createStoryMarkerIcon(int mediaType) {
 
 		Bitmap bitmap = null;
 		try {
@@ -649,29 +562,53 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	}
 
-	//------------------------------------------------------------------------------------------
-	@SuppressLint("NewApi")
-	private void calculateScreenDimensions() {
-		// find the width and height of the screen
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		try {
-			display.getSize(size);
-			screenHeight = size.y;
-			screenWidth = size.x;
-		} catch (NoSuchMethodError e) {
-			screenHeight = display.getHeight();
-			screenWidth = display.getWidth();
+	//------------------------------------------------------------------------------------------	
+	private void addMarkersToMap() {
+		
+		// store all stories as objects from database
+		/*List<Story> stories = getallStories();
+		if(stories != null) {
+			for (int i=0; i<stories.size(); i++) {
+				Story s = stories.get(i);
+	
+				LatLng ll = new LatLng(s.getLat(), s.getLng());
+				String t = "" + "days old"; // TODO: calculate days old
+				Bitmap ic = createStoryMarkerIcon(s.getMedia());
+	
+				// now, create a marker
+				mMap.addMarker(new MarkerOptions()
+				.position(ll)
+				.icon(BitmapDescriptorFactory.fromBitmap(ic))
+				.title(t));
+				// and store that marker's ID into the story object from which it came
+				// this will link the story in the db to the marker on the map
+			}
 		}
+		*/
+		
+		// *** another function ***String calculateAge(TIMESTAMP) --> days since message was left from timestamp.....?
+		
+		// dummy LatLngs - should be in database
+		Marker melbourne = mMap.addMarker(new MarkerOptions()
+		.position(new LatLng(33.784, -84.343636))
+		.icon(BitmapDescriptorFactory.fromBitmap(createStoryMarkerIcon(2)))
+		.title("345 days old"));
+	
+		Marker newMelbourne = mMap.addMarker(new MarkerOptions()
+		.position(new LatLng(33.7557, -84.32952))
+		.icon(BitmapDescriptorFactory.fromBitmap(createStoryMarkerIcon(0)))
+		.title("6 days old"));
+	
 	}
+
 	//------------------------------------------------------------------------------------------
 	public void showMediaButtons() {
-		layoutRecordMedia.setVisibility(View.VISIBLE);
+		layoutRecordMedia2.setVisibility(View.VISIBLE);
 		PropertyValuesHolder makeVisible = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
 		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (screenHeight-500));
 
 		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia, makeVisible, slideUpHalfway)
+		.ofPropertyValuesHolder(layoutRecordMedia2, makeVisible, slideUpHalfway)
 		.setDuration(200)
 		.start();
 
@@ -684,7 +621,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", (screenHeight-500), screenHeight);
 
 		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia, makeInvisible, slideDown)
+		.ofPropertyValuesHolder(layoutRecordMedia2, makeInvisible, slideDown)
 		.setDuration(200)
 		.start();
 
@@ -726,32 +663,20 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-
-		journeyMode = 1;
-		// TODO: set this to false (0) from a button within the info window that pops up from below
-
-		// store Location in a globa var
+		
+		setMyLocationMarker();
+		
+		// store marker as global
+		targetMarker = marker;
+		
+		// store Location in a global var
 		LatLng target = marker.getPosition();
 		targetLocation = new Location("Target");
 		targetLocation.setLatitude(target.latitude);
 		targetLocation.setLongitude(target.longitude);
-
-		// TODO: BEGIN the journey process: 
-		// display partial view with additional information for this place
-		// set boundaries so myLocation and the destination marker are both visible on the screen
-		// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
-
-		//****** PROBABLY NEED TO PUT THIS IN ANOTHER FUNCTION AND STORE THE
-		// VALUES FOR THE MARKER'S ENDING LOCATION, so that the bearing can be UPDATED
-		// with the user's LAT and LNG .. so put it in onLOCATIONCHANGED() ***********/
-		// http://android-er.blogspot.com/2013/02/get-bearing-between-two-location-using.html
-		calculateDistanceToTarget();
-		calculateBearingToTarget();
-
-		setMyLocationMarker(); // TODO: rotate this shit so it appears to be pointing in the right direction
-
-		// test
-		updateTestValues();
+		
+		journeyMode = 1;
+		updateJourneyMode(); // also called onLocationChanged()
 
 	}
 
@@ -776,24 +701,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		if (myLocationListener != null) {
 			myLocationListener.onLocationChanged(location);
-
+			
+			// save device location to global variable.
+			myCurrentLocation = mMap.getMyLocation();
+			
 			if(firstFix) { // we have gotten the first fix on myLocation
-
 				// set the MyLocation button position to a global variable
 				MYLOCATION = new CameraPosition.Builder()
-				.target(new LatLng(mMap.getMyLocation().getLatitude(), mMap.getMyLocation().getLongitude()))
-				.zoom(12)
-				.bearing(mMap.getCameraPosition().bearing)
-				.tilt(0)
-				.build();
+					.target(new LatLng(
+							myCurrentLocation.getLatitude(), 
+							myCurrentLocation.getLongitude()))
+					.zoom(ZOOM_LEVEL)
+					.bearing(mMap.getCameraPosition().bearing)
+					.tilt(0)
+					.build();
 
-				//animate the camera to this place NOT WORKING
+				//animate the camera to this place
 				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
 					@Override
 					public void onFinish() {
 						rotateView = true;
 					}
-
 					@Override
 					public void onCancel() {
 						rotateView = true;
@@ -801,55 +729,138 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				});
 				// set firstFix to false so it runs only once
 				firstFix = false;
+				
 			}
-
-			// save device location to global variable.
-			myCurrentLocation = mMap.getMyLocation();
 
 			// test
 			testMyLocation.setText(
 					"My lat: " + myCurrentLocation.getLatitude() + "\n" +
-							"My lon: " + myCurrentLocation.getLongitude());
+					"My lon: " + myCurrentLocation.getLongitude());
 
-			// if we are journeying. update myMarker's location
+			// if we are journeying. 
+			// update myMarker's location
 			if (journeyMode == 1) {
-				calculateDistanceToTarget();
-				calculateBearingToTarget();
-
+				updateJourneyMode();
 				setMyLocationMarker();
 			}
 
 		}
 		// test
-		updateTestValues();
+		// updateTestValues();
 
 	}
-	//------------------------------------------------------------------------------------------
+	
+	/** 
+	 * While in journey mode
+	 * 
+	 * Set visibility for the panel
+	 * Constantly update values for bearing and distance to target
+	 * 
+	 */
+	private void updateJourneyMode() {
+
+		// note: update journeyMode before calling this function
+
+		if (journeyMode != 1) {
+			// exit journey mode
+			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
+			removeMyLocationMarker();
+		} else {
+			// enter journey mode
+			if(journeyBlock.getVisibility() == View.INVISIBLE) { 
+				// called when we FIRST enter journey mode
+				journeyBlock.setVisibility(View.VISIBLE); // change for animation?
+				targetMarker.hideInfoWindow();
+				
+				LatLngBounds.Builder builder = new LatLngBounds.Builder();
+				
+				builder.include(myMarker.getPosition());
+				builder.include(targetMarker.getPosition());
+				builder.build();
+
+				VisibleRegion vr = mMap.getProjection().getVisibleRegion();
+				double left = vr.latLngBounds.southwest.longitude;
+				double top = vr.latLngBounds.northeast.latitude;
+				double right = vr.latLngBounds.northeast.longitude;
+				double bottom = vr.latLngBounds.southwest.latitude;
+				// set boundaries so myLocation and the destination marker are both visible on the screen
+				// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
+			}
+			// calculate new values for bearing and distance to target
+			calculateBearingToTarget();
+			calculateDistanceToTarget();
+			// update Views with new values for bearing and distance
+			journeyBearing.setText(Float.toString(targetBearing));
+			journeyDistance.setText(Float.toString(targetDistance));
+
+		}
+	}
+
+	/**
+	 * Called in Journey mode,
+	 * 
+	 * update global targetDistance
+	 * @return float, the device's distance to the target
+	 */
 	private float calculateDistanceToTarget() {
 		if(myCurrentLocation != null) {
 			targetDistance = myCurrentLocation.distanceTo(targetLocation);
+			// round to a whole number
+			targetDistance = Math.round(targetDistance);
 			return targetDistance;
+			
 		} else return 0;
 	}
-	//------------------------------------------------------------------------------------------
+	
+	/**
+	 * Called in Journey mode
+	 * 
+	 * update global targetBearing
+	 * @tutorial http://android-er.blogspot.com/2013/02/get-bearing-between-two-location-using.html
+	 * @return float, the device's bearing to the target
+	 */
 	private float calculateBearingToTarget() {
 		if(myCurrentLocation != null) {
-
 			targetBearing = myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
 			targetBearing = bearing - targetBearing;
 			targetBearing = targetBearing >= 0 ? targetBearing: targetBearing + 360;
-			// CHANGE THESE NUMBERS SO THAT  THEY READ 0 - !*) depending on 
-			// and round them to a whole number
+			// Round to a whole number
 			targetBearing = Math.round(targetBearing);
+			// spit out a value from -180 to 0 , and 0 - 180
 			targetBearing = targetBearing >= 180 ? -(360 - targetBearing): targetBearing;
-
-
-			updateTestValues();
+			
 			return targetBearing;
-
 		}
 		else return 0;
 	}
+
+	/**
+	 * update global bearing (for device) based onSensorChanged()
+	 * @param azimuth
+	 */
+	private void setDeviceBearing(double azimuth) {
+		
+		bearing = (float) azimuth;
+		if (!rotateView) {
+			//bearing = 0;
+		} else {
+			// normalize azimuth values so they range from 0-360
+			bearing = bearing >= 0 ? bearing: bearing + 360;
+			// and round to a whole number
+			bearing = Math.round(bearing);
+		}
+	
+		if(journeyMode == 1) {
+			updateJourneyMode();
+		}
+	
+		rotateMyCamera();
+	
+		// test
+		// testAzimuth.setText("Bearing: " + bearing);
+	
+	}
+
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
 		// http://androiddev.orkitra.com/?p=3933	
@@ -891,10 +902,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	private void removeMyLocationMarker() {
 		if(myMarker != null) {
-			myMarker.remove(); // remove the old one before you draw another.
+			// remove the old one before you draw another.
+			myMarker.remove(); 
 		}
 	}
-
 	//------------------------------------------------------------------------------------------
 	private void rotateMyCamera() {
 
@@ -906,10 +917,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			.bearing(bearing)                
 			.tilt(mMap.getCameraPosition().tilt)                   
 			.build();               
-
+			Toast.makeText(this, "rotateMyCamera Called. rotateView : " + Boolean.toString(rotateView), Toast.LENGTH_SHORT).show();
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
-
-
 		}
 	}
 	//------------------------------------------------------------------------------------------
@@ -931,6 +940,34 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 
 
+	}
+
+	//------------------------------------------------------------------------------------------
+	@SuppressLint("NewApi")
+	private void calculateScreenDimensions() {
+		// find the width and height of the screen
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		try {
+			display.getSize(size);
+			screenHeight = size.y;
+			screenWidth = size.x;
+		} catch (NoSuchMethodError e) {
+			screenHeight = display.getHeight();
+			screenWidth = display.getWidth();
+		}
+	}
+
+	//------------------------------------------------------------------------------------------
+	public List<Story> getallStories() {
+
+		// create a new instance of the database adapter
+		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
+
+		// Generate List from all stories in the database;
+		List<Story> allStories = myStoriesDBAdapter.getAllStories();
+
+		return allStories;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -970,11 +1007,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
+		
+		float[] inR = new float[16];
+		float[] I = new float[16];
+		float[] gravity = new float[3];
+		float[] geomag = new float[3];
+		float[] orientVals = new float[3];
+		
 		// http://stackoverflow.com/questions/4819626/android-phone-orientation-overview-including-compass 
 		// http://stackoverflow.com/questions/4020048/finding-orientation-using-getrotationmatrix-and-getorientation?rq=1
 		// If the sensor data is unreliable return
-		if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
-			return;
+		//if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
+			//return;
 
 		// Gets the value of the sensor that has been changed
 		switch (event.sensor.getType()) {  
@@ -1011,40 +1055,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				azimuth = azimuth+compensation;
 
 				setDeviceBearing(azimuth);
-
-
+				Toast.makeText(MapActivity.this, "onSensorChanged", Toast.LENGTH_SHORT).show();
 
 			}
 		}
 
 	}	
-	//------------------------------------------------------------------------------------------	
-	private void setDeviceBearing(double azimuth) {
-		// normalize azimuth values so they range from 0-360
-		bearing = (float) azimuth;
-		if (!rotateView) {
-			//bearing = 0;
-		} else {
-			bearing = bearing >= 0 ? bearing: bearing + 360;
-			// and round them to a whole number
-			bearing = Math.round(bearing);
-		}
-
-		if(journeyMode == 1) {
-			calculateBearingToTarget();
-			//setMyLocationMarker();
-		}
-
-		rotateMyCamera();
-
-		// test
-		testAzimuth.setText("Bearing: " + bearing);
-
-	}
-
-
-
-
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -1058,7 +1074,87 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		super.onRestoreInstanceState(savedInstanceState);
 	}
 
+	/**
+	 * CustomInfoWindowAdapter
+	 * 
+	 * customizes the look of marker infoWindow
+	 */
+	class CustomInfoWindowAdapter implements InfoWindowAdapter {
+	
+		private final View mWindow;
 
+		/**
+		 * Constructor
+		 */
+		CustomInfoWindowAdapter() {
+			// the xml layout file
+			mWindow = getLayoutInflater().inflate(R.layout.custom_info_window, null);
+		}
+
+		/**
+		 * getInfoWindow
+		 * 
+		 * called for every Marker
+		 * 
+		 * Use the equals() method on a Marker to check for equals.  Do not use ==.
+		 * 
+		 * @return View
+		 */
+		@Override
+		public View getInfoWindow(Marker marker) { 
+			
+			// TODO: iterate through List<Story> until you find the story with this marker id
+			// asign values from this story object. 
+			
+			// assign views
+			ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);	// perspective image
+			TextView titleUi = (TextView) mWindow.findViewById(R.id.title); 				// days ago				 
+			ImageView hear 	= (ImageView) mWindow.findViewById(R.id.ic_sense_hear);			// background set to: R.drawable.btn_sense_bg_false		
+			ImageView see 	= (ImageView) mWindow.findViewById(R.id.ic_sense_see);
+			ImageView smell = (ImageView) mWindow.findViewById(R.id.ic_sense_smell);
+			ImageView taste = (ImageView) mWindow.findViewById(R.id.ic_sense_taste);
+			ImageView touch = (ImageView) mWindow.findViewById(R.id.ic_sense_touch);
+
+
+			int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
+			/*if(the row has a URI to a perspective image)  {
+        	 	//perspectiveUri = thatresourceURI;
+        	 	make an image resource from that URI
+             } else {
+                 // Passing 0 to setImageResource will clear the image view.
+                 perspectiveUri = 0;
+             }*/
+			perspective.setImageResource(perspectiveUri);
+
+			String title = marker.getTitle(); // TODO: set this title from a story object linked to this marker's id
+			if (title != null) {
+				titleUi.setText(title);
+			} else {
+				titleUi.setText("");
+			}
+
+			// TODO: iterate through each property of the row. if it equals TRUE
+			if(marker.getId().equals("m1")) { 
+				hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
+			} else {
+				hear.setBackgroundResource(R.drawable.btn_sense_bg_false);
+			}
+
+			/* if(marker.getSenseSee().equals(true)) {
+            	 see.setBackgroundResource(R.drawable.btn_sense_bg_true);
+             } else {
+            	 see.setBackgroundResource(R.drawable.btn_sense_bg_false);
+             } */
+
+			return mWindow;
+		}
+
+		@Override
+		public View getInfoContents(Marker marker) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	} 
 
 
 }

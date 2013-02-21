@@ -17,6 +17,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.widget.Toast;
 
 public class DBAdapter {
 
@@ -64,7 +65,6 @@ public class DBAdapter {
 	/*
 	private static final String CREATE_TABLE_ENCOUNTERS = "";
 	private static final String CREATE_TABLE_COMMENTS = "";
-	private static final String CREATE_TABLE_USERS = "";
 	*/
 
 	private final Context context;
@@ -93,17 +93,17 @@ public class DBAdapter {
 			 * Call for every table.
 			 * http://androidforbeginners.blogspot.com/2010/01/creating-multiple-sqlite-database.html
 			 *  
+			 *  
+			 *  			db.execSQL(CREATE_TABLE_COMMENTS);
+							db.execSQL(CREATE_TABLE_ENCOUNTERS);
+			
 			 */
 			db.execSQL(CREATE_TABLE_STORIES);
 			db.execSQL(CREATE_TABLE_VIDEOS);
 			db.execSQL(CREATE_TABLE_AUDIO);
 			db.execSQL(CREATE_TABLE_IMAGES);
 			db.execSQL(CREATE_TABLE_USERS);
-			/*
-			db.execSQL(CREATE_TABLE_COMMENTS);
-			db.execSQL(CREATE_TABLE_ENCOUNTERS);
 			db.execSQL(CREATE_TABLE_USERS);
-			 */
 			
 			Log.i("SQL", "Placebase SQL tables created");
 		}

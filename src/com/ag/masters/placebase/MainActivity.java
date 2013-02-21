@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -19,7 +20,9 @@ public class MainActivity extends Activity {
 		
 		// set up database on splash screen
 		DBAdapter db = new DBAdapter(this);
-		//db.open();
+		if(db.open() != null) {
+			Toast.makeText(this, "database Adapter not null", Toast.LENGTH_LONG).show();
+		}
 		
 		
 		Button startBtn = (Button) findViewById(R.id.startapp_btn);
