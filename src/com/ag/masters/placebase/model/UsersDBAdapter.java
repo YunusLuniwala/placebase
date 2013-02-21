@@ -22,7 +22,7 @@ public class UsersDBAdapter {
 		private static final String DATABASE_TABLE = "users";
 		// columns
 		public static final String ROW_ID = "_id";
-		public static final String NAME = "story";
+		public static final String NAME = "name";
 
 		private DatabaseHelper mDbHelper;
 		private SQLiteDatabase mDb;

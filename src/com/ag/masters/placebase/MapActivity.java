@@ -566,9 +566,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
 		
+		
+		
 		// breaks everything
 		// store all stories as objects from database
-		/* List<Story> stories = getallStories();
+		
+		List<Story> stories = getallStories();
+		
 		if(stories != null) {
 			for (int i=0; i<stories.size(); i++) {
 				Story s = stories.get(i);
@@ -586,7 +590,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// this will link the story in the db to the marker on the map
 			}
 		}
-		*/
+		
 		
 		
 		
@@ -914,7 +918,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
 
 		// Generate List from all stories in the database;
-		List<Story> allStories = myStoriesDBAdapter.getAllStories();
+		//List<Story> allStories = myStoriesDBAdapter.getAllStories();
 
 		return allStories;
 	}

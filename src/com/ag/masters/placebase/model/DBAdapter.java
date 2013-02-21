@@ -28,18 +28,18 @@ public class DBAdapter {
 	// Prepare Create statements for each table
 	private static final String CREATE_TABLE_STORIES = 
 			"CREATE TABLE stories (_id INTEGER PRIMARY KEY AUTOINCREMENT, "//$NON-NLS-1$
-			+ StoriesDBAdapter.LAT + " REAL,"//$NON-NLS-1$
-			+ StoriesDBAdapter.LNG + " REAL,"//$NON-NLS-1$
-			+ StoriesDBAdapter.BEARING + " REAL,"//$NON-NLS-1$
 			+ StoriesDBAdapter.MEDIA + " INT,"//$NON-NLS-1$
+			+ StoriesDBAdapter.USER + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.HEAR + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.SEE + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.SMELL + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.TASTE + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.TOUCH + " INT,"//$NON-NLS-1$
 			+ StoriesDBAdapter.PERSPECTIVE + " TEXT,"//$NON-NLS-1$
-			+ StoriesDBAdapter.TIMESTAMP + " TEXT,"//$NON-NLS-1$
-			+ StoriesDBAdapter.USER + " INT" + ");";//$NON-NLS-1$
+			+ StoriesDBAdapter.LAT + " REAL,"//$NON-NLS-1$
+			+ StoriesDBAdapter.LNG + " REAL,"//$NON-NLS-1$
+			+ StoriesDBAdapter.BEARING + " REAL,"//$NON-NLS-1$
+			+ StoriesDBAdapter.TIMESTAMP + " TEXT" + ");";//$NON-NLS-1$
 
 	private static final String CREATE_TABLE_VIDEOS = 
 			"CREATE TABLE videos (_id INTEGER PRIMARY KEY AUTOINCREMENT, "//$NON-NLS-1$
@@ -54,7 +54,8 @@ public class DBAdapter {
 	private static final String CREATE_TABLE_IMAGES = 
 			"CREATE TABLE videos (_id INTEGER PRIMARY KEY AUTOINCREMENT, "//$NON-NLS-1$
 			+ ImagesDBAdapter.STORY + " INT,"//$NON-NLS-1$
-			+ ImagesDBAdapter.URI + " TEXT" + ");";//$NON-NLS-1$;
+			+ ImagesDBAdapter.URI + " TEXT,"//$NON-NLS-1$
+			+ ImagesDBAdapter.CAPTION + " TEXT" + ");";//$NON-NLS-1$;
 
 	private static final String CREATE_TABLE_USERS = 
 			"CREATE TABLE users (_id INTEGER PRIMARY KEY AUTOINCREMENT, "//$NON-NLS-1$

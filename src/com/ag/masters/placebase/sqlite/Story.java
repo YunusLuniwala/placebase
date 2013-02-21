@@ -1,21 +1,22 @@
 package com.ag.masters.placebase.sqlite;
 
 public class Story {
-	int _id;		
-	double _lat;		// perspective taken
-	double _lng;		// perspective taken
-	float _bearing;		// perspective taken
-	int _media;			// first created
-	int _hear;			// sense input
-	int _see;			// sense input
-	int _smell;			// sense input
-	int _taste;			// sense input
-	int _touch;			// sense input
-	String _timestamp;	// perspective taken
-	String _perspective_uri; // or perhaps the URI? perspective taken
-	int _user;			// first created
+	int _id;
+	int _user;				// first created
+	int _media;				// first created
+	int _hear;				// sense input
+	int _see;				// sense input
+	int _smell;				// sense input
+	int _taste;				// sense input
+	int _touch;				// sense input
+	double _lat;			// perspective taken
+	double _lng;			// perspective taken
+	float _bearing;			// perspective taken
+	String _timestamp;		// perspective taken
+	String _perspective_uri;// perspective taken (perhaps store as a URI?)
 	
-	String _markerId;	// created dynamically when markers are added to the map
+	
+	String _markerId;	// created dynamically when markers are added to the map (not in db)
 
 	// Empty constructor
 	public Story() {
