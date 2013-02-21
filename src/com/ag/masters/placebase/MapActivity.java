@@ -120,7 +120,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private SensorManager mySensorManager;
 	private boolean sensorRunning;
 
-
+	float[] inR = new float[16];
+	float[] I = new float[16];
+	float[] gravity = new float[3];
+	float[] geomag = new float[3];
+	float[] orientVals = new float[3];
 
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
@@ -460,7 +464,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 									rotateView = true;
 								}
 							});
-					Toast.makeText(MapActivity.this, "Rotate View " + Boolean.toString(rotateView), Toast.LENGTH_LONG).show();
+					
 				}
 			}
 		});
@@ -565,8 +569,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
 		
+		// breaks everything
 		// store all stories as objects from database
-		/*List<Story> stories = getallStories();
+		/* List<Story> stories = getallStories();
 		if(stories != null) {
 			for (int i=0; i<stories.size(); i++) {
 				Story s = stories.get(i);
@@ -585,6 +590,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 		}
 		*/
+		
+		
 		
 		// *** another function ***String calculateAge(TIMESTAMP) --> days since message was left from timestamp.....?
 		
@@ -917,7 +924,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			.bearing(bearing)                
 			.tilt(mMap.getCameraPosition().tilt)                   
 			.build();               
-			Toast.makeText(this, "rotateMyCamera Called. rotateView : " + Boolean.toString(rotateView), Toast.LENGTH_SHORT).show();
+			
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
 		}
 	}
@@ -1008,12 +1015,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		
-		float[] inR = new float[16];
-		float[] I = new float[16];
-		float[] gravity = new float[3];
-		float[] geomag = new float[3];
-		float[] orientVals = new float[3];
-		
 		// http://stackoverflow.com/questions/4819626/android-phone-orientation-overview-including-compass 
 		// http://stackoverflow.com/questions/4020048/finding-orientation-using-getrotationmatrix-and-getorientation?rq=1
 		// If the sensor data is unreliable return
@@ -1055,7 +1056,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				azimuth = azimuth+compensation;
 
 				setDeviceBearing(azimuth);
-				Toast.makeText(MapActivity.this, "onSensorChanged", Toast.LENGTH_SHORT).show();
 
 			}
 		}

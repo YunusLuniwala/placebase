@@ -1,7 +1,5 @@
 package com.ag.masters.placebase;
 
-import com.ag.masters.placebase.model.DBAdapter;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +7,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.Toast;
+
+import com.ag.masters.placebase.model.DBAdapter;
 
 public class MainActivity extends Activity {
 
@@ -20,10 +19,6 @@ public class MainActivity extends Activity {
 		
 		// set up database on splash screen
 		DBAdapter db = new DBAdapter(this);
-		if(db.open() != null) {
-			Toast.makeText(this, "database Adapter not null", Toast.LENGTH_LONG).show();
-		}
-		
 		
 		Button startBtn = (Button) findViewById(R.id.startapp_btn);
 		startBtn.setOnClickListener(new OnClickListener() {

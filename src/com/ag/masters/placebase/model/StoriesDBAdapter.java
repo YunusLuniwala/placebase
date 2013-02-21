@@ -208,7 +208,7 @@ public class StoriesDBAdapter {
      * and store them in a List of Story objects
      * @return List<Story> 
      */
-    public List<Story> getAllStories() {
+    public List<Story> getAllStories() throws SQLException {
 		List<Story>allStories = new ArrayList<Story>();
 		
 		// Select All Query
