@@ -287,7 +287,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	}
 	
-	//------------------------------------------------------------------------------------------
 
 	//------------------------------------------------------------------------------------------	
 	@Override
@@ -321,8 +320,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				.SENSOR_DELAY_NORMAL);
 	
 	
-		// test
-		updateTestValues();
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -699,64 +696,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 	}
 
-	//------------------------------------------------------------------------------------------
-	// LOCATION LISTENER
-	// http://android-er.blogspot.com/2013/01/implement-locationsource-and.html
-	//------------------------------------------------------------------------------------------
-	@Override
-	public void onLocationChanged(Location location) {
-
-		if (myLocationListener != null) {
-			myLocationListener.onLocationChanged(location);
-			
-			// save device location to global variable.
-			myCurrentLocation = mMap.getMyLocation();
-			
-			if(firstFix) { // we have gotten the first fix on myLocation
-				// set the MyLocation button position to a global variable
-				MYLOCATION = new CameraPosition.Builder()
-					.target(new LatLng(
-							myCurrentLocation.getLatitude(), 
-							myCurrentLocation.getLongitude()))
-					.zoom(ZOOM_LEVEL)
-					.bearing(mMap.getCameraPosition().bearing)
-					.tilt(0)
-					.build();
-
-				//animate the camera to this place
-				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
-					@Override
-					public void onFinish() {
-						rotateView = true;
-					}
-					@Override
-					public void onCancel() {
-						rotateView = true;
-					}
-				});
-				// set firstFix to false so it runs only once
-				firstFix = false;
-				
-			}
-
-			// test
-			testMyLocation.setText(
-					"My lat: " + myCurrentLocation.getLatitude() + "\n" +
-					"My lon: " + myCurrentLocation.getLongitude());
-
-			// if we are journeying. 
-			// update myMarker's location
-			if (journeyMode == 1) {
-				updateJourneyMode();
-				setMyLocationMarker();
-			}
-
-		}
-		// test
-		// updateTestValues();
-
-	}
-	
 	/** 
 	 * While in journey mode
 	 * 
@@ -860,11 +799,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if(journeyMode == 1) {
 			updateJourneyMode();
 		}
+		
+		if(rotateView) {
+			rotateMyCamera();
+		}
 	
-		rotateMyCamera();
-	
-		// test
-		// testAzimuth.setText("Bearing: " + bearing);
 	
 	}
 
@@ -916,7 +855,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	private void rotateMyCamera() {
 
-		if(mMap.isMyLocationEnabled() && mMap.getMyLocation() != null && rotateView == true) {
+		if(mMap.isMyLocationEnabled() && mMap.getMyLocation() != null) {
+			if(rotateView && !firstFix) {
+		
 
 			CameraPosition cameraPosition = new CameraPosition.Builder()
 			.target(mMap.getCameraPosition().target)      
@@ -926,6 +867,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			.build();               
 			
 			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
+			}
 		}
 	}
 	//------------------------------------------------------------------------------------------
@@ -976,6 +918,65 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		return allStories;
 	}
+
+	//------------------------------------------------------------------------------------------
+	// LOCATION LISTENER
+	// http://android-er.blogspot.com/2013/01/implement-locationsource-and.html
+	//------------------------------------------------------------------------------------------
+	@Override
+	public void onLocationChanged(Location location) {
+	
+		if (myLocationListener != null) {
+			myLocationListener.onLocationChanged(location);
+			
+			// save device location to global variable.
+			myCurrentLocation = mMap.getMyLocation();
+			
+			if(firstFix) { // we have gotten the first fix on myLocation
+				// set the MyLocation button position to a global variable
+				MYLOCATION = new CameraPosition.Builder()
+					.target(new LatLng(
+							myCurrentLocation.getLatitude(), 
+							myCurrentLocation.getLongitude()))
+					.zoom(ZOOM_LEVEL)
+					.bearing(mMap.getCameraPosition().bearing)
+					.tilt(0)
+					.build();
+	
+				//animate the camera to this place
+				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
+					@Override
+					public void onFinish() {
+						rotateView = true;
+						// set firstFix to false so it runs only once
+						firstFix = false;
+					}
+					@Override
+					public void onCancel() {
+						rotateView = true;
+						// set firstFix to false so it runs only once
+						firstFix = false;
+					}
+				});			
+			}
+	
+			// test
+			testMyLocation.setText(
+					"My lat: " + myCurrentLocation.getLatitude() + "\n" +
+					"My lon: " + myCurrentLocation.getLongitude());
+	
+			// if we are journeying. 
+			// update myMarker's location
+			if (journeyMode == 1) {
+				updateJourneyMode();
+				setMyLocationMarker();
+			}
+	
+		}
+	
+	
+	}
+
 
 	//------------------------------------------------------------------------------------------
 	@Override
