@@ -22,10 +22,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// set up database on splash screen
-		
-		//DBAdapter db = new DBAdapter(this);
-		
 		mDatabaseHelper = new DatabaseHelper(this);
 		try {
 			mDatabaseHelper.createDataBase();

@@ -46,7 +46,7 @@
                     android:layout_weight=".4" >
 
                     <ImageView
-                        android:id="@+id/journey_perspective"
+                        android:id="@+id/ic_info_media"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
@@ -301,7 +301,7 @@
                 android:visibility="gone" >
 
                 <TextView
-                    android:id="@+id/textView1"
+                    android:id="@+id/testInterval"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Accelerometer" />

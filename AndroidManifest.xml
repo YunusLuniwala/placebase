@@ -61,6 +61,9 @@
         <activity
             android:name="com.ag.masters.placebase.SenseActivity"
             android:label="@string/title_activity_sense" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
     </application>
 

@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import com.ag.masters.placebase.model.Global;
+
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
@@ -47,6 +47,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.model.StoriesDBAdapter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
@@ -79,7 +82,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private static final int TARGET_RANGE = 5;
 	
 	private GoogleMap mMap;	
-
+	private DatabaseHelper dbh;
+	
+	private List<Story> allStories;
+	
 	// journey mode 
 	private static int journeyMode = -1;
 	private Location myCurrentLocation = null;	
@@ -133,6 +139,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
 	
+	DateHandler myDateHandler;
 
 	private boolean rotateView = true;
 	private boolean firstFix = true;
@@ -182,7 +189,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		addCustomMyLocationButton();
 
 		calculateScreenDimensions();
-
+		myDateHandler = new DateHandler();
+			
 		// testPrintouts. Delete when done
 		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
 		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
@@ -199,8 +207,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
 		testPitch = (TextView) findViewById(R.id.testPitch);
 		testRoll = (TextView) findViewById(R.id.testRoll);
-		
-
 		
 		//testGeoX.setText("0.00");
 		//testGeoY.setText("0.00");
@@ -571,49 +577,33 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
+
+		dbh = new DatabaseHelper(this);
 		
+		allStories = dbh.getAllStories();
 		
-		
-		// breaks everything
-		// store all stories as objects from database
-		
-		/*
-		List<Story> stories = getallStories();
-		
-		if(stories != null) {
-			for (int i=0; i<stories.size(); i++) {
-				Story s = stories.get(i);
-	
+		if(allStories != null) {
+			for (int i=0; i<allStories.size(); i++) {
+				Story s = allStories.get(i);
+
 				LatLng ll = new LatLng(s.getLat(), s.getLng());
-				String t = "" + "days old"; // TODO: calculate days old
 				Bitmap ic = createStoryMarkerIcon(s.getMedia());
-	
+
 				// now, create a marker
-				mMap.addMarker(new MarkerOptions()
+				Marker thisMarker = mMap.addMarker(new MarkerOptions()
 				.position(ll)
-				.icon(BitmapDescriptorFactory.fromBitmap(ic))
-				.title(t));
-				// and store that marker's ID into the story object from which it came
-				// this will link the story in the db to the marker on the map
-			}
+				.icon(BitmapDescriptorFactory.fromBitmap(ic)));
+				
+				// and store that marker's ID into the Story instance
+				// to pull up the correct information onInfoWindowClick
+				String markerId = thisMarker.getId();
+				allStories.get(i).setMarkerId(markerId);
+			} 
+		} else {
+			Toast.makeText(this, "no stories in db", Toast.LENGTH_LONG).show();
 		}
-		*/
 		
 		
-		
-		// *** another function ***String calculateAge(TIMESTAMP) --> days since message was left from timestamp.....?
-		
-		// dummy LatLngs - should be in database
-		Marker melbourne = mMap.addMarker(new MarkerOptions()
-		.position(new LatLng(33.784, -84.343636))
-		.icon(BitmapDescriptorFactory.fromBitmap(createStoryMarkerIcon(2)))
-		.title("345 days old"));
-	
-		Marker newMelbourne = mMap.addMarker(new MarkerOptions()
-		.position(new LatLng(33.7557, -84.32952))
-		.icon(BitmapDescriptorFactory.fromBitmap(createStoryMarkerIcon(0)))
-		.title("6 days old"));
-	
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -951,19 +941,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 	}
 
-	//------------------------------------------------------------------------------------------
-	public List<Story> getallStories() {
-		
-		// TODO: refactor for DatabaseHelper class (instead of DBAdapter)
-		
-		// create a new instance of the database adapter
-		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
 
-		// Generate List from all stories in the database;
-		List<Story> allStories = myStoriesDBAdapter.getAllStories();
-		
-		return allStories;
-	}
 
 	//------------------------------------------------------------------------------------------
 	// LOCATION LISTENER
@@ -1150,49 +1128,87 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		@Override
 		public View getInfoWindow(Marker marker) { 
 			
-			// TODO: iterate through List<Story> until you find the story with this marker id
-			// asign values from this story object. 
+			// "m0" format 
+			// We can reliably query the array of story objects based
+			// on the key and id being the same (they are added in the order they are read in).
+			// No need to store a markerId with the story object
+			String markerId = marker.getId();
+			String markerNumId = markerId.substring(1);
+			int markerIntId = Integer.parseInt(markerNumId);
+			// grab the story object associated with this marker
+			Story thisStory = allStories.get(markerIntId);
 			
 			// assign views
 			ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);	// perspective image
-			TextView titleUi = (TextView) mWindow.findViewById(R.id.title); 				// days ago				 
+			TextView daysAgo = (TextView) mWindow.findViewById(R.id.daysago); 				// days ago				 
 			ImageView hear 	= (ImageView) mWindow.findViewById(R.id.ic_sense_hear);			// background set to: R.drawable.btn_sense_bg_false		
 			ImageView see 	= (ImageView) mWindow.findViewById(R.id.ic_sense_see);
 			ImageView smell = (ImageView) mWindow.findViewById(R.id.ic_sense_smell);
 			ImageView taste = (ImageView) mWindow.findViewById(R.id.ic_sense_taste);
 			ImageView touch = (ImageView) mWindow.findViewById(R.id.ic_sense_touch);
+			ImageView media = (ImageView) mWindow.findViewById(R.id.ic_info_media);
 
+			if (thisStory != null ) {
+				
+				switch (thisStory.getMedia()) {
+				case Global.IMAGE_CAPTURE:
+					media.setImageResource(R.drawable.ic_record_photo);
+					break;
+				case Global.VIDEO_CAPTURE:
+					media.setImageResource(R.drawable.ic_record_video);
+					break;
+				case Global.AUDIO_CAPTURE:
+					media.setImageResource(R.drawable.ic_record_audio);
+					break;
+				}
+				
+				
+				daysAgo.setText(formatInterval(thisStory.getTimestamp()));
+			
+				// display background resources for assigned senses
+				if(thisStory.getHear() == 1) { 
+					hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
+				} else {
+					hear.setBackgroundResource(R.drawable.btn_sense_bg_false);
+				}
 
-			int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
-			/*if(the row has a URI to a perspective image)  {
-        	 	//perspectiveUri = thatresourceURI;
-        	 	make an image resource from that URI
-             } else {
-                 // Passing 0 to setImageResource will clear the image view.
-                 perspectiveUri = 0;
-             }*/
-			perspective.setImageResource(perspectiveUri);
+				if(thisStory.getSee() == 1) { 
+					see.setBackgroundResource(R.drawable.btn_sense_bg_true);
+				} else {
+					see.setBackgroundResource(R.drawable.btn_sense_bg_false);
+				}
 
-			String title = marker.getTitle(); // TODO: set this title from a story object linked to this marker's id
-			if (title != null) {
-				titleUi.setText(title);
-			} else {
-				titleUi.setText("");
+				if(thisStory.getSmell() == 1) { 
+					smell.setBackgroundResource(R.drawable.btn_sense_bg_true);
+				} else {
+					smell.setBackgroundResource(R.drawable.btn_sense_bg_false);
+				}
+
+				if(thisStory.getTaste() == 1) { 
+					taste.setBackgroundResource(R.drawable.btn_sense_bg_true);
+				} else {
+					taste.setBackgroundResource(R.drawable.btn_sense_bg_false);
+				}
+
+				if(thisStory.getTouch() == 1) { 
+					touch.setBackgroundResource(R.drawable.btn_sense_bg_true);
+				} else {
+					touch.setBackgroundResource(R.drawable.btn_sense_bg_false);
+				}
+				
+				
+				int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
+				/*if(the row has a URI to a perspective image)  {
+	        	 	//perspectiveUri = thatresourceURI;
+	        	 	make an image resource from that URI
+	             } else {
+	                 // Passing 0 to setImageResource will clear the image view.
+	                 perspectiveUri = 0;
+	             }*/
+				perspective.setImageResource(perspectiveUri);
+
 			}
-
-			// TODO: iterate through each property of the row. if it equals TRUE
-			if(marker.getId().equals("m1")) { 
-				hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
-			} else {
-				hear.setBackgroundResource(R.drawable.btn_sense_bg_false);
-			}
-
-			/* if(marker.getSenseSee().equals(true)) {
-            	 see.setBackgroundResource(R.drawable.btn_sense_bg_true);
-             } else {
-            	 see.setBackgroundResource(R.drawable.btn_sense_bg_false);
-             } */
-
+			
 			return mWindow;
 		}
 
@@ -1201,6 +1217,41 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// TODO Auto-generated method stub
 			return null;
 		}
+		
+		/**
+		 * format time interval to display in info window
+		 * @param timeStamp
+		 * @return
+		 */
+		public String formatInterval(String timeStamp) {
+
+			String thisInterval;
+
+			if(timeStamp != null) {
+				// handle String formation based on authored date
+				int interval = myDateHandler.getDaysAgo(timeStamp);
+
+				switch (interval) {
+				case 0:
+					thisInterval = "today";
+					break;
+				case 1:
+					thisInterval = Integer.toString(interval) + " day ago";
+					break;
+				default:
+					thisInterval = Integer.toString(interval) + " days ago";
+					break;
+				}
+			} else {
+				thisInterval = "";
+				Toast.makeText(MapActivity.this, "timeStamp is null", Toast.LENGTH_SHORT).show();
+			}
+			
+			// return String value to populate TextView in InfoWindow
+			return thisInterval;
+
+		}
+
 	} 
 
 

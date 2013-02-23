@@ -6,8 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ag.masters.placebase.sqlite.Story;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -217,5 +222,83 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		// TODO Auto-generated method stub
 
 	}
+	
+	/**
+	 * 
+	 * STORIES TABLE
+	 * All CRUD operations
+	 * 
+	 */
+	
+	
+	 /**
+     * Get all stories in the database 
+     * 
+     * @return List<Story> 
+     */
+    public List<Story> getAllStories() throws SQLException {
+		List<Story>allStories = new ArrayList<Story>();
+		
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + TABLE_STORIES;
+		
+		// open the database
+		this.openDataBase();
+		Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+		
+		if(cursor.moveToFirst()) {
+			do {
+				Story story = new Story();
+				story.setId(Integer.parseInt(cursor.getString(0)));
+				story.setUser(cursor.getInt(1));
+				story.setMedia(cursor.getInt(2));
+				story.setHear(cursor.getInt(3));
+				story.setSee(cursor.getInt(4));
+				story.setSmell(cursor.getInt(5));
+				story.setTaste(cursor.getInt(6));
+				story.setTouch(cursor.getInt(7));
+				story.setLat(cursor.getDouble(8));
+				story.setLng(cursor.getDouble(9));
+				story.setBearing(cursor.getFloat(10));
+				story.setTimestamp(cursor.getString(11));
+				story.setPerspectiveUri(cursor.getString(12));
+				
+				// add story to the list
+				allStories.add(story);
+				
+			} while (cursor.moveToNext());
+		}
+		
+		// close db connection
+		cursor.close();
+		this.close();
+		
+		// return story list
+		return allStories;
+	}
+    
+    
+    
+	/**
+	 * 
+	 * IMAGE TABLE
+	 * All CRUD operations
+	 * 
+	 */
+    
+	/**
+	 * 
+	 * VIDEO TABLE
+	 * All CRUD operations
+	 * 
+	 */
+
+	/**
+	 * 
+	 * AUDIO TABLE
+	 * All CRUD operations
+	 * 
+	 */
+    
 
 }
