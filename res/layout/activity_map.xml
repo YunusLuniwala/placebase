@@ -95,7 +95,9 @@
                             android:layout_below="@+id/txt_metersaway"
                             android:layout_centerHorizontal="true"
                             android:text="45600"
+                            android:textColor="@android:color/black"
                             android:textSize="28sp" />
+
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -106,7 +108,7 @@
                         android:layout_weight=".40" >
 
                         <ImageView
-                            android:id="@+id/imageView1"
+                            android:id="@+id/ic_alignment"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
@@ -116,10 +118,28 @@
                             android:id="@+id/journey_bearing"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignRight="@+id/imageView1"
+                            android:layout_alignRight="@+id/ic_alignment"
                             android:layout_centerVertical="true"
                             android:text="Large Text"
                             android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <FrameLayout
+                            android:id="@+id/container_compass"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="40dp" >
+
+                            <ImageView
+                                android:id="@+id/ic_compass"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:adjustViewBounds="true"
+                                android:paddingBottom="5dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_compass" />
+
+                        </FrameLayout>
 
                     </RelativeLayout>
 

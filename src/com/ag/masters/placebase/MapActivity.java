@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-
+import com.ag.masters.placebase.model.Global;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -73,7 +74,10 @@ public class MapActivity extends Activity
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
 	public static final int ZOOM_LEVEL = 13;
-
+	
+	private static final int TARGET_BEARING = 20;
+	private static final int TARGET_RANGE = 5;
+	
 	private GoogleMap mMap;	
 
 	// journey mode 
@@ -145,15 +149,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	Button btnCloseJourneyPanel;
 	TextView journeyBearing;
 	TextView journeyDistance;
+	ImageView compass;
+	ImageView alignmentIcon;
 	
 	// Animation
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
-	
-	// intent request codes
-	private static final int IMAGE_CAPTURE = 0;
-	private static final int VIDEO_CAPTURE = 1;
-	private static final int AUDIO_CAPTURE = 2;
 
 	//------------------------------------------------------------------------------------------
 	@Override
@@ -198,7 +199,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
 		testPitch = (TextView) findViewById(R.id.testPitch);
 		testRoll = (TextView) findViewById(R.id.testRoll);
+		
 
+		
 		//testGeoX.setText("0.00");
 		//testGeoY.setText("0.00");
 		//testGeoZ.setText("0.00");
@@ -223,6 +226,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		journeyDistance = (TextView) findViewById(R.id.journey_distance);
 		btnGetMessage = (Button) findViewById(R.id.journey_claim);
 		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_hidejourneyblock);
+		alignmentIcon = (ImageView) findViewById(R.id.ic_alignment);
+		compass = (ImageView) findViewById(R.id.ic_compass);
 		
 		// TODO: not the best... a swipe gesture would be better here
 		btnCloseJourneyPanel.setLongClickable(true); 
@@ -234,6 +239,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				updateJourneyMode();
 			}
 		});
+		
 		
 		// define media buttons and layouts as globals
 		layoutRecordMedia2 = (FrameLayout) findViewById(R.id.recordBtnLayout2);
@@ -360,7 +366,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(new File(filename).toString()));
 		
 		startCameraActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		startActivityForResult(startCameraActivity, IMAGE_CAPTURE); // can add options as a bundle
+		startActivityForResult(startCameraActivity, Global.IMAGE_CAPTURE); // can add options as a bundle
 
 	}
 
@@ -389,7 +395,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		// also check to see that the request code is OK
 		switch(requestCode) {
-		case IMAGE_CAPTURE:
+		case Global.IMAGE_CAPTURE:
 			if (resultCode == RESULT_OK) {
 				// create a new Image object
 				StoryImage image = new StoryImage();
@@ -409,21 +415,21 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 //				// image.setUri(extras.getString("URI"));
 //				myStoryFileHandler.saveStoryImageToFile(filename, bitmap);
 				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-				story.setMedia(IMAGE_CAPTURE);
+				story.setMedia(Global.IMAGE_CAPTURE);
 				break;
 			}
-		case VIDEO_CAPTURE:
+		case Global.VIDEO_CAPTURE:
 			// create a new Video object
 			StoryVideo video = new StoryVideo();
 			// video.setUri(extras.getString("URI"));
 			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-			story.setMedia(VIDEO_CAPTURE);
+			story.setMedia(Global.VIDEO_CAPTURE);
 			break;
-		case AUDIO_CAPTURE:
+		case Global.AUDIO_CAPTURE:
 			StoryAudio audio = new StoryAudio();
 			// String uri = extras.getString("URI"); // WHAT IS THE KEY???
 			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-			story.setMedia(AUDIO_CAPTURE);
+			story.setMedia(Global.AUDIO_CAPTURE);
 			break;
 		}
 
@@ -486,13 +492,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			//Bitmap mCompass = BitmapFactory.decodeResource(res, R.drawable.ic_compass);
 			Bitmap mMedia;
 			switch(mediaType) {
-			case IMAGE_CAPTURE:// image
+			case Global.IMAGE_CAPTURE:// image
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_photo);
 				break;
-			case VIDEO_CAPTURE: // video
+			case Global.VIDEO_CAPTURE: // video
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_video);
 				break;
-			case AUDIO_CAPTURE: // audio
+			case Global.AUDIO_CAPTURE: // audio
 				mMedia = BitmapFactory.decodeResource(res, R.drawable.ic_record_audio);
 				break;
 			default:
@@ -711,7 +717,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void updateJourneyMode() {
 
 		// note: update journeyMode before calling this function
-
+		
+		boolean isWithinRange = false;
+		boolean isWithinBearing = false;
+		btnGetMessage.setEnabled(false);
+		
 		if (journeyMode != 1) {
 			// exit journey mode
 			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
@@ -738,12 +748,42 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
 			}
 			// calculate new values for bearing and distance to target
-			calculateBearingToTarget();
 			calculateDistanceToTarget();
+			calculateBearingToTarget();
+			// convert the float to int for display
+			int intDistance = (int)targetDistance;
 			// update Views with new values for bearing and distance
 			journeyBearing.setText(Float.toString(targetBearing));
-			journeyDistance.setText(Float.toString(targetDistance));
+			journeyDistance.setText(Integer.toString(intDistance));
+			// rotate the compass to reflect device bearing to target
+			compass.setRotation(targetBearing);
 
+			// if device bearing is within the target range
+			if (targetBearing >= -(TARGET_BEARING) && targetBearing <= TARGET_BEARING) {
+				isWithinBearing = true;
+			}
+			
+			if (targetDistance <= TARGET_RANGE) {
+				isWithinRange = true;
+			}
+			
+			// change icon to reflect true or false alignment
+			if (isWithinBearing == true) {
+				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_true));
+			} else {
+				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_false));
+			}
+			
+			if(isWithinRange == true) {
+				// make text green
+				journeyDistance.setTextColor(Color.GREEN);				
+			} else {
+				journeyDistance.setTextColor(Color.BLACK);
+			}
+			
+			if (isWithinRange && isWithinBearing) {
+				btnGetMessage.setEnabled(true);
+			}
 		}
 	}
 
@@ -913,7 +953,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	//------------------------------------------------------------------------------------------
 	public List<Story> getallStories() {
-
+		
+		// TODO: refactor for DatabaseHelper class (instead of DBAdapter)
+		
 		// create a new instance of the database adapter
 		StoriesDBAdapter myStoriesDBAdapter = new StoriesDBAdapter(this);
 
