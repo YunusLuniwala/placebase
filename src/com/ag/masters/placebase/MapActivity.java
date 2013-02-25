@@ -76,7 +76,7 @@ import com.google.android.gms.maps.model.VisibleRegion;
 public class MapActivity extends Activity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
-	public static final int ZOOM_LEVEL = 13;
+	public static final int ZOOM_LEVEL = 16;
 	
 	private static final int TARGET_BEARING = 20;
 	private static final int TARGET_RANGE = 5;
@@ -136,6 +136,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	float[] geomag = new float[3];
 	float[] orientVals = new float[3];
 
+	/*
+	 * time smoothing constant for low-pass filter
+	 * 0 ² x ² 1 ; a smaller value basically means more smoothing
+	 * See: http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
+	 */
+	static final float ALPHA = 0.2f;
+	protected float[] accelVals;
+	
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
 	
@@ -520,7 +528,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 			mIconDrawable.setBounds(0,0,100,100);
 			//mCompassDrawable.setBounds(25,0,75,75);
-			mMediaDrawable.setBounds(25,0,75,75);
+			mMediaDrawable.setBounds(15,10,85,80);
 
 			mIconDrawable.draw(c);
 			mMediaDrawable.draw(c);
@@ -842,6 +850,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	
 	}
 
+	
+	
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
 		// http://androiddev.orkitra.com/?p=3933	
@@ -1049,7 +1059,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// Gets the value of the sensor that has been changed
 		switch (event.sensor.getType()) {  
 		case Sensor.TYPE_ACCELEROMETER:
-			gravity = event.values.clone();
+			accelVals = event.values.clone();
+			accelVals = lowPass(event.values, accelVals);
+			
+			//gravity = event.values.clone();
+			
+			gravity = accelVals;
+			
 			//test
 			/*testAccelX.setText(Float.toString(gravity[0]));
 			testAccelY.setText(Float.toString(gravity[1]));
@@ -1086,6 +1102,20 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 
 	}	
+	
+	/**
+	 * @see http://en.wikipedia.org/wiki/Low-pass_filter#Algorithmic_implementation
+	 * @see http://developer.android.com/reference/android/hardware/Sensor.html#TYPE_ACCELEROMETER
+	 */
+	protected float[] lowPass( float[] input, float[] output ) {
+	    if ( output == null ) return input;
+
+	    for ( int i=0; i<input.length; i++ ) {
+	        output[i] = output[i] + ALPHA * (input[i] - output[i]);
+	    }
+	    return output;
+	}
+
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
