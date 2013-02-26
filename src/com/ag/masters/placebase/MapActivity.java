@@ -176,6 +176,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	
 	private Uri mCaptureImageUri;
+	private Uri mCaptureVideoUri;
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -381,9 +382,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			
 			// must specify the URI where the image will be stored
 			// as a global variable to access in onActivityResult
-			intent.putExtra(
-					MediaStore.EXTRA_OUTPUT, 
-					mCaptureImageUri);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, mCaptureImageUri);
 			
 			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 			startActivityForResult(intent, Global.IMAGE_CAPTURE); // can add options as a bundle
@@ -405,11 +404,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 	
 	/**
-	 * use built-in camera
+	 * use built-in video camera
 	 * save files to root
 	 */
 	private void startCaptureVideo() {
-		// TODO: 
+		//http://stackoverflow.com/questions/4990390/android-mediastore-action-video-capture-external-path
+		Intent intent = new Intent(android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
+		if(isAvailable(getApplicationContext(), intent)) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+			startActivityForResult(intent, Global.VIDEO_CAPTURE);
+		}
 	}
 	
 	
@@ -428,9 +432,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		switch(requestCode) {
 		case Global.IMAGE_CAPTURE:
 			if (resultCode == RESULT_OK) {
-				
-				// create a new media object
-				StoryImage image = new StoryImage();
 
 				// get filename from the column where we 
 				// specified it would be when we defined the intent (startCaptureImage())
@@ -441,39 +442,65 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				String capturedImageFilePath = cursor.getString(index);
 				
 				Log.i("IMAGE-CAPTURE", capturedImageFilePath);
+				
+				// create a new media object
+				StoryImage image = new StoryImage();
 				// and store the filepath in StoryImage object
 				image.setUri(capturedImageFilePath);
+				
 			} else if (resultCode == RESULT_CANCELED){
 				Log.i("IMAGE-CAPTURE", "image capture canceled");
 			} 
+			
 			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
 			story.setMedia(Global.IMAGE_CAPTURE);
 			break;
+		
 		case Global.VIDEO_CAPTURE:
-			// create a new Video object
-			StoryVideo video = new StoryVideo();
-			// video.setUri(extras.getString("URI"));
+			if (resultCode == RESULT_OK) {
+
+				Uri videoUri = data.getData();
+				
+				String[] projection = {MediaStore.Video.Media.DATA};
+				Cursor cursor = getContentResolver().query(videoUri, projection, null, null,null);
+				int index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+				cursor.moveToFirst();
+				String capturedVideoFilePath = cursor.getString(index);
+				
+				Log.i("VIDEO-CAPTURE", capturedVideoFilePath);
+				
+				// create a new Video object
+				StoryVideo video = new StoryVideo();
+				// and store the filepath in the StoryVideo object
+				video.setUri(capturedVideoFilePath);	
+			
+			} else if (resultCode == RESULT_CANCELED){
+				Log.i("VIDEO-CAPTURE", "video recording canceled");
+			} 
+			
 			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
 			story.setMedia(Global.VIDEO_CAPTURE);
 			break;
+		
 		case Global.AUDIO_CAPTURE:
 			if (resultCode == RESULT_OK) {
-				// create a new media object
-				StoryAudio audio = new StoryAudio();
+
 				// get the URI from the data returned
 				Uri audioUri = data.getData();
-				// convert the URI to a String
 
 				String[] projection = {MediaStore.Audio.AudioColumns.DATA};
 				Cursor cursor = getContentResolver().query(audioUri, projection, null, null, null);
 				int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATA);
 				cursor.moveToFirst();
+				// read String from the database column
 				String audioFilePath = cursor.getString(index);
-
-				Log.i("AUDIO-CAPTURE", audioFilePath);
-				
-				// and store the StoryAudio object
+		
+				// create a new media object
+				StoryAudio audio = new StoryAudio();
+				// store the filepath in the StoryAudio object
 				audio.setUri(audioFilePath);
+				
+				Log.i("AUDIO-CAPTURE", audioFilePath);
 				
 				//story.setUser(user); TODO: set this username on a previous login activity, or set a default
 				story.setMedia(Global.AUDIO_CAPTURE);
