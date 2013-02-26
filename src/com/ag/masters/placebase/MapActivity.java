@@ -12,7 +12,10 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -33,6 +36,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,7 +54,6 @@ import android.widget.Toast;
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
-import com.ag.masters.placebase.model.StoriesDBAdapter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
@@ -171,6 +174,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
 
+	
+	private Uri mCaptureImageUri;
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -308,7 +313,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 	
 
-	//------------------------------------------------------------------------------------------	
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
@@ -342,7 +346,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	
 	}
 
-	//------------------------------------------------------------------------------------------
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -354,55 +357,69 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		mMap.setLocationSource(null);
 	}
 
-	//------------------------------------------------------------------------------------------
+	/**
+	 * use built-in camera to record photos
+	 * save files to root
+	 */
 	private void startCaptureImage() {
-		// TODO: check that there is a camera
-		Intent startCameraActivity = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		
-		// all junk.
-		// look more at this...
-		///http://stackoverflow.com/questions/10042695/how-to-get-camera-result-as-a-uri-in-data-folder/10229228#10229228
-		String filename = "temp.jpg";
-		
-		File out = Environment.getExternalStorageDirectory();
-		out = new File(out, filename);
-		startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(out));
-		
-		ContentValues values = new ContentValues();
-		values.put(MediaStore.Images.Media.TITLE, filename);
-		Uri mCapturedImageURI = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-		
-		//StoryFileHandler myStoryFileHandler = new StoryFileHandler();
-		//String filename = myStoryFileHandler.createFilename(IMAGE_CAPTURE);
-		
-		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, mCapturedImageURI);
-		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(filename)));
-		//startCameraActivity.putExtra(MediaStore.EXTRA_OUTPUT, Uri.parse(new File(filename).toString()));
-		
-		startCameraActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-		startActivityForResult(startCameraActivity, Global.IMAGE_CAPTURE); // can add options as a bundle
-
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		if(isAvailable(getApplicationContext(), intent)) {
+			
+			// Hiyo, holy shitballs. what a pain this was
+			// http://stackoverflow.com/questions/4184951/get-path-of-image-from-action-image-capture-intent
+			
+			// define the filename
+			String filename = Environment.getExternalStorageDirectory().getAbsolutePath() 
+					+ String.valueOf(System.currentTimeMillis()) 
+					+ ".jpg";
+			
+			Log.i("IMAGE INTENT" , filename);
+			
+			ContentValues values = new ContentValues();
+			values.put(MediaStore.Images.Media.TITLE, filename);
+			mCaptureImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+			
+			// must specify the URI where the image will be stored
+			// as a global variable to access in onActivityResult
+			intent.putExtra(
+					MediaStore.EXTRA_OUTPUT, 
+					mCaptureImageUri);
+			
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+			startActivityForResult(intent, Global.IMAGE_CAPTURE); // can add options as a bundle
+		}
 	}
 
+	/**
+	 * use built-in audio recorder
+	 * saves files to root
+	 * 
+	 * see tut: http://www.grokkingandroid.com/recording-audio-using-androids-mediarecorder-framework/
+	 */
+	private void startCaptureAudio() {
+		Intent intent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+		if(isAvailable(getApplicationContext(), intent)) {
+			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+			startActivityForResult(intent, Global.AUDIO_CAPTURE);
+		}
+	}
+	
+	/**
+	 * use built-in camera
+	 * save files to root
+	 */
 	private void startCaptureVideo() {
 		// TODO: 
 	}
-
-	private void startCaptureAudio() {
-		// TODO:
-	}
-
-	// handle results from Recording activity
+	
+	
+	/**
+	 * Handle Results from Recording Activities
+	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
-		Bundle extras = data.getExtras();
 
-		// create the handler object to write files to SD card
-		//StoryFileHandler myStoryFileHandler = new StoryFileHandler();
-		// create a filename for returned object
-		//String filename = myStoryFileHandler.createFilename(requestCode);
+		super.onActivityResult(requestCode, resultCode, data);
 
 		// create new story object
 		Story story = new Story();
@@ -411,27 +428,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		switch(requestCode) {
 		case Global.IMAGE_CAPTURE:
 			if (resultCode == RESULT_OK) {
-				// create a new Image object
-				StoryImage image = new StoryImage();
-				// turn URI into string and store in Image object TODO: figure out this URI key
-				Uri imageUri = data.getData();
 				
-				Bitmap bitmap = null;
-				try {
-					bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-//				// image.setUri(extras.getString("URI"));
-//				myStoryFileHandler.saveStoryImageToFile(filename, bitmap);
-				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-				story.setMedia(Global.IMAGE_CAPTURE);
-				break;
-			}
+				// create a new media object
+				StoryImage image = new StoryImage();
+
+				// get filename from the column where we 
+				// specified it would be when we defined the intent (startCaptureImage())
+				String[] projection = {MediaStore.Images.Media.DATA};
+				Cursor cursor = getContentResolver().query(mCaptureImageUri, projection, null, null, null);
+				int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				cursor.moveToFirst();
+				String capturedImageFilePath = cursor.getString(index);
+				
+				Log.i("IMAGE-CAPTURE", capturedImageFilePath);
+				// and store the filepath in StoryImage object
+				image.setUri(capturedImageFilePath);
+			} else if (resultCode == RESULT_CANCELED){
+				Log.i("IMAGE-CAPTURE", "image capture canceled");
+			} 
+			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+			story.setMedia(Global.IMAGE_CAPTURE);
+			break;
 		case Global.VIDEO_CAPTURE:
 			// create a new Video object
 			StoryVideo video = new StoryVideo();
@@ -440,16 +457,50 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			story.setMedia(Global.VIDEO_CAPTURE);
 			break;
 		case Global.AUDIO_CAPTURE:
-			StoryAudio audio = new StoryAudio();
-			// String uri = extras.getString("URI"); // WHAT IS THE KEY???
-			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-			story.setMedia(Global.AUDIO_CAPTURE);
-			break;
+			if (resultCode == RESULT_OK) {
+				// create a new media object
+				StoryAudio audio = new StoryAudio();
+				// get the URI from the data returned
+				Uri audioUri = data.getData();
+				// convert the URI to a String
+
+				String[] projection = {MediaStore.Audio.AudioColumns.DATA};
+				Cursor cursor = getContentResolver().query(audioUri, projection, null, null, null);
+				int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATA);
+				cursor.moveToFirst();
+				String audioFilePath = cursor.getString(index);
+
+				Log.i("AUDIO-CAPTURE", audioFilePath);
+				
+				// and store the StoryAudio object
+				audio.setUri(audioFilePath);
+				
+				//story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setMedia(Global.AUDIO_CAPTURE);
+				break;
+			} else if (resultCode == RESULT_CANCELED){
+				Log.i("AUDIO-CAPTURE", "audio recording canceled");
+			}
 		}
 
-		// start SensesActivity,
+		// start SensesActivity
 		// pass parcellable Story
 		// pass parcellable StoryAudio, StoryVideo, or StoryImage too.
+	}
+
+
+	/**
+	 * Check that an intent is available before using it.
+	 * @param context
+	 * @param intent
+	 * @return true, if there is an intent available to handle the request.
+	 * 
+	 * see tut: http://www.grokkingandroid.com/checking-intent-availability/
+	 */
+	public static boolean isAvailable(Context c, Intent i) {
+		final PackageManager mgr = c.getPackageManager();
+		List<ResolveInfo> list = mgr.queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY);
+		return list.size() > 0;
 	}
 
 
@@ -846,11 +897,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if(rotateView) {
 			rotateMyCamera();
 		}
-	
-	
 	}
-
-	
 	
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
@@ -914,26 +961,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 		}
 	}
-	//------------------------------------------------------------------------------------------
-	private void updateTestValues() {
-		if (myCurrentLocation != null) {
-			if (journeyMode >= -1 && journeyMode <= 1) {
-				testJourneyMode.setText("journey MODE: " + String.valueOf(journeyMode));
-			}
-			if (targetLocation != null) {
-				testTargetLat.setText("TargetLat: " + targetLocation.getLatitude());
-				testTargetLng.setText("TargetLng: " + targetLocation.getLongitude());	
-			}
-			if(targetDistance != 0) {
-				testTargetDistance.setText("TargetDistance: " + targetDistance);
-			} 
-			if (targetBearing != 0) {
-				testTargetBearing.setText("targetBearing: " + targetBearing);
-			}
-		}
-
-
-	}
 
 	//------------------------------------------------------------------------------------------
 	@SuppressLint("NewApi")
@@ -950,9 +977,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			screenWidth = display.getWidth();
 		}
 	}
-
-
-
 	//------------------------------------------------------------------------------------------
 	// LOCATION LISTENER
 	// http://android-er.blogspot.com/2013/01/implement-locationsource-and.html

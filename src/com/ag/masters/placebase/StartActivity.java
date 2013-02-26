@@ -13,14 +13,14 @@ import android.widget.Button;
 
 import com.ag.masters.placebase.model.DatabaseHelper;
 
-public class MainActivity extends Activity {
+public class StartActivity extends Activity {
 
 	DatabaseHelper mDatabaseHelper;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_start);
 
 		mDatabaseHelper = new DatabaseHelper(this);
 		try {
@@ -39,7 +39,7 @@ public class MainActivity extends Activity {
 			
 			@Override
 			public void onClick(View v) {
-				Intent beginMap = new Intent(MainActivity.this, MapActivity.class);
+				Intent beginMap = new Intent(StartActivity.this, MapActivity.class);
 				startActivity(beginMap);
 				
 			}
