@@ -2,18 +2,31 @@ package com.ag.masters.placebase;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 
 import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.sqlite.Story;
 
 public class SenseActivity extends Activity {
 
+	private Story story;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sense);
 		
+		Bundle data = getIntent().getExtras();
+		Story tempStory = data.getParcelable("story");
+		if (tempStory != null) {
+			story = tempStory;
+		}else {
+			throw new RuntimeException(
+					"SenseActivity: story passed was null");
+		}
+
 		
 		TextView testDate = (TextView) findViewById(R.id.testDate);
 		TextView testInterval = (TextView) findViewById(R.id.testInterval);
@@ -33,7 +46,10 @@ public class SenseActivity extends Activity {
 		} else {
 			thisInterval = Integer.toString(interval) + " days ago";
 		}
+		
+		thisInterval = Integer.toString(story.getUser());
 		testInterval.setText(thisInterval);
+		
 		
 		
 	}

@@ -168,7 +168,8 @@ containing a value of this type.
         public static final int ic_sense_smell=0x7f020022;
         public static final int ic_sense_taste=0x7f020023;
         public static final int ic_sense_touch=0x7f020024;
-        public static final int markerbubble=0x7f020025;
+        public static final int logo_placebase=0x7f020025;
+        public static final int markerbubble=0x7f020026;
     }
     public static final class id {
         public static final int TextView01=0x7f050027;
@@ -185,38 +186,39 @@ containing a value of this type.
         public static final int btnShowMyLocation=0x7f050018;
         public static final int btnVideo=0x7f050014;
         public static final int btn_hidejourneyblock=0x7f050006;
-        public static final int cont_senses=0x7f050034;
+        public static final int cont_senses=0x7f050035;
         public static final int container_compass=0x7f05000f;
-        public static final int daysago=0x7f050032;
+        public static final int daysago=0x7f050033;
         public static final int geoX=0x7f050028;
         public static final int geoY=0x7f050029;
         public static final int geoZ=0x7f05002a;
         public static final int ic_alignment=0x7f05000d;
         public static final int ic_compass=0x7f050010;
         public static final int ic_info_media=0x7f050007;
-        public static final int ic_perspective=0x7f050031;
-        public static final int ic_sense_hear=0x7f050035;
-        public static final int ic_sense_see=0x7f050036;
-        public static final int ic_sense_smell=0x7f050037;
-        public static final int ic_sense_taste=0x7f050038;
-        public static final int ic_sense_touch=0x7f050039;
+        public static final int ic_perspective=0x7f050032;
+        public static final int ic_sense_hear=0x7f050036;
+        public static final int ic_sense_see=0x7f050037;
+        public static final int ic_sense_smell=0x7f050038;
+        public static final int ic_sense_taste=0x7f050039;
+        public static final int ic_sense_touch=0x7f05003a;
         public static final int journey_bearing=0x7f05000e;
         public static final int journey_claim=0x7f050011;
         public static final int journey_distance=0x7f05000b;
         public static final int journey_mute=0x7f050008;
         public static final int journeyblock=0x7f050005;
         public static final int linearLayout1=0x7f05002b;
+        public static final int logo=0x7f05002f;
         public static final int map=0x7f050004;
-        public static final int menu_settings=0x7f05003a;
-        public static final int msgavailable=0x7f050033;
+        public static final int menu_settings=0x7f05003b;
+        public static final int msgavailable=0x7f050034;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
         public static final int recordBtnLayout=0x7f050013;
         public static final int recordBtnLayout2=0x7f050012;
         public static final int satellite=0x7f050002;
-        public static final int saved_spaces=0x7f05003b;
+        public static final int saved_spaces=0x7f05003c;
         public static final int startapp_btn=0x7f050030;
-        public static final int tagline=0x7f05002f;
+        public static final int tagline=0x7f050031;
         public static final int terrain=0x7f050003;
         public static final int testAzimuth=0x7f05001b;
         public static final int testDate=0x7f05002d;
@@ -231,7 +233,7 @@ containing a value of this type.
         public static final int testTargetLat=0x7f05001e;
         public static final int testTargetLng=0x7f05001f;
         public static final int txt_metersaway=0x7f05000a;
-        public static final int user_places=0x7f05003c;
+        public static final int user_places=0x7f05003d;
     }
     public static final class layout {
         public static final int activity_map=0x7f030000;
@@ -294,25 +296,27 @@ containing a value of this type.
         Google Play services (from Play Store) [CHAR LIMIT=40] 
          */
         public static final int common_google_play_services_update_title=0x7f060007;
-        public static final int get_message=0x7f060016;
+        public static final int get_message=0x7f060018;
         public static final int hello_world=0x7f06000d;
-        public static final int jouney_distance=0x7f060020;
+        public static final int jouney_distance=0x7f060022;
+        public static final int login=0x7f060011;
         public static final int menu_settings=0x7f06000c;
-        public static final int perspective_get_psyched=0x7f06001c;
-        public static final int perspective_instructions=0x7f06001b;
-        public static final int perspective_record_cta=0x7f06001d;
-        public static final int perspective_title=0x7f06001a;
-        public static final int record=0x7f060012;
-        public static final int recordsense_instructions=0x7f060019;
-        public static final int recordsense_title=0x7f060018;
-        public static final int saved_spaces=0x7f060013;
-        public static final int story_confirm=0x7f06001e;
-        public static final int story_confirm_addl=0x7f06001f;
+        public static final int perspective_get_psyched=0x7f06001e;
+        public static final int perspective_instructions=0x7f06001d;
+        public static final int perspective_record_cta=0x7f06001f;
+        public static final int perspective_title=0x7f06001c;
+        public static final int record=0x7f060014;
+        public static final int recordsense_instructions=0x7f06001b;
+        public static final int recordsense_title=0x7f06001a;
+        public static final int saved_spaces=0x7f060015;
+        public static final int sign_up=0x7f060012;
+        public static final int story_confirm=0x7f060020;
+        public static final int story_confirm_addl=0x7f060021;
         public static final int tagline=0x7f06000e;
-        public static final int title_activity_map=0x7f060011;
-        public static final int title_activity_sense=0x7f060017;
-        public static final int title_activity_video_player=0x7f060015;
-        public static final int user_stories=0x7f060014;
+        public static final int title_activity_map=0x7f060013;
+        public static final int title_activity_sense=0x7f060019;
+        public static final int title_activity_video_player=0x7f060017;
+        public static final int user_stories=0x7f060016;
     }
     public static final class style {
         /** 

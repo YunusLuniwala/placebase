@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/background_dark"
     tools:context=".StartActivity" >
 
     <FrameLayout
@@ -16,20 +17,42 @@
             android:scaleType="centerCrop"
             android:src="@drawable/bgimage_launcher" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/background_dark"
+                android:src="@drawable/logo_placebase" />
+
+            <Button
+                android:id="@+id/startapp_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="false"
+                android:layout_margin="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@android:color/background_dark"
+                android:text="@string/login"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tagline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/logo"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/tagline"
+                android:textSize="22sp" />
+
+        </RelativeLayout>
+
     </FrameLayout>
-
-    <TextView
-        android:id="@+id/tagline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tagline"
-        android:textSize="22sp" />
-
-    <Button
-        android:id="@+id/startapp_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="31dp"
-        android:text="@string/begin_app" />
 
 </RelativeLayout>

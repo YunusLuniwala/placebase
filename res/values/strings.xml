@@ -7,6 +7,8 @@
     <string name="tagline">Sense your surroundings</string>
     <string name="begin_journey">journey here</string>
     <string name="begin_app">Go</string>
+    <string name="login">login</string>
+    <string name="sign_up">I\'m new</string>
     <string name="title_activity_map">Map</string>
     <string name="record">Record</string>
     <string name="saved_spaces">Saved Spaces</string>

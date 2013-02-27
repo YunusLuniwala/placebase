@@ -428,6 +428,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// create new story object
 		Story story = new Story();
 
+		// create new Intent
+		// so we can add parcellables to it.
+		Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
+		
 		// also check to see that the request code is OK
 		switch(requestCode) {
 		case Global.IMAGE_CAPTURE:
@@ -509,10 +513,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				Log.i("AUDIO-CAPTURE", "audio recording canceled");
 			}
 		}
-
-		// start SensesActivity
-		// pass parcellable Story
-		// pass parcellable StoryAudio, StoryVideo, or StoryImage too.
+		
+		// only start the new activity if the recording was not cancelled
+		if (resultCode == RESULT_OK)  {
+			// pass in Story parcel
+			startSenses.putExtra("story", story);
+			// start SensesActivity
+			startActivity(startSenses);
+		}
 	}
 
 

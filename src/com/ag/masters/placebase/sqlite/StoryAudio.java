@@ -5,7 +5,6 @@ public class StoryAudio {
 	int _story;
 	String _uri;
 	
-	
 	// empty Constructor
 	public StoryAudio() {
 		
@@ -47,4 +46,6 @@ public class StoryAudio {
 	public void setUri(String uri) {
 		this._uri = uri;
 	}
+	
+	
 }	
