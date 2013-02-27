@@ -26,7 +26,7 @@
         android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -39,8 +39,8 @@
 
         <activity
             android:name="com.ag.masters.placebase.StartActivity"
-            android:label="@string/app_name" 
-            android:theme="@android:style/Theme.Holo.NoActionBar">
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Holo.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,12 +62,16 @@
         </activity>
         <activity
             android:name="com.ag.masters.placebase.SenseActivity"
-            android:label="@string/confirm_recording" 
             android:configChanges="orientation"
+            android:label="@string/confirm_recording"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.ConfirmTrace"
+            android:label="@string/title_activity_confirm_trace" >
         </activity>
     </application>
 

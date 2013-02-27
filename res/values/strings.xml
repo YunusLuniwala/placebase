@@ -27,5 +27,6 @@
     <string name="story_confirm">Success!</string>
     <string name="story_confirm_addl">You left a trace.</string>
     <string name="jouney_distance">METERS AWAY</string>
+    <string name="title_activity_confirm_trace">ConfirmTrace</string>
 
 </resources>
