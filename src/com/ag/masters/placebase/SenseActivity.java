@@ -109,13 +109,10 @@ public class SenseActivity extends Activity {
 		
 		// test
 		//story = new Story();
-		
-		setUpSenseBtns();
 
 		// close btn
-		ImageButton close = (ImageButton) findViewById(R.id.btn_close_senses);
+		ImageButton close = (ImageButton) findViewById(R.id.btn_close_caption);
 		close.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(SenseActivity.this, MapActivity.class);
@@ -123,10 +120,13 @@ public class SenseActivity extends Activity {
 			}
 		});
 		
+		// add Click Listeners to sense Buttons
+		setUpSenseBtns();
+		
 	}
 
 	/**
-	 * set on Click Listners and add attributes to story element
+	 * set on Click Listeners and add attributes to story element
 	 * when the sense Buttons are clicked
 	 */
 	private void setUpSenseBtns() {
@@ -136,7 +136,7 @@ public class SenseActivity extends Activity {
 		final ImageButton btnTaste = (ImageButton) findViewById(R.id.btn_record_taste);
 		final ImageButton btnTouch = (ImageButton) findViewById(R.id.btn_record_touch);
 		
-		List<ImageButton> imageButtons = new ArrayList();
+		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
 		imageButtons.add(btnHear);
 		imageButtons.add(btnSee);
 		imageButtons.add(btnSmell);
@@ -202,10 +202,12 @@ public class SenseActivity extends Activity {
 		
 	}
 	
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_sense, menu);
+		getMenuInflater().inflate(R.menu.main_menu, menu);
 		return true;
 	}
 

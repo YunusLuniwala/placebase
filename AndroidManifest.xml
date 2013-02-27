@@ -73,6 +73,18 @@
             android:name="com.ag.masters.placebase.ConfirmTrace"
             android:label="@string/title_activity_confirm_trace" >
         </activity>
+        <activity
+            android:name="com.ag.masters.placebase.Caption"
+            android:label="@string/title_activity_caption" >
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.Login"
+            android:label="@string/title_activity_login" >
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.NewUser"
+            android:label="@string/title_activity_new_user" >
+        </activity>
     </application>
 
 </manifest>

@@ -28,17 +28,32 @@
                 android:background="@android:color/background_dark"
                 android:src="@drawable/logo_placebase" />
 
-            <Button
-                android:id="@+id/startapp_btn"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="false"
-                android:layout_margin="10dp"
-                android:layout_marginLeft="10dp"
-                android:background="@android:color/background_dark"
-                android:text="@string/login"
-                android:textColor="@android:color/white" />
+                android:layout_margin="5dp"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="false"
+                    android:layout_marginBottom="10dp"
+                    android:background="@android:color/background_dark"
+                    android:text="@string/login"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/btn_newuser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="false"
+                    android:background="@android:color/background_dark"
+                    android:text="@string/sign_up_btn"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tagline"

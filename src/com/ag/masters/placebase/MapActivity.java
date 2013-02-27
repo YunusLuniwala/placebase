@@ -438,10 +438,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// create a new media object
 			StoryAudio audio = new StoryAudio();
 			
-			// create new Intent
+			// create new Intent for video, audio (not photo)
 			// so we can add parcels to it.
 			Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
-
+			
 			// also check to see that the request code is OK
 			switch(requestCode) {
 			case Global.IMAGE_CAPTURE:
@@ -464,10 +464,15 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					Log.i("IMAGE-CAPTURE", "image capture canceled");
 				} 
 
+				Intent startCaption = new Intent(MapActivity.this, Caption.class);
 				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
 				story.setMedia(Global.IMAGE_CAPTURE);
 				// pass in StoryImage parcel
-				startSenses.putExtra("image", image);
+				startCaption.putExtra("image", image);
+				// pass in Story parcel
+				startCaption.putExtra("story", story);
+				// start SensesActivity
+				startActivity(startCaption);
 				
 				break;
 
@@ -496,6 +501,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				story.setMedia(Global.VIDEO_CAPTURE);
 				// pass in StoryVideo parcel
 				startSenses.putExtra("video", video);
+				// pass in Story parcel
+				startSenses.putExtra("story", story);
+				// start SensesActivity
+				startActivity(startSenses);
 				
 				break;
 
@@ -523,6 +532,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 					// pass in StoryAudio parcel
 					startSenses.putExtra("audio", audio);
+					// pass in Story parcel
+					startSenses.putExtra("story", story);
+					// start SensesActivity
+					startActivity(startSenses);
 
 					break;
 				} else if (resultCode == RESULT_CANCELED){
@@ -531,10 +544,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 
 
-			// pass in Story parcel
-			startSenses.putExtra("story", story);
-			// start SensesActivity
-			startActivity(startSenses);
+			
 		}
 	}
 

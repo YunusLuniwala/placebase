@@ -7,8 +7,14 @@
     <string name="tagline">Sense your surroundings</string>
     <string name="begin_journey">journey here</string>
     <string name="begin_app">Go</string>
-    <string name="login">login</string>
-    <string name="sign_up">I\'m new</string>
+    <string name="login">Login</string>
+    <string name="login_title">Good to see you</string>
+    <string name="login_instructions">Enter your username and password</string>
+    <string name="sign_up_title">Join</string>
+    <string name="sign_up_instructions">PlaceBase lets you record and retrieve geotagged messages.\n\nGet personal with the spaces around you where people have stood before.</string>
+    <string name="sign_up_username">Select a username:</string>
+    <string name="sign_up_password">Enter a password:</string>
+    <string name="sign_up_btn">Create New Account</string>
     <string name="title_activity_map">Map</string>
     <string name="record">Record</string>
     <string name="saved_spaces">Saved Spaces</string>
@@ -28,5 +34,10 @@
     <string name="story_confirm_addl">You left a trace.</string>
     <string name="jouney_distance">METERS AWAY</string>
     <string name="title_activity_confirm_trace">ConfirmTrace</string>
+    <string name="title_activity_caption">Caption</string>
+    <string name="caption_hint">What happened here is...</string>
+    <string name="btn_done">Done</string>
+    <string name="title_activity_login">Login</string>
+    <string name="title_activity_new_user">NewUser</string>
 
 </resources>

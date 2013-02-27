@@ -21,7 +21,10 @@ public class StartActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-
+		
+		/**
+		 * Create database if it does not exist
+		 */
 		mDatabaseHelper = new DatabaseHelper(this);
 		try {
 			mDatabaseHelper.createDataBase();
@@ -34,16 +37,32 @@ public class StartActivity extends Activity {
 			throw sqle;
 		}
 		
-		Button startBtn = (Button) findViewById(R.id.startapp_btn);
-		startBtn.setOnClickListener(new OnClickListener() {
-			
+		/**
+		 * LOGIN
+		 */
+		Button btnLogin = (Button) findViewById(R.id.btn_login);
+		btnLogin.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent beginMap = new Intent(StartActivity.this, MapActivity.class);
-				startActivity(beginMap);
-				
+				//Intent beginMap = new Intent(StartActivity.this, MapActivity.class);
+				// startActivity(beginMap);
+				Intent loginActivity = new Intent(StartActivity.this, Login.class);
+				startActivity(loginActivity);
 			}
 		});
+		
+		/**
+		 * NEW USER
+		 */
+		Button newAccount = (Button) findViewById(R.id.btn_newuser);
+		newAccount.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent newUserActivity = new Intent(StartActivity.this, NewUser.class);
+				startActivity(newUserActivity);
+			}
+		});
+		
 	}
 
 	@Override
