@@ -508,6 +508,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				
 				//story.setUser(user); TODO: set this username on a previous login activity, or set a default
 				story.setMedia(Global.AUDIO_CAPTURE);
+				
+				// pass in StoryAudio parcel
+				startSenses.putExtra("audio", audio);
+				
 				break;
 			} else if (resultCode == RESULT_CANCELED){
 				Log.i("AUDIO-CAPTURE", "audio recording canceled");

@@ -188,7 +188,7 @@ public class Story implements Parcelable {
 		return this._markerId;
 	}
 	/**
-	 * TODO: AS A PARCELLABLE ITEM
+	 *  AS A PARCELLABLE ITEM
 	 * 
 	 * @see http://techdroid.kbeanie.com/2010/06/parcelable-how-to-do-that-in-android.html
 	 * @see http://shri.blog.kraya.co.uk/2010/04/26/android-parcel-data-to-pass-between-activities-using-parcelable-classes/
@@ -218,7 +218,7 @@ public class Story implements Parcelable {
 		// We just need to write each field into the
 		// parcel. When we read from parcel, they
 		// will come back in the same order
-		Log.v("Writing to Parcel", "writeToParcel..." + flags);
+		Log.v("Writing Story to Parcel", "writeToParcel..." + flags);
 		dest.writeInt(_id);
 		dest.writeInt(_user);
 		dest.writeInt(_media);
