@@ -17,6 +17,7 @@
     <string name="get_message">Get Message</string>
     <string name="title_activity_sense">SenseActivity</string>
     <string name="recordsense_title">The Five Senses</string>
+    <string name="confirm_recording">Message Recorded!</string>
     <string name="recordsense_instructions">What should others use to retrieve your story?</string>
     <string name="perspective_title">Your Perspective</string>
     <string name="perspective_instructions">Face the direction you want people to stand in.</string>

@@ -62,7 +62,9 @@
         </activity>
         <activity
             android:name="com.ag.masters.placebase.SenseActivity"
-            android:label="@string/title_activity_sense" >
+            android:label="@string/confirm_recording" 
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

@@ -425,101 +425,112 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		super.onActivityResult(requestCode, resultCode, data);
 
-		// create new story object
-		Story story = new Story();
 
-		// create new Intent
-		// so we can add parcellables to it.
-		Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
-		
-		// also check to see that the request code is OK
-		switch(requestCode) {
-		case Global.IMAGE_CAPTURE:
-			if (resultCode == RESULT_OK) {
-
-				// get filename from the column where we 
-				// specified it would be when we defined the intent (startCaptureImage())
-				String[] projection = {MediaStore.Images.Media.DATA};
-				Cursor cursor = getContentResolver().query(mCaptureImageUri, projection, null, null, null);
-				int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-				cursor.moveToFirst();
-				String capturedImageFilePath = cursor.getString(index);
-				
-				Log.i("IMAGE-CAPTURE", capturedImageFilePath);
-				
-				// create a new media object
-				StoryImage image = new StoryImage();
-				// and store the filepath in StoryImage object
-				image.setUri(capturedImageFilePath);
-				
-			} else if (resultCode == RESULT_CANCELED){
-				Log.i("IMAGE-CAPTURE", "image capture canceled");
-			} 
-			
-			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-			story.setMedia(Global.IMAGE_CAPTURE);
-			break;
-		
-		case Global.VIDEO_CAPTURE:
-			if (resultCode == RESULT_OK) {
-
-				Uri videoUri = data.getData();
-				
-				String[] projection = {MediaStore.Video.Media.DATA};
-				Cursor cursor = getContentResolver().query(videoUri, projection, null, null,null);
-				int index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-				cursor.moveToFirst();
-				String capturedVideoFilePath = cursor.getString(index);
-				
-				Log.i("VIDEO-CAPTURE", capturedVideoFilePath);
-				
-				// create a new Video object
-				StoryVideo video = new StoryVideo();
-				// and store the filepath in the StoryVideo object
-				video.setUri(capturedVideoFilePath);	
-			
-			} else if (resultCode == RESULT_CANCELED){
-				Log.i("VIDEO-CAPTURE", "video recording canceled");
-			} 
-			
-			// story.setUser(user); TODO: set this username on a previous login activity, or set a default
-			story.setMedia(Global.VIDEO_CAPTURE);
-			break;
-		
-		case Global.AUDIO_CAPTURE:
-			if (resultCode == RESULT_OK) {
-
-				// get the URI from the data returned
-				Uri audioUri = data.getData();
-
-				String[] projection = {MediaStore.Audio.AudioColumns.DATA};
-				Cursor cursor = getContentResolver().query(audioUri, projection, null, null, null);
-				int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATA);
-				cursor.moveToFirst();
-				// read String from the database column
-				String audioFilePath = cursor.getString(index);
-		
-				// create a new media object
-				StoryAudio audio = new StoryAudio();
-				// store the filepath in the StoryAudio object
-				audio.setUri(audioFilePath);
-				
-				Log.i("AUDIO-CAPTURE", audioFilePath);
-				
-				//story.setUser(user); TODO: set this username on a previous login activity, or set a default
-				story.setMedia(Global.AUDIO_CAPTURE);
-				
-				// pass in StoryAudio parcel
-				startSenses.putExtra("audio", audio);
-				
-				break;
-			} else if (resultCode == RESULT_CANCELED){
-				Log.i("AUDIO-CAPTURE", "audio recording canceled");
-			}
-		}
-		
 		// only start the new activity if the recording was not cancelled
 		if (resultCode == RESULT_OK)  {
+			
+			// create new story object
+			Story story = new Story();
+			// create a new media object
+			StoryImage image = new StoryImage();
+			// create a new Video object
+			StoryVideo video = new StoryVideo();
+			// create a new media object
+			StoryAudio audio = new StoryAudio();
+			
+			// create new Intent
+			// so we can add parcels to it.
+			Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
+
+			// also check to see that the request code is OK
+			switch(requestCode) {
+			case Global.IMAGE_CAPTURE:
+				if (resultCode == RESULT_OK) {
+
+					// get filename from the column where we 
+					// specified it would be when we defined the intent (startCaptureImage())
+					String[] projection = {MediaStore.Images.Media.DATA};
+					Cursor cursor = getContentResolver().query(mCaptureImageUri, projection, null, null, null);
+					int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+					cursor.moveToFirst();
+					String capturedImageFilePath = cursor.getString(index);
+
+					Log.i("IMAGE-CAPTURE", capturedImageFilePath);
+
+					// and store the filepath in StoryImage object
+					image.setUri(capturedImageFilePath);
+
+				} else if (resultCode == RESULT_CANCELED){
+					Log.i("IMAGE-CAPTURE", "image capture canceled");
+				} 
+
+				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setMedia(Global.IMAGE_CAPTURE);
+				// pass in StoryImage parcel
+				startSenses.putExtra("image", image);
+				
+				break;
+
+			case Global.VIDEO_CAPTURE:
+				if (resultCode == RESULT_OK) {
+
+					Uri videoUri = data.getData();
+
+					String[] projection = {MediaStore.Video.Media.DATA};
+					Cursor cursor = getContentResolver().query(videoUri, projection, null, null,null);
+					int index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+					cursor.moveToFirst();
+					String capturedVideoFilePath = cursor.getString(index);
+
+					Log.i("VIDEO-CAPTURE", capturedVideoFilePath);
+
+					
+					// and store the filepath in the StoryVideo object
+					video.setUri(capturedVideoFilePath);	
+
+				} else if (resultCode == RESULT_CANCELED){
+					Log.i("VIDEO-CAPTURE", "video recording canceled");
+				} 
+
+				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setMedia(Global.VIDEO_CAPTURE);
+				// pass in StoryVideo parcel
+				startSenses.putExtra("video", video);
+				
+				break;
+
+			case Global.AUDIO_CAPTURE:
+				if (resultCode == RESULT_OK) {
+
+					// get the URI from the data returned
+					Uri audioUri = data.getData();
+
+					String[] projection = {MediaStore.Audio.AudioColumns.DATA};
+					Cursor cursor = getContentResolver().query(audioUri, projection, null, null, null);
+					int index = cursor.getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATA);
+					cursor.moveToFirst();
+					// read String from the database column
+					String audioFilePath = cursor.getString(index);
+
+					
+					// store the filepath in the StoryAudio object
+					audio.setUri(audioFilePath);
+
+					Log.i("AUDIO-CAPTURE", audioFilePath);
+
+					//story.setUser(user); TODO: set this username on a previous login activity, or set a default
+					story.setMedia(Global.AUDIO_CAPTURE);
+
+					// pass in StoryAudio parcel
+					startSenses.putExtra("audio", audio);
+
+					break;
+				} else if (resultCode == RESULT_CANCELED){
+					Log.i("AUDIO-CAPTURE", "audio recording canceled");
+				}
+			}
+
+
 			// pass in Story parcel
 			startSenses.putExtra("story", story);
 			// start SensesActivity

@@ -121,7 +121,8 @@
                             android:layout_alignRight="@+id/ic_alignment"
                             android:layout_centerVertical="true"
                             android:text="Large Text"
-                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:visibility="invisible" />
 
                         <FrameLayout
                             android:id="@+id/container_compass"
@@ -155,14 +156,13 @@
         </LinearLayout>
     </RelativeLayout>
 
-    
       <FrameLayout
-        android:id="@+id/recordBtnLayout2"
-       android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/bg_mediabuttonlayout"
-        android:visibility="invisible" >
+          android:id="@+id/recordBtnLayout2"
+          android:layout_width="wrap_content"
+          android:layout_height="300dp"
+          android:layout_centerHorizontal="true"
+          android:background="@drawable/bg_recordcircle"
+          android:visibility="invisible" >
 
         <RelativeLayout
             android:id="@+id/recordBtnLayout"
@@ -172,21 +172,20 @@
 
             <ImageButton
                 android:id="@+id/btnVideo"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_marginRight="10dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginRight="20dp"
                 android:layout_marginTop="50dp"
+                android:adjustViewBounds="true"
                 android:background="@drawable/btn_white"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_record_video" />
 
             <ImageButton
                 android:id="@+id/btnAudio"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_margin="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
                 android:layout_toRightOf="@id/btnVideo"
                 android:background="@drawable/btn_white"
                 android:scaleType="centerCrop"
@@ -194,9 +193,9 @@
 
             <ImageButton
                 android:id="@+id/btnPhoto"
-                android:layout_width="75dp"
-                android:layout_height="75dp"
-                android:layout_marginLeft="10dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="20dp"
                 android:layout_marginTop="50dp"
                 android:layout_toRightOf="@id/btnAudio"
                 android:background="@drawable/btn_white"
