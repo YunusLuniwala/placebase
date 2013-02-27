@@ -245,7 +245,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		journeyBearing = (TextView) findViewById(R.id.journey_bearing); // change to an ImageView of the Bearing Icon
 		journeyDistance = (TextView) findViewById(R.id.journey_distance);
 		btnGetMessage = (Button) findViewById(R.id.journey_claim);
-		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_hidejourneyblock);
+		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_record_perspective);
 		alignmentIcon = (ImageView) findViewById(R.id.ic_alignment);
 		compass = (ImageView) findViewById(R.id.ic_compass);
 		

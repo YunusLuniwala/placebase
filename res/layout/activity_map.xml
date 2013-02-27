@@ -27,7 +27,7 @@
             android:orientation="vertical" >
 
             <Button
-                android:id="@+id/btn_hidejourneyblock"
+                android:id="@+id/btn_record_perspective"
                 style="@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -329,7 +329,7 @@
                 android:visibility="gone" >
 
                 <TextView
-                    android:id="@+id/TextView01"
+                    android:id="@+id/perspective_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Geomagnetic" />

@@ -68,7 +68,7 @@ public class SenseActivity extends Activity {
 
 		
 
-		TextView testDate = (TextView) findViewById(R.id.testDate);
+		TextView testDate = (TextView) findViewById(R.id.title_record_sense);
 		TextView testInterval = (TextView) findViewById(R.id.testInterval);
 		
 		// what we would be getting from the database

@@ -5,28 +5,131 @@
     tools:context=".SenseActivity" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/testDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:id="@+id/senses"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".5"
+            android:orientation="vertical"
+            android:padding="10dp" >
 
-        <TextView
-            android:id="@+id/testInterval"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
+            <TextView
+                android:id="@+id/title_record_sense"
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="@string/recordsense_title" />
+
+            <TextView
+                android:id="@+id/testInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/recordsense_instructions" />
+
+            <RelativeLayout
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_mediabuttonlayout" >
+
+                <ImageButton
+                    android:id="@+id/btn_record_hear"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/btn_teal"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_hear" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_see"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="59dp"
+                    android:layout_marginTop="50dp"
+                    android:background="@drawable/btn_teal"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_see" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_smell"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="59dp"
+                    android:layout_marginTop="50dp"
+                    android:background="@drawable/btn_teal"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_smell" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_taste"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="59dp"
+                    android:layout_marginTop="50dp"
+                    android:background="@drawable/btn_teal"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_taste" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_touch"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginLeft="59dp"
+                    android:layout_marginTop="50dp"
+                    android:background="@drawable/btn_teal"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_touch" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/perspective"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".5"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <TextView
+                android:id="@+id/perspective_title"
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/perspective_title" />
+
+            <TextView
+                android:id="@+id/perspective_body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/perspective_instructions" />
+
+            <TextView
+                android:id="@+id/perspective_body2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/perspective_instructions2" />
+
+            <Button
+                android:id="@+id/btn_record_perspective"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/perspective_record_cta" />
+
+        </LinearLayout>
+
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btn_hidejourneyblock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="24dp"
-        android:text="@string/perspective_record_cta" />
 
 </RelativeLayout>
