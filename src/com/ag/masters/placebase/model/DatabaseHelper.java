@@ -9,14 +9,16 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ag.masters.placebase.sqlite.Story;
-
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.ag.masters.placebase.sqlite.Story;
+import com.ag.masters.placebase.sqlite.User;
 /**
  * 
  * General DatabaseHelper to access databases.
@@ -58,6 +60,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		//column names
 		private static final String USERS_ID = "_id";
 		private static final String USERS_NAME = "name";
+		private static final String USERS_PASSWORD = "password";
+		private static final String USERS_DATE = "date";
 
 	//Image Table info
 	private static final String TABLE_PHOTOS = "photos";
@@ -208,7 +212,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if(myDataBase != null)
 			myDataBase.close();
 		super.close();
-
 	}
 
 	@Override
@@ -276,6 +279,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		// return story list
 		return allStories;
 	}
+
+
+
+    
     
     
     
@@ -299,6 +306,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * All CRUD operations
 	 * 
 	 */
+    
+    /**
+	 * 
+	 * USER TABLE
+	 * All CRUD operations
+	 * 
+	 */
+    
+
+    
+    /**
+     * Add new user
+     * @param username
+     * @return
+     * 
+     */
+    public void addUser(User user) {
+    	this.openDataBase(); // setValues of myDataBase
+    	myDataBase = this.getWritableDatabase(); // and get writable version of db
+    	ContentValues values = new ContentValues();
+    	values.put(USERS_NAME, user.getName());
+    	values.put(USERS_PASSWORD, user.getPassword());
+    	values.put(USERS_DATE, user.getDate());
+    	
+    	// insert a new row
+    	myDataBase.insert(TABLE_USERS, null, values);
+    	myDataBase.close();
+    }
+    
+    /**
+     * Return a single user via username
+     * @param username
+     * @return User
+     */
+	public User getUser(String username) {
+		this.openDataBase();
+		User user;
+		Cursor cursor = myDataBase.query(TABLE_USERS, new String[] {USERS_ID, USERS_NAME, USERS_PASSWORD, USERS_DATE}, USERS_NAME + "=?", 
+				new String[]{String.valueOf(username)}, null, null, null);
+		if (cursor.moveToFirst()) {
+			user = new User(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3));
+		} else {
+			user = new User();
+			user.setId(0);
+			user.setName(null);
+			user.setPassword(null);
+			user.setDate("0");
+		}
+		cursor.close();
+		myDataBase.close();
+		return user;
+	}
     
 
 }

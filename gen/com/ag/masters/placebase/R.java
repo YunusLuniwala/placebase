@@ -369,6 +369,7 @@ containing a value of this type.
         public static final int title_activity_map=0x7f060019;
         public static final int title_activity_new_user=0x7f060030;
         public static final int title_activity_sense=0x7f06001f;
+        public static final int title_activity_user=0x7f060031;
         public static final int title_activity_video_player=0x7f06001d;
         public static final int user_stories=0x7f06001c;
     }

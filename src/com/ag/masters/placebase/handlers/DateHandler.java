@@ -26,6 +26,11 @@ public class DateHandler {
 		return date;
 	}
 	
+	public String getCurrentTimeAsString() {
+		DateTime now = DateTime.now();
+		return dateTimetoString(now);
+	}
+	
 	/**
 	 * Calculate the number of days between specified date and current date
 	 * @param String endDate from db

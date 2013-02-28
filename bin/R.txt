@@ -211,6 +211,7 @@ int string title_activity_login 0x7f06002f
 int string title_activity_map 0x7f060019
 int string title_activity_new_user 0x7f060030
 int string title_activity_sense 0x7f06001f
+int string title_activity_user 0x7f060031
 int string title_activity_video_player 0x7f06001d
 int string user_stories 0x7f06001c
 int style AppBaseTheme 0x7f070000

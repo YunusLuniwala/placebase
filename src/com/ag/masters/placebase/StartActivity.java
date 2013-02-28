@@ -47,6 +47,7 @@ public class StartActivity extends Activity {
 				//Intent beginMap = new Intent(StartActivity.this, MapActivity.class);
 				// startActivity(beginMap);
 				Intent loginActivity = new Intent(StartActivity.this, Login.class);
+				loginActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(loginActivity);
 			}
 		});
@@ -59,6 +60,7 @@ public class StartActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent newUserActivity = new Intent(StartActivity.this, NewUser.class);
+				newUserActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(newUserActivity);
 			}
 		});
@@ -68,7 +70,7 @@ public class StartActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_main, menu);
+		getMenuInflater().inflate(R.menu.main_menu, menu);
 		return true;
 	}
 	
