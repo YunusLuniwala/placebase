@@ -190,6 +190,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		dbh = new DatabaseHelper(this);
 		
+		
 		Bundle data = getIntent().getExtras();
 
 		if (data != null) {
@@ -202,8 +203,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 		}
 		
-		//int updateDB = dbh.updateUserLoginDate(user);
-		//Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
+		// This throws everything to shit
+		int updateDB = dbh.updateUserLoginDate(user);
+		Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
 		
 		//dbh.close();
 		

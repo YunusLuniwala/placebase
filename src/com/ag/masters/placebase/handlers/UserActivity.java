@@ -32,7 +32,7 @@ public class UserActivity extends Activity{
 	private static int GET_ACCOUNT = 2;
 	private static String BAD_PASSWORD = "bad";
 	
-	DatabaseHelper dbh;
+	private static DatabaseHelper dbh;
 	
 	/** Called when the activity is first created. */
 	@Override

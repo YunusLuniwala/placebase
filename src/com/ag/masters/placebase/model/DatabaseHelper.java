@@ -127,14 +127,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void createDataBase() throws IOException{
 
 		boolean dbExist = checkDataBase();
-
+		SQLiteDatabase db_Read = null;
+		
 		if(dbExist){
 			//do nothing - database already exist
 		}else{
 
 			//By calling this method an empty database will be created into the default system path
 			//of your application so we will be able to overwrite that database with our database.
-			this.getReadableDatabase();
+			db_Read = this.getReadableDatabase();
+			db_Read.close();
 
 			try {
 
@@ -184,10 +186,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		//Open your local db as the input stream
 		InputStream myInput = myContext.getAssets().open(DB_NAME);
+		
 		// Path to the just created empty db
 		String outFileName = DB_PATH + DB_NAME;
+		
 		//Open the empty db as the output stream
 		OutputStream myOutput = new FileOutputStream(outFileName);
+		
 		//transfer bytes from the inputfile to the outputfile
 		byte[] buffer = new byte[1024];
 		int length;
@@ -203,12 +208,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void openDataBase() throws SQLException{
 		//Open the database
 		String myPath = DB_PATH + DB_NAME;
-		//myDataBase.close();
 		myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+		myDataBase.close(); // really?
 		
 	}
 	
-
+    public SQLiteDatabase getDatabase(){
+    	return myDataBase;
+    }
+    
 	@Override
 	public synchronized void close() {
 		if(myDataBase != null)
@@ -220,13 +228,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
-
+		// table pre created
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// TODO Auto-generated method stub
+		//table
 
 	}
 	
@@ -250,8 +257,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_STORIES;
 		
 		// open the database
-		this.openDataBase();
-		Cursor cursor = myDataBase.rawQuery(selectQuery, null);
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
 		
 		if(cursor.moveToFirst()) {
 			do {
@@ -278,7 +285,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		// close db connection
 		cursor.close();
-		this.close();
+		db.close();
 		
 		// return story list
 		return allStories;
@@ -324,16 +331,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * 
      */
     public void addUser(User user) {
-    	this.openDataBase(); // setValues of myDataBase
-    	myDataBase = this.getWritableDatabase(); // and get writable version of db
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	
     	ContentValues values = new ContentValues();
     	values.put(USERS_NAME, user.getName());
     	values.put(USERS_PASSWORD, user.getPassword());
     	values.put(USERS_DATE, user.getDate());
     	
     	// insert a new row
-    	myDataBase.insert(TABLE_USERS, null, values);
-    	this.close();
+    	db.insert(TABLE_USERS, null, values);
+    	db.close();
     }
     
     /**
@@ -342,9 +349,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return User
      */
 	public User getUser(String username) {
-		this.openDataBase();
+		SQLiteDatabase db = this.getWritableDatabase();
 		User user;
-		Cursor cursor = myDataBase.query(TABLE_USERS, new String[] {USERS_ID, USERS_NAME, USERS_PASSWORD, USERS_DATE}, USERS_NAME + "=?", 
+		Cursor cursor = db.query(TABLE_USERS, new String[] {USERS_ID, USERS_NAME, USERS_PASSWORD, USERS_DATE}, USERS_NAME + "=?", 
 				new String[]{String.valueOf(username)}, null, null, null);
 		if (cursor.moveToFirst()) {
 			user = new User(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3));
@@ -356,7 +363,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			user.setDate("0");
 		}
 		cursor.close();
-		this.close();
+		db.close();
 		return user;
 	}
 	
@@ -364,15 +371,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * update single user's login date
 	 */
 	public int updateUserLoginDate(User user) {
-		this.openDataBase();
-		myDataBase = this.getWritableDatabase();
+		SQLiteDatabase db = this.getWritableDatabase();
+
 		ContentValues values = new ContentValues();
 		values.put(USERS_DATE, user.getDate());
 		
-		this.close();
-		
+		//db.close();
 		Log.i("DATABASE", "user login date updated");
-		return myDataBase.update(TABLE_USERS, values, USERS_NAME + "=?", new String[]{String.valueOf(user.getDate())});
+		return db.update(TABLE_USERS, values, USERS_NAME + "=?", new String[]{String.valueOf(user.getDate())});
 	}
     
 
