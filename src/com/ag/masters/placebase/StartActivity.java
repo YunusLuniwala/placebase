@@ -16,14 +16,15 @@ import com.ag.masters.placebase.model.DatabaseHelper;
 public class StartActivity extends Activity {
 
 	DatabaseHelper mDatabaseHelper;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_start);
-		
+
 		/**
 		 * Create database if it does not exist
+		 * (moved to AccountActivity)
 		 */
 		mDatabaseHelper = new DatabaseHelper(this);
 		try {
@@ -36,7 +37,8 @@ public class StartActivity extends Activity {
 		}catch(SQLException sqle){
 			throw sqle;
 		}
-		
+
+
 		/**
 		 * LOGIN
 		 */
@@ -51,7 +53,7 @@ public class StartActivity extends Activity {
 				startActivity(loginActivity);
 			}
 		});
-		
+
 		/**
 		 * NEW USER
 		 */
@@ -64,7 +66,7 @@ public class StartActivity extends Activity {
 				startActivity(newUserActivity);
 			}
 		});
-		
+
 	}
 
 	@Override
@@ -73,6 +75,6 @@ public class StartActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main_menu, menu);
 		return true;
 	}
-	
+
 
 }

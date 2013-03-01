@@ -82,7 +82,7 @@ public class NewUser extends Activity {
 				    else{
 				    	Intent goToMap = new Intent(this, MapActivity.class);
 				    	// pass the user parcel to the map activity
-				    	//goToMap.putExtra("user", user);
+				    	goToMap.putExtra("user", user);
 				    	startActivity(goToMap);
 				    }
 					break;

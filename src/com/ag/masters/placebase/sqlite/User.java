@@ -90,7 +90,7 @@ public class User implements Parcelable{
 		// We just need to write each field into the
 		// parcel. When we read from parcel, they
 		// will come back in the same order
-		Log.v("Writing Image to Parcel", "writeToParcel..." + flags);
+		Log.v("Writing User to Parcel", "writeToParcel..." + flags);
 		dest.writeInt(_id);
 		dest.writeString(_name);
 		dest.writeString(_password);

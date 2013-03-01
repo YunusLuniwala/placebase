@@ -16,6 +16,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
@@ -167,9 +168,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 
 		if(checkDB != null){
-
 			checkDB.close();
-
 		}
 
 		return checkDB != null ? true : false;
@@ -204,8 +203,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void openDataBase() throws SQLException{
 		//Open the database
 		String myPath = DB_PATH + DB_NAME;
+		//myDataBase.close();
 		myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+		
 	}
+	
 
 	@Override
 	public synchronized void close() {
@@ -213,6 +215,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			myDataBase.close();
 		super.close();
 	}
+	
+
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
@@ -281,9 +285,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
 
-
-    
-    
     
     
 	/**
@@ -332,7 +333,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	
     	// insert a new row
     	myDataBase.insert(TABLE_USERS, null, values);
-    	myDataBase.close();
+    	this.close();
     }
     
     /**
@@ -355,8 +356,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			user.setDate("0");
 		}
 		cursor.close();
-		myDataBase.close();
+		this.close();
 		return user;
+	}
+	
+	/**
+	 * update single user's login date
+	 */
+	public int updateUserLoginDate(User user) {
+		this.openDataBase();
+		myDataBase = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(USERS_DATE, user.getDate());
+		
+		this.close();
+		
+		Log.i("DATABASE", "user login date updated");
+		return myDataBase.update(TABLE_USERS, values, USERS_NAME + "=?", new String[]{String.valueOf(user.getDate())});
 	}
     
 

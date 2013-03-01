@@ -2,7 +2,6 @@ package com.ag.masters.placebase.handlers;
 
 import java.io.IOException;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.SQLException;
@@ -40,7 +39,8 @@ public class UserActivity extends Activity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		dbh = startDatabase();
+		//dbh = startDatabase();
+		dbh = new DatabaseHelper(this);
 		
 		// Retrieve information from the passed Bundle to
 		// get user information and display it
@@ -85,13 +85,12 @@ public class UserActivity extends Activity{
 						if(userCheck.getPassword() != BAD_PASSWORD){
 							// if the password is correct, and username is correct
 							// start activity with the correct password
-							
 							Log.d("AccountActivity" , "UserCheck's username: " + userCheck.getName());
 							
-							Intent accountFetched = new Intent();
-							accountFetched.putExtra("username", userCheck.getName());
-							accountFetched.putExtra("account", userCheck);
-							setResult(RESULT_OK, accountFetched);
+							Intent userFetched = new Intent();
+							userFetched.putExtra("username", userCheck.getName());
+							userFetched.putExtra("user", userCheck);
+							setResult(RESULT_OK, userFetched);
 							finish();
 						} else{
 							// if the account returns a bad password, start
@@ -126,7 +125,7 @@ public class UserActivity extends Activity{
 	 * @return String username
 	 */
 	public String createUser(String username, String password, String date) {
-		
+		//dbh = startDatabase();
 		final String NAME_EXISTS = "0";
 		
 		String name = null;
@@ -135,11 +134,13 @@ public class UserActivity extends Activity{
 
 		if (accountExists.getName() != null) {
 			Log.d("Name is : ", NAME_EXISTS);
+			dbh.close();
 			return NAME_EXISTS;
 		} else {
 			name = username;
 			Log.d("Insert: ", "Inserting ..");
 			dbh.addUser(new User(name, password, date));
+			dbh.close();
 		}
 		return name;
 		
@@ -158,7 +159,7 @@ public class UserActivity extends Activity{
 	 * @return User
 	 */
 	public User checkAndFetchUser(String username, String password){
-		
+		//dbh = startDatabase();
 		User userExists = dbh.getUser(username);
 		String n = userExists.getName();
 		String p = userExists.getPassword();
@@ -178,7 +179,7 @@ public class UserActivity extends Activity{
 				return userExists;
 			}
 		} 
-		
+		dbh.close();
 		return userExists=null;
 	}
 	
@@ -188,7 +189,7 @@ public class UserActivity extends Activity{
 	 * 
 	 * @return AccountDatabaseHelper
 	 */
-	public DatabaseHelper startDatabase(){
+	/*public DatabaseHelper startDatabase(){
 		dbh = new DatabaseHelper(this);
 		
 		try {
@@ -199,23 +200,20 @@ public class UserActivity extends Activity{
 		}
 		// OPEN THE DATABASE
 		try {
-			dbh.openDataBase(); // we also open the DB in every CRUD call to DataBaseHelper
+			//dbh.close();
+			dbh.openDataBase();
 		} catch (SQLException sqle) {
 			throw sqle;
 		}
 		
 		return dbh;
 	}
+	*/
 	
 	@Override
 	protected void onPause(){
 		super.onPause();
-		dbh.close();
+		//dbh.close();
 	}
 	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		dbh.close();
-	}
 }

@@ -1,8 +1,5 @@
 package com.ag.masters.placebase;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import android.animation.ObjectAnimator;
@@ -58,6 +55,7 @@ import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
+import com.ag.masters.placebase.sqlite.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
@@ -122,6 +120,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
 	
+	private User user;
+	
 	// device dimensions
 	private int screenHeight;
 	private int screenWidth;
@@ -150,7 +150,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
 	
-	DateHandler myDateHandler;
+	private static DateHandler myDateHandler;
 
 	private boolean rotateView = true;
 	private boolean firstFix = true;
@@ -177,6 +177,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	
 	private Uri mCaptureImageUri;
 	private Uri mCaptureVideoUri;
+	
+	
+	
+	
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -184,6 +188,24 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		setContentView(R.layout.activity_map);
 		
+		dbh = new DatabaseHelper(this);
+		
+		Bundle data = getIntent().getExtras();
+
+		if (data != null) {
+			// get the story object
+			User tempUser = data.getParcelable("user");
+			if (tempUser != null) {
+				user = tempUser;
+			}else {
+				throw new RuntimeException("MapActivity: user passed was null");
+			}
+		}
+		
+		//int updateDB = dbh.updateUserLoginDate(user);
+		//Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
+		
+		//dbh.close();
 		
 		setUpMapIfNeeded();
 		// define a callback for animateCamera
@@ -356,8 +378,17 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		myLocationManager.removeUpdates(this);
 		mMap.setMyLocationEnabled(false);
 		mMap.setLocationSource(null);
+		
+		//dbh.close();
 	}
 
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		dbh.close();
+	}
 	/**
 	 * use built-in camera to record photos
 	 * save files to root
@@ -697,9 +728,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
 
-		dbh = new DatabaseHelper(this);
 		
+		//dbh.openDataBase();	
 		allStories = dbh.getAllStories();
+		
 		
 		if(allStories != null) {
 			for (int i=0; i<allStories.size(); i++) {
@@ -722,6 +754,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			Toast.makeText(this, "no stories in db", Toast.LENGTH_LONG).show();
 		}
 		
+		//dbh.close();
 		
 	}
 
