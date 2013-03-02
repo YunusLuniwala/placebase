@@ -35,11 +35,24 @@
     <string name="jouney_distance">METERS AWAY</string>
     <string name="title_activity_confirm_trace">ConfirmTrace</string>
     <string name="title_activity_caption">Caption</string>
-    <string name="caption_hint">What happened here is...</string>
+    <string name="caption_hint">What happened here?</string>
     <string name="btn_done">Done</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_new_user">NewUser</string>
     <string name="title_activity_user">Checking User</string>
     <string name="title_activity_perspective">PerspectiveActivity</string>
-	<string name="getting_location">Finding Precise Location...</string>
+    <string name="getting_location">Finding Precise Location...</string>
+    <string name="title_activity_retrieve_video">RetrieveVideo</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+    <string name="title_activity_retrieve_audio">RetrieveAudio</string>
+    <string name="title_activity_retrieve_image">RetrieveImage</string>
+    <string name="comments">comments</string>
+    <string name="story">story</string>
+    <string name="comment">comment</string>
+    <string name="comment_hint">What do you think?...</string>
+    <string name="encounters">encounters</string>
+    <string name="i_sense_it">I sense it</string>
+
 </resources>

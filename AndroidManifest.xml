@@ -27,7 +27,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -100,7 +100,34 @@
         </activity>
         <activity
             android:name="com.ag.masters.placebase.PerspectiveActivity"
-            android:label="@string/title_activity_perspective" 
+            android:label="@string/title_activity_perspective"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.RetrieveVideo"
+            android:label="@string/title_activity_retrieve_video"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.RetrieveAudio"
+            android:label="@string/title_activity_retrieve_audio"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.ag.masters.placebase.RetrieveMedia"
+            android:label="@string/title_activity_retrieve_image"
             android:configChanges="orientation"
             android:screenOrientation="portrait" >
             <intent-filter>

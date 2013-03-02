@@ -50,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.handlers.SDImageLoader;
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Story;
@@ -88,6 +89,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	
 	private List<Story> allStories;
 	
+	private User user;
+	
 	// journey mode 
 	private static int journeyMode = -1;
 	private Location myCurrentLocation = null;	
@@ -121,7 +124,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
 	
-	private User user;
+	
 	
 	// device dimensions
 	private int screenHeight;
@@ -149,8 +152,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
 	
+	// helper classes
 	private static DateHandler myDateHandler;
-
+	private static SDImageLoader imageLoader;
+	
 	private boolean rotateView = true;
 	private boolean firstFix = true;
 	private static CameraPosition MYLOCATION;
@@ -168,6 +173,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	TextView journeyDistance;
 	ImageView compass;
 	ImageView alignmentIcon;
+	ImageView photo;
 	
 	// Animation
 	private ObjectAnimator slideUpHalfway;
@@ -188,7 +194,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		dbh = new DatabaseHelper(this);
 
-		
+		imageLoader = new SDImageLoader();
 		
 		Bundle data = getIntent().getExtras();
 		if (data != null) {
@@ -203,6 +209,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			User tempUser = data.getParcelable("user");
 			if (tempUser != null) {
 				user = tempUser;
+				// update the database to reflect the user's new login date
+				// TODO: shouldn't this be the last thing to happen in the login activity class? 
+				// So that we can check for notifications and display the immediately when the map starts up?
+				int updateDB = dbh.updateUserLoginDate(user);
+				Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
 			} else {
 				// test with default user
 				user = new User("ashton", "pass", "0");
@@ -210,11 +221,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 		}
 		
-		// update the database to reflect the user's new login date
-		// TODO: shouldn't this be the last thing to happen in the login activity class? 
-		// So that we can check for notifications and display the immediately when the map starts up?
-		int updateDB = dbh.updateUserLoginDate(user);
-		Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
+		
 		
 		//dbh.close();
 		
@@ -281,6 +288,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_record_perspective);
 		alignmentIcon = (ImageView) findViewById(R.id.ic_alignment);
 		compass = (ImageView) findViewById(R.id.ic_compass);
+		photo = (ImageView) findViewById(R.id.ic_info_media);
 		
 		// TODO: not the best... a swipe gesture would be better here
 		btnCloseJourneyPanel.setLongClickable(true); 
@@ -846,6 +854,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		targetLocation.setLongitude(target.longitude);
 		
 		journeyMode = 1;
+		
+		updateJourneyBlockImage(targetMarker);
 		updateJourneyMode(); // also called onLocationChanged()
 
 	}
@@ -860,6 +870,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			//Toast.makeText(getApplicationContext(), "map was clicked", Toast.LENGTH_LONG).show();
 			hideMediaButtons();
 		}
+	}
+	
+	private void updateJourneyBlockImage(Marker marker) {
+		getStoryFromMarker(marker);
+		Story thisStory = getStoryFromMarker(marker);
+		photo.setImageBitmap(BitmapFactory.decodeFile(thisStory.getPerspectiveUri())); 
 	}
 
 	/** 
@@ -902,6 +918,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// set boundaries so myLocation and the destination marker are both visible on the screen
 				// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
 			}
+			
 			// calculate new values for bearing and distance to target
 			calculateDistanceToTarget();
 			calculateBearingToTarget();
@@ -1082,6 +1099,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			screenHeight = display.getHeight();
 			screenWidth = display.getWidth();
 		}
+	}
+	
+	private Story getStoryFromMarker(Marker marker) {
+		// "m0" format 
+		// We can reliably query the array of story objects based
+		// on the key and id being the same (they are added in the order they are read in).
+		// No need to store a markerId with the story object
+		String markerId = marker.getId();
+		String markerNumId = markerId.substring(1);
+		int markerIntId = Integer.parseInt(markerNumId);
+		// grab the story object associated with this marker
+		Story story = allStories.get(markerIntId);
+		return story;
 	}
 	//------------------------------------------------------------------------------------------
 	// LOCATION LISTENER
@@ -1288,15 +1318,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		@Override
 		public View getInfoWindow(Marker marker) { 
 			
-			// "m0" format 
-			// We can reliably query the array of story objects based
-			// on the key and id being the same (they are added in the order they are read in).
-			// No need to store a markerId with the story object
-			String markerId = marker.getId();
-			String markerNumId = markerId.substring(1);
-			int markerIntId = Integer.parseInt(markerNumId);
-			// grab the story object associated with this marker
-			Story thisStory = allStories.get(markerIntId);
+			Story thisStory = getStoryFromMarker(marker);
 			
 			// assign views
 			ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);	// perspective image
@@ -1357,21 +1379,30 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				}
 				
 				
-				int perspectiveUri = 0; // this was a resource ID. Will now probably be a string
-				/*if(the row has a URI to a perspective image)  {
-	        	 	//perspectiveUri = thatresourceURI;
-	        	 	make an image resource from that URI
-	             } else {
-	                 // Passing 0 to setImageResource will clear the image view.
-	                 perspectiveUri = 0;
-	             }*/
-				perspective.setImageResource(perspectiveUri);
+				//int perspectiveUri = 0; 
+				// this was a resource ID. Will now probably be a string
+				if(thisStory.getPerspectiveUri() != null) {
+					//Log.v(getClass().getSimpleName(), "Perspective URI is not null");
+					Bitmap bitmap = BitmapFactory.decodeFile(thisStory.getPerspectiveUri());
+					perspective.setImageBitmap(bitmap);
+					//imageLoader.load(thisStory.getPerspectiveUri(), perspective);
+				} else {
+					// Passing 0 to setImageResource will clear the image view.
+	                 int perspectiveUri = 0;
+	                 perspective.setImageResource(perspectiveUri);
+	                // Log.v(getClass().getSimpleName(), "Perspective URI is null");
+				}
+				
+				
+				
 
 			}
 			
 			return mWindow;
 		}
 
+
+		
 		@Override
 		public View getInfoContents(Marker marker) {
 			// TODO Auto-generated method stub
