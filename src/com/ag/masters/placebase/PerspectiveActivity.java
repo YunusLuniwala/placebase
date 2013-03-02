@@ -15,14 +15,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,26 +30,33 @@ import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.ag.masters.placebase.handlers.DateHandler;
-import com.ag.masters.placebase.model.CameraView;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
+import com.ag.masters.placebase.view.CameraView;
 
 public class PerspectiveActivity extends Activity implements 
 	OnClickListener, Camera.PictureCallback, Camera.ShutterCallback, LocationListener, SensorEventListener{
 
 	private CameraView cameraView;
     private LocationManager myLocationManager;
-
+    private ImageButton pictureButton;
+    private View overlay;
+    
 	// device sensor (accelerometer and magnetic field)
 	private SensorManager mySensorManager;
 	float[] inR = new float[16];
@@ -117,50 +121,51 @@ public class PerspectiveActivity extends Activity implements
 			}
 		}
 		
-
-		ImageButton pictureButton = (ImageButton) this.findViewById(R.id.btn_takePhoto);
 		cameraView = (CameraView) this.findViewById(R.id.view_preview);
-		
+		pictureButton = (ImageButton) this.findViewById(R.id.btn_takePhoto);
 		pictureButton.setOnClickListener(this);
+		pictureButton.setEnabled(false); // start the button disabled until we have a location fix
 		
-		Criteria myCriteria = new Criteria();
-		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
+		 LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		 overlay = inflater.inflate(R.layout.location_progress, null);
+		 FrameLayout container = (FrameLayout) findViewById(R.id.perspective_layout);
+		 container.addView(overlay);
 		
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		
-		 //call GPS location manager to get the data from the GPS
         myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		//Register for location updates using a Criteria, and a callback on the specified looper thread.
-		myLocationManager.requestLocationUpdates(
-				400L, 		// minTime
-				1.0f,		// minDistance
-				myCriteria,	// criteria
-				(LocationListener) this, 		// listener
-				null);		// intent
 		
-
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		// register sensor listeners
-				mySensorManager.registerListener(this, 
-						mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
-						SensorManager
-						.SENSOR_DELAY_NORMAL);
-				mySensorManager.registerListener(this, 
-						mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
-						SensorManager
-						.SENSOR_DELAY_NORMAL);
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
+		mySensorManager.registerListener(this, 
+				mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
+				SensorManager
+				.SENSOR_DELAY_NORMAL);
+		// register location listener
+		myLocationManager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER,
+				0,
+				0,
+				(LocationListener) this);
+		myLocationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER,
+				0,
+				0,
+				(LocationListener) this);
 	}
 	
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		myLocationManager.removeUpdates((LocationListener) this);
+		mySensorManager.unregisterListener(this);
 	}
 	
 	@Override
@@ -189,25 +194,31 @@ public class PerspectiveActivity extends Activity implements
 		
 		// save the azimuth to the story
 		story.setBearing((float) azimuth);
+		Log.v(getClass().getSimpleName(), "bearing set to " + Float.toString(story.getBearing()));
 		
 		// Set up content Values to save with the Image on the SD card		
 		ContentValues values = new ContentValues();
 		
 		//GPS 
-		Location location = myLocationManager.getLastKnownLocation("gps");
+		Location location = myLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		if(location != null) {
+			
 			values.put(Images.Media.LATITUDE, location.getLatitude());
 			// save latitude data to Story
 			story.setLat(location.getLatitude());
+			Log.v(getClass().getSimpleName(), "latitude set to " + Double.toString(story.getLat()));
+			
 			values.put(Images.Media.LONGITUDE, location.getLongitude());
 			// save longitude data to Story
 			story.setLng(location.getLongitude());
+			Log.v(getClass().getSimpleName(), "longitude set to " + Double.toString(story.getLng()));
+			
 		} else {
-			Log.v("PERSPECTIVE", "GPS NULL");
+			Log.v(getClass().getSimpleName(), "GPS is null");
 		}
-	    
 		
-		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+		//Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 		// TODO resize this image and save it to the database instead of the raw data.
 		
 		
@@ -237,9 +248,9 @@ public class PerspectiveActivity extends Activity implements
 		cursor.moveToFirst();
 		String capturedImageFilePath = cursor.getString(index);
 		cursor.close();
-		Log.i("IMAGE-CAPTURE", capturedImageFilePath);
-		// Store the filepath in StoryImage object
-		image.setUri(capturedImageFilePath);
+		Log.i("IMAGE CAPTURE", capturedImageFilePath);
+		// Store the filepath in Story object
+		story.setPerspectiveUri(capturedImageFilePath);
 		
 		// start new Activity to confirm capture
 		Intent intent = new Intent(this, ConfirmTrace.class);
@@ -262,24 +273,29 @@ public class PerspectiveActivity extends Activity implements
 	@Override
 	public void onShutter() {
 		// play sound
-		// store bearing
 		Log.i(getClass().getSimpleName(), "SHUTTER CALLBACK");
 	}
 
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
-		
-	}
+		// disallow the user from saving a photo until the location
+		// has been set and is accurate within 10 meters
+		if(location.getAccuracy() < 10) {
+			pictureButton.setEnabled(true);
+			overlay.setVisibility(View.INVISIBLE);
+		} else {
+			pictureButton.setEnabled(false);
+			overlay.setVisibility(View.VISIBLE);
+		}
 
+	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
 		
 	}
-
 
 	@Override
 	public void onProviderEnabled(String provider) {

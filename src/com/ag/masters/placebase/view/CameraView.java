@@ -1,4 +1,4 @@
-package com.ag.masters.placebase.model;
+package com.ag.masters.placebase.view;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -95,10 +95,12 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback{
 			}
 		}
 		
+		
 		mCamera.setParameters(params);
 		
 		try{
 			mCamera.setPreviewDisplay(holder);
+			mCamera.startPreview();
 		} catch(IOException exception) {
 			mCamera.release();
 			mCamera = null;

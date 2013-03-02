@@ -531,6 +531,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 				story.setUser(user.getId());
 				story.setMedia(Global.VIDEO_CAPTURE);
+				
 				// pass in StoryVideo parcel
 				startSenses.putExtra("video", video);
 				// pass in Story parcel

@@ -25,6 +25,14 @@ public class ConfirmTrace extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_confirm_trace);
+		
+		// unpack parcel
+		// write story data to db
+		// query id of the row
+		// media.setStory(ROWID);
+		// write image/audio/video data to db
+		
+		// delay for a few seconds before you redirect to map
 	}
 
 	@Override
