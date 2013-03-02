@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    
+
+    <com.ag.masters.placebase.model.CameraView
+        android:id="@+id/view_preview"
+        android:layout_width="350dp"
+        android:layout_height="350dp" />
+
+    <ImageButton
+        android:id="@+id/btn_takePhoto"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/transparent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/btn_teal" />
+
+</LinearLayout>

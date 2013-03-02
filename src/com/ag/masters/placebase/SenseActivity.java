@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.ag.masters.placebase.model.Global;
@@ -22,7 +23,6 @@ import com.ag.masters.placebase.sqlite.StoryVideo;
 public class SenseActivity extends Activity {
 
 	private Story story;
-	
 	// only one of these will not be null
 	private StoryAudio audio;
 	private StoryImage image;
@@ -81,32 +81,6 @@ public class SenseActivity extends Activity {
 		}
 
 		
-
-		
-		
-		/*TextView testDate = (TextView) findViewById(R.id.title_record_sense);
-		TextView testInterval = (TextView) findViewById(R.id.testInterval);
-		
-		// what we would be getting from the database
-		String strDate = "2013-2-22 09:13:59";
-		testDate.setText(strDate);
-		
-		DateHandler myDateHandler = new DateHandler();
-		int interval = myDateHandler.getDaysAgo(strDate);
-		
-		String thisInterval;
-		if(interval == 0) {
-			thisInterval = "today";
-		} else if (interval == 1) {
-			thisInterval = Integer.toString(interval) + " day ago";
-		} else {
-			thisInterval = Integer.toString(interval) + " days ago";
-		}
-		
-		testInterval.setText(thisInterval);
-		
-		*/
-		
 		// test
 		//story = new Story();
 
@@ -117,6 +91,31 @@ public class SenseActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(SenseActivity.this, MapActivity.class);
 				startActivity(intent);
+			}
+		});
+		
+		// record perspective button
+		Button record = (Button) findViewById(R.id.btn_record_perspective);
+		record.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(SenseActivity.this, PerspectiveActivity.class);
+				intent.putExtra("story", story);
+				
+				switch(story.getMedia()) {
+				case Global.IMAGE_CAPTURE:
+					intent.putExtra("media", image);
+					break;
+				case Global.VIDEO_CAPTURE:
+					intent.putExtra("media", video);
+					break;
+				case Global.AUDIO_CAPTURE:
+					intent.putExtra("media", audio);
+					break;
+				}
+				startActivity(intent);
+				
 			}
 		});
 		

@@ -131,8 +131,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	// device sensor (accelerometer and magnetic field)
 	private SensorManager mySensorManager;
-	private boolean sensorRunning;
-
 	float[] inR = new float[16];
 	float[] I = new float[16];
 	float[] gravity = new float[3];
@@ -174,7 +172,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
 
-	
+	// hard reference to saved URIs to use onActivityResult
 	private Uri mCaptureImageUri;
 	private Uri mCaptureVideoUri;
 	
@@ -185,25 +183,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
-
 		setContentView(R.layout.activity_map);
 		
 		dbh = new DatabaseHelper(this);
-		
-		
-		Bundle data = getIntent().getExtras();
 
+		Bundle data = getIntent().getExtras();
 		if (data != null) {
 			// get the story object
 			User tempUser = data.getParcelable("user");
 			if (tempUser != null) {
 				user = tempUser;
-			}else {
+			} else {
 				throw new RuntimeException("MapActivity: user passed was null");
 			}
+		} else {
+			// test
+			user = new User("ashton", "pass", "0");
 		}
 		
-		// This throws everything to shit
+		// update the database to reflect the user's new login date
+		// TODO: shouldn't this be the last thing to happen in the login activity class? 
+		// So that we can check for notifications and display the immediately when the map starts up?
 		int updateDB = dbh.updateUserLoginDate(user);
 		Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
 		
@@ -340,7 +340,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
+		
 		super.onResume();
 		setUpMapIfNeeded();
 		
@@ -387,7 +387,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
 		dbh.close();
 	}
@@ -487,7 +486,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 					cursor.moveToFirst();
 					String capturedImageFilePath = cursor.getString(index);
-
+					cursor.close();
 					Log.i("IMAGE-CAPTURE", capturedImageFilePath);
 
 					// and store the filepath in StoryImage object
@@ -498,7 +497,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				} 
 
 				Intent startCaption = new Intent(MapActivity.this, Caption.class);
-				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setUser(user.getId()); 
 				story.setMedia(Global.IMAGE_CAPTURE);
 				// pass in StoryImage parcel
 				startCaption.putExtra("image", image);
@@ -519,7 +518,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					int index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
 					cursor.moveToFirst();
 					String capturedVideoFilePath = cursor.getString(index);
-
+					cursor.close();
 					Log.i("VIDEO-CAPTURE", capturedVideoFilePath);
 
 					
@@ -530,7 +529,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					Log.i("VIDEO-CAPTURE", "video recording canceled");
 				} 
 
-				// story.setUser(user); TODO: set this username on a previous login activity, or set a default
+				story.setUser(user.getId());
 				story.setMedia(Global.VIDEO_CAPTURE);
 				// pass in StoryVideo parcel
 				startSenses.putExtra("video", video);
@@ -553,14 +552,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					cursor.moveToFirst();
 					// read String from the database column
 					String audioFilePath = cursor.getString(index);
-
+					cursor.close();
 					
 					// store the filepath in the StoryAudio object
 					audio.setUri(audioFilePath);
 
 					Log.i("AUDIO-CAPTURE", audioFilePath);
 
-					//story.setUser(user); TODO: set this username on a previous login activity, or set a default
+					story.setUser(user.getId());
 					story.setMedia(Global.AUDIO_CAPTURE);
 
 					// pass in StoryAudio parcel
