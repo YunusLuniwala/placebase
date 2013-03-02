@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
@@ -187,18 +188,26 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		dbh = new DatabaseHelper(this);
 
+		
+		
 		Bundle data = getIntent().getExtras();
 		if (data != null) {
+			
+			boolean returnFromStory = data.getBoolean("returnFromStory");
+			if (returnFromStory) {
+				Log.v(getClass().getSimpleName(), "User returned from authoring story");
+				//TODO: something to the marker in the db so the user knows which one is hers
+			}
+			
 			// get the story object
 			User tempUser = data.getParcelable("user");
 			if (tempUser != null) {
 				user = tempUser;
 			} else {
-				throw new RuntimeException("MapActivity: user passed was null");
+				// test with default user
+				user = new User("ashton", "pass", "0");
+				//throw new RuntimeException("MapActivity: user passed was null");
 			}
-		} else {
-			// test
-			user = new User("ashton", "pass", "0");
 		}
 		
 		// update the database to reflect the user's new login date
@@ -415,7 +424,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// must specify the URI where the image will be stored
 			// as a global variable to access in onActivityResult
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, mCaptureImageUri);
-			
 			intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 			startActivityForResult(intent, Global.IMAGE_CAPTURE); // can add options as a bundle
 		}
@@ -503,6 +511,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaption.putExtra("image", image);
 				// pass in Story parcel
 				startCaption.putExtra("story", story);
+				startCaption.putExtra("user", user);
 				// start SensesActivity
 				startActivity(startCaption);
 				
@@ -537,6 +546,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// pass in Story parcel
 				startSenses.putExtra("story", story);
 				// start SensesActivity
+				startSenses.putExtra("user", user);
 				startActivity(startSenses);
 				
 				break;
@@ -567,6 +577,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					startSenses.putExtra("audio", audio);
 					// pass in Story parcel
 					startSenses.putExtra("story", story);
+					startSenses.putExtra("user", user);
 					// start SensesActivity
 					startActivity(startSenses);
 

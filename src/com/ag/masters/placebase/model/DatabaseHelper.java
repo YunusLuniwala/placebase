@@ -291,7 +291,48 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return allStories;
 	}
 
+    public void createStory(Story story) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(STORIES_USER, story.getUser()); 
+		values.put(STORIES_MEDIA, story.getMedia()); 
+		values.put(STORIES_HEAR, story.getHear());
+		values.put(STORIES_SEE, story.getSee());
+		values.put(STORIES_SMELL, story.getSmell());
+		values.put(STORIES_TASTE, story.getTaste());
+		values.put(STORIES_TOUCH, story.getTouch());
+		values.put(STORIES_LAT, story.getLat());
+		values.put(STORIES_LNG, story.getLng());
+		values.put(STORIES_BEARING, story.getBearing());
+		values.put(STORIES_TIMESTAMP, story.getTimestamp());
+		values.put(STORIES_PERSPECTIVE, story.getPerspectiveUri());
+		
+		// insert a new row
+		db.insert(TABLE_STORIES, null, values);
+		db.close(); //close database connection  	
+    }
 
+    
+    /** 
+     * Return the story id from a timestamp
+     * @param timestamp
+     * @return Story _id
+     */
+    public int getStoryId(String timestamp) {
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	int storyId;
+		Cursor cursor = db.query(TABLE_STORIES, new String[] {STORIES_ID, STORIES_TIMESTAMP}, STORIES_TIMESTAMP + "=?", 
+				new String[]{String.valueOf(timestamp)}, null, null, null);
+		if (cursor.moveToFirst()) {
+			storyId = cursor.getInt(0);
+		} else {
+			storyId = -1; // fail to return story id
+		}
+		cursor.close();
+		db.close();
+		return storyId;
+    }
     
     
 	/**

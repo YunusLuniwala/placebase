@@ -47,6 +47,7 @@ import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
+import com.ag.masters.placebase.sqlite.User;
 import com.ag.masters.placebase.view.CameraView;
 
 public class PerspectiveActivity extends Activity implements 
@@ -66,6 +67,7 @@ public class PerspectiveActivity extends Activity implements
 	float[] orientVals = new float[3];
 	double azimuth = 0;
 	
+	private User user;
     private Story story;
 	// only one of these will not be null
 	private StoryAudio audio;
@@ -87,6 +89,14 @@ public class PerspectiveActivity extends Activity implements
 				story = tempStory;
 			}else {
 				throw new RuntimeException("SenseActivity: story passed was null");
+			}
+			// get the user object
+			User tempUser = data.getParcelable("user");
+			if (tempUser != null) {
+				// and save into a global var
+				user = tempUser;
+			}else {
+				throw new RuntimeException("SenseActivity: user passed was null");
 			}
 		}
 
@@ -151,11 +161,6 @@ public class PerspectiveActivity extends Activity implements
 		// register location listener
 		myLocationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
-				0,
-				0,
-				(LocationListener) this);
-		myLocationManager.requestLocationUpdates(
-				LocationManager.NETWORK_PROVIDER,
 				0,
 				0,
 				(LocationListener) this);
@@ -255,6 +260,7 @@ public class PerspectiveActivity extends Activity implements
 		// start new Activity to confirm capture
 		Intent intent = new Intent(this, ConfirmTrace.class);
 		intent.putExtra("story", story);
+		intent.putExtra("user", user);
 		switch(story.getMedia()) {
 		case Global.IMAGE_CAPTURE:
 			intent.putExtra("media", image);

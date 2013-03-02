@@ -19,9 +19,11 @@ import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
+import com.ag.masters.placebase.sqlite.User;
 
 public class SenseActivity extends Activity {
 
+	private User user;
 	private Story story;
 	// only one of these will not be null
 	private StoryAudio audio;
@@ -37,8 +39,9 @@ public class SenseActivity extends Activity {
 		context = this;
 		
 		Bundle data = getIntent().getExtras();
-		
+
 		if (data != null) {
+
 			// get the story object
 			Story tempStory = data.getParcelable("story");
 			if (tempStory != null) {
@@ -46,6 +49,15 @@ public class SenseActivity extends Activity {
 				story = tempStory;
 			}else {
 				throw new RuntimeException("SenseActivity: story passed was null");
+			}
+
+			// get the user object
+			User tempUser = data.getParcelable("user");
+			if (tempUser != null) {
+				// and save into a global var
+				user = tempUser;
+			}else {
+				throw new RuntimeException("SenseActivity: user passed was null");
 			}
 		}
 
@@ -102,6 +114,7 @@ public class SenseActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(SenseActivity.this, PerspectiveActivity.class);
 				intent.putExtra("story", story);
+				intent.putExtra("user", user);
 				
 				switch(story.getMedia()) {
 				case Global.IMAGE_CAPTURE:
@@ -114,6 +127,7 @@ public class SenseActivity extends Activity {
 					intent.putExtra("media", audio);
 					break;
 				}
+				
 				startActivity(intent);
 				
 			}
