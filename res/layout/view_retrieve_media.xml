@@ -4,15 +4,90 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ViewStub
-        android:id="@+id/viewing_stub"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent" />
+    <LinearLayout
+        android:id="@+id/media_stubs"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.74"
+        android:background="#000000"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/media_stubs_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ViewStub
+                android:id="@+id/audio_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" />
+
+            <ViewStub
+                android:id="@+id/image_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" />
+
+            <ViewStub
+                android:id="@+id/video_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/story_senses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#33ffffff"
+            android:gravity="right" >
+
+            <ImageView
+                android:id="@+id/story_hear"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:src="@drawable/ic_sense_hear" />
+
+            <ImageView
+                android:id="@+id/story_see"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:src="@drawable/ic_sense_see" />
+
+            <ImageView
+                android:id="@+id/story_smell"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:src="@drawable/ic_sense_smell" />
+
+            <ImageView
+                android:id="@+id/story_taste"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:src="@drawable/ic_sense_taste" />
+
+            <ImageView
+                android:id="@+id/story_touch"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="3dp"
+                android:src="@drawable/ic_sense_touch" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/media_meta"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="0dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="-30dp"
+        android:layout_weight="0.24"
+        android:paddingTop="5dp" >
 
         <LinearLayout
             android:id="@+id/encounters_container"
@@ -26,7 +101,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
-                android:textSize="50sp" />
+                android:textColor="#cccccc"
+                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/title_encounters"
@@ -47,7 +123,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0"
-                android:textSize="50sp" />
+                android:textColor="#cccccc"
+                android:textSize="40sp" />
 
             <TextView
                 android:id="@+id/title_comments"
@@ -63,7 +140,8 @@
             android:layout_gravity="right"
             android:layout_weight=".4"
             android:gravity="right"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingTop="10dp" >
 
             <TextView
                 android:id="@+id/meta_timestamp"
@@ -89,7 +167,8 @@
     <LinearLayout
         android:id="@+id/media_senses"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.19"
         android:orientation="vertical" >
 
         <TextView
@@ -100,14 +179,16 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:gravity="center" >
 
             <ImageButton
                 android:id="@+id/media_hear"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
+                android:layout_margin="3dp"
                 android:layout_weight="0"
-                android:background="@drawable/btn_teal"
+                android:background="@drawable/btn_sense_bg_false"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_sense_hear" />
 
@@ -115,7 +196,8 @@
                 android:id="@+id/media_see"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/btn_teal"
+                android:layout_margin="3dp"
+                android:background="@drawable/btn_sense_bg_false"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_sense_see" />
 
@@ -123,8 +205,9 @@
                  android:id="@+id/media_smell"
                  android:layout_width="60dp"
                  android:layout_height="60dp"
+                 android:layout_margin="3dp"
                  android:layout_weight="0"
-                 android:background="@drawable/btn_teal"
+                 android:background="@drawable/btn_sense_bg_false"
                  android:scaleType="centerCrop"
                  android:src="@drawable/ic_sense_smell" />
 
@@ -132,8 +215,9 @@
                   android:id="@+id/media_taste"
                   android:layout_width="60dp"
                   android:layout_height="60dp"
+                  android:layout_margin="3dp"
                   android:layout_weight="0"
-                  android:background="@drawable/btn_teal"
+                  android:background="@drawable/btn_sense_bg_false"
                   android:scaleType="centerCrop"
                   android:src="@drawable/ic_sense_taste" />
 
@@ -141,8 +225,9 @@
                    android:id="@+id/media_touch"
                    android:layout_width="60dp"
                    android:layout_height="60dp"
+                   android:layout_margin="3dp"
                    android:layout_weight="0"
-                   android:background="@drawable/btn_teal"
+                   android:background="@drawable/btn_sense_bg_false"
                    android:scaleType="centerCrop"
                    android:src="@drawable/ic_sense_touch" />
 

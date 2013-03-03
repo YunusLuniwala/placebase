@@ -255,7 +255,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testGeoX = (TextView) findViewById(R.id.geoX);
 		testGeoY = (TextView) findViewById(R.id.geoY);
 		testGeoZ = (TextView) findViewById(R.id.geoZ);
-		testAccelX = (TextView) findViewById(R.id.accelX);
+		testAccelX = (TextView) findViewById(R.id.media_stubs);
 		testAccelY = (TextView) findViewById(R.id.accelY);
 		testAccelZ = (TextView) findViewById(R.id.accelZ);
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);

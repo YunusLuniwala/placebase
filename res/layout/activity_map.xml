@@ -308,7 +308,7 @@
                     android:text="Accelerometer" />
 
                 <TextView
-                    android:id="@+id/accelX"
+                    android:id="@+id/media_stubs"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 

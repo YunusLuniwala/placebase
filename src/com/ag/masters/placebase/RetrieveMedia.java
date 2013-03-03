@@ -1,7 +1,5 @@
 package com.ag.masters.placebase;
 
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -10,14 +8,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
 import com.ag.masters.placebase.view.CommentFragment;
@@ -26,6 +21,8 @@ import com.ag.masters.placebase.view.MediaFragment;
 public class RetrieveMedia extends FragmentActivity implements
 		ActionBar.TabListener {
 
+	DatabaseHelper dbh;
+	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
@@ -40,21 +37,31 @@ public class RetrieveMedia extends FragmentActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-	private int mediaType = -1;
+
 	
 	// store references to the Fragments in the 
 	// main class when they are created
-	MediaFragment mMediaFragment;
-	CommentFragment mCommentFragment;
+	private MediaFragment mMediaFragment;
+	private CommentFragment mCommentFragment;
 	
 	// passed in from MapActivity
-	Story story;
-	User user;
+	private Story story;
+	private User user;
 	
+	private Encounter encounter;
+	
+	// determine which viewStub to sub
+	private int mediaType = -1;
+	
+	/**
+	 * ON CREATE
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_retrieve_media);
+		
+		dbh = new DatabaseHelper(this);
 		
 		// TODO: unpack user and story parcel
 		Bundle data = getIntent().getExtras();
@@ -77,9 +84,20 @@ public class RetrieveMedia extends FragmentActivity implements
 			}
 		}
 		
-		// test 
+		// ENCOUNTERS
+		//create a new encounter object
+		dbh.openDataBase();
+		//dbh.getAllEncounters();
+		encounter = new Encounter();
+		// read encounters from database, and create a new encounter object
+		
+		// use this number to set the text for the view  
+		dbh.close();
+		
+		// set the media type
+		// TODO: load in the correct view stub, based on this value		
 		mediaType = story.getMedia();
-			
+		
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -103,7 +121,7 @@ public class RetrieveMedia extends FragmentActivity implements
 					@Override
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
-						prepareBehavior(position);
+						
 					}
 				});
 
@@ -148,7 +166,7 @@ public class RetrieveMedia extends FragmentActivity implements
 	@Override
 	public void onTabSelected(ActionBar.Tab tab,FragmentTransaction fragmentTransaction) {
 		mViewPager.setCurrentItem(tab.getPosition());
-		prepareBehavior(tab.getPosition());
+		switchToSelected(tab.getPosition());
 	}
 
 	@Override
@@ -166,19 +184,19 @@ public class RetrieveMedia extends FragmentActivity implements
 	 * 
 	 * @param adapter position
 	 */
-	private void prepareBehavior(int pos) {
+	private void switchToSelected(int pos) {
 		if (pos == 0) { 
-			prepareMedia();
+			switchToMedia();
 		} else if (pos == 1){ 
-			prepareComments();
+			switchToComments();
 		}
 	}
 	
-	private void prepareMedia() {
+	private void switchToMedia() {
 		Toast.makeText(this, "MEDIA TAB", Toast.LENGTH_SHORT).show();
 	}
 	
-	private void prepareComments() {
+	private void switchToComments() {
 		Toast.makeText(this, "COMMENTS TAB", Toast.LENGTH_SHORT).show();
 	}
 	
@@ -210,7 +228,12 @@ public class RetrieveMedia extends FragmentActivity implements
 				
 				// pass an arg to MediaFragment so we can load the right stub
 				Bundle args = new Bundle();
+				// to determine the viewStub to inflate
 				args.putInt("mediaType", mediaType);
+				// to populate the fields
+				args.putParcelable("story", story);
+				args.putParcelable("user", user);
+				args.putParcelable("encounter", encounter);
 				fragment.setArguments(args);
 				
 				//Log.v(getClass().getSimpleName(), "Fragment 0 called in getItem");
