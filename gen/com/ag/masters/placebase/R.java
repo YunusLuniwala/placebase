@@ -203,7 +203,7 @@ containing a value of this type.
         public static final int btn_record_taste=0x7f050048;
         public static final int btn_record_touch=0x7f050047;
         public static final int btn_takePhoto=0x7f050040;
-        public static final int btn_to_map=0x7f050074;
+        public static final int btn_to_map=0x7f050075;
         public static final int caption_title=0x7f050006;
         public static final int comments_container=0x7f05006f;
         public static final int cont_senses=0x7f050054;
@@ -249,7 +249,7 @@ containing a value of this type.
         public static final int media_taste=0x7f05007a;
         public static final int media_touch=0x7f05007b;
         public static final int menu_settings=0x7f05007d;
-        public static final int meta_geo=0x7f050075;
+        public static final int meta_geo=0x7f050074;
         public static final int meta_timestamp=0x7f050073;
         public static final int msgavailable=0x7f050053;
         public static final int new_user_name=0x7f05003b;

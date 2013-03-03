@@ -83,7 +83,7 @@ int id btn_record_smell 0x7f050046
 int id btn_record_taste 0x7f050048
 int id btn_record_touch 0x7f050047
 int id btn_takePhoto 0x7f050040
-int id btn_to_map 0x7f050074
+int id btn_to_map 0x7f050075
 int id caption_title 0x7f050006
 int id comments_container 0x7f05006f
 int id cont_senses 0x7f050054
@@ -129,7 +129,7 @@ int id media_stubs_container 0x7f050061
 int id media_taste 0x7f05007a
 int id media_touch 0x7f05007b
 int id menu_settings 0x7f05007d
-int id meta_geo 0x7f050075
+int id meta_geo 0x7f050074
 int id meta_timestamp 0x7f050073
 int id msgavailable 0x7f050053
 int id new_user_name 0x7f05003b

@@ -43,6 +43,11 @@ public class MediaFragment extends Fragment  {
 	User user;
 	Encounter encounter;
 	
+	// encounter shtuff
+	int numEncountersInDb;
+	int numEncountersActual;
+	boolean usersFirstEncounter = true;
+	
 	public MediaFragment() {
 		// TODO Auto-generated constructor stub
 	}
@@ -62,7 +67,37 @@ public class MediaFragment extends Fragment  {
 		// save parcel objects in global vars
 		story = getArguments().getParcelable("story");
 		user = getArguments().getParcelable("user");
-		encounter = getArguments().getParcelable("encounter");
+		
+		// ENCOUNTERS
+		// initialize 
+		encounter = new Encounter(story.getId(), user.getId());
+		
+		
+		dbh.openDataBase();
+		// get stored encounter count for this story
+		numEncountersInDb = dbh.getEncounterCountForStory(story.getId());
+		// check if this is user's first encounter
+		Encounter priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());
+		dbh.close();
+		
+		// if this is the first time, add one to the number returned from the db.
+		if(priorEncounter == null) {
+			numEncountersActual = numEncountersInDb + 1; 
+			// +1 is this user : )
+			// hold off on actually writing this to the DB 
+			// until we have sense data and can do it all onDestory TODO
+			// But set values so buttons don't freak out later
+			encounter.setHear(0);
+			encounter.setSee(0);
+			encounter.setSmell(0);
+			encounter.setTaste(0);
+			encounter.setTouch(0);
+		} else {
+			numEncountersActual = numEncountersInDb;
+			//populate Encounter object with user's prior history here
+			encounter = priorEncounter;
+			usersFirstEncounter = false;
+		}
 		
 		// inflate the layout
 		View v = inflater.inflate(R.layout.view_retrieve_media, container, false);
@@ -82,16 +117,17 @@ public class MediaFragment extends Fragment  {
 			public void onClick(View v) {
 				// save senses to the database? or do this onDestory so we don't have to repeat it for other "back" operations?
 				Intent intent = new Intent(getActivity(), MapActivity.class);
+				intent.putExtra("user", user);
 				getActivity().startActivity(intent);
 			}
 		});
 		
 		// Fields to populate from Story data  
         TextView numComments = (TextView) v.findViewById(R.id.num_comments);
-        numComments.setText(Integer.toString(getArguments().getInt("mediaType"))); // temporary
+        numComments.setText(Integer.toString(getArguments().getInt("mediaType"))); // TODO: actual data
         
         TextView numEncounters = (TextView) v.findViewById(R.id.num_encounters);
-        numComments.setText(Integer.toString(4)); // temporary
+        numEncounters.setText(Integer.toString(numEncountersActual));
         
         TextView metaTime = (TextView) v.findViewById(R.id.meta_timestamp);
         metaTime.setText(setTimestampAndAuthor()); 
@@ -122,7 +158,23 @@ public class MediaFragment extends Fragment  {
         	storyTouch.setVisibility(View.VISIBLE);
         }
         
-        
+        // pre-populate sense buttons based on user's prior encounter
+		if(encounter.getHear() == 1) {
+			_btnHear.setBackgroundResource(R.drawable.btn_sense_bg_true);
+		}
+		if(encounter.getSee() == 1) {
+			_btnSee.setBackgroundResource(R.drawable.btn_sense_bg_true);
+		}
+		if(encounter.getSmell() == 1) {
+			_btnSmell.setBackgroundResource(R.drawable.btn_sense_bg_true);
+		}
+		if(encounter.getTaste() == 1) {
+			_btnTaste.setBackgroundResource(R.drawable.btn_sense_bg_true);
+		}
+		if(encounter.getTouch() == 1) {
+			_btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_true);
+		}
+		
         // user input
 		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
 		imageButtons.add(_btnHear);
@@ -130,7 +182,8 @@ public class MediaFragment extends Fragment  {
 		imageButtons.add(_btnSmell);
 		imageButtons.add(_btnTaste);
 		imageButtons.add(_btnTouch);
-		
+	
+		// add on click listeners
 		for(int i = 0; i < imageButtons.size(); i ++) {
 			imageButtons.get(i).setOnClickListener(new OnClickListener() {
 				
@@ -188,7 +241,7 @@ public class MediaFragment extends Fragment  {
 			
 		}
 		// subsitute the view stub based on the mediaType
-		switch(mediaType) {
+		/*switch(mediaType) {
 		case (Global.AUDIO_CAPTURE):
 			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
 			break;
@@ -198,7 +251,7 @@ public class MediaFragment extends Fragment  {
 		case (Global.VIDEO_CAPTURE):
 			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
 			break;
-		}
+		}*/
         
         // return the view
         return v;
@@ -216,6 +269,27 @@ public class MediaFragment extends Fragment  {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 
+	}
+	
+	/**
+	 * save the Encounter to the DB when the activity is Paused
+	 */
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		
+		// write encounter to the database
+		dbh.openDataBase();
+		if(usersFirstEncounter) {
+			// write new
+			dbh.createEncounter(encounter);
+		} else {
+			// update
+			dbh.updateEncounter(encounter);
+		}
+		
+		dbh.close();
 	}
 
 	/**

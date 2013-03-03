@@ -11,22 +11,22 @@ public class Encounter implements Parcelable{
 
 	int _hear;
 	int _see;
-	int _taste;
 	int _smell;
+	int _taste;
 	int _touch;
 	
 	// empty constructor
 	public Encounter() {
 	}
 	// Constructors
-	public Encounter(int id, int story, int user, int hear, int see, int taste, int smell, int touch) {
+	public Encounter(int id, int story, int user, int hear, int see, int smell, int taste, int touch) {
 		this._id = id;
 		this._story = story;
 		this._user = user;
 		this._hear = hear;
 		this._see = see;
-		this._taste = taste;
 		this._smell = smell;
+		this._taste = taste;
 		this._touch = touch;
 	}
 

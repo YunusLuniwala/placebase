@@ -18,8 +18,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
+
 /**
  * 
  * General DatabaseHelper to access databases.
@@ -244,20 +246,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * 
 	 */
 	
-	
-	 /**
-     * Get all stories in the database 
-     * 
-     * @return List<Story> 
-     */
+	// get all stories
     public List<Story> getAllStories() throws SQLException {
 		List<Story>allStories = new ArrayList<Story>();
 		
-		// Select All Query
-		String selectQuery = "SELECT * FROM " + TABLE_STORIES;
-		
-		// open the database
 		SQLiteDatabase db = this.getWritableDatabase();
+		String selectQuery = "SELECT * FROM " + TABLE_STORIES;
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
 		if(cursor.moveToFirst()) {
@@ -283,14 +277,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			} while (cursor.moveToNext());
 		}
 		
-		// close db connection
 		cursor.close();
 		db.close();
 		
-		// return story list
 		return allStories;
 	}
 
+    // create new story
     public void createStory(Story story) {
     	SQLiteDatabase db = this.getWritableDatabase();
 		
@@ -310,7 +303,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		// insert a new row
 		db.insert(TABLE_STORIES, null, values);
-		db.close(); //close database connection  	
+		db.close();
     }
 
     
@@ -356,21 +349,111 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * 
 	 */
     
+    
     /**
+ 	 * 
+ 	 * ENCOUNTER TABLE
+ 	 * All CRUD operations
+ 	 * 
+ 	 */   
+    
+  /**
+   * Returns a prior Encounter if the user has one at this place
+   * @param storyId
+   * @param userId
+   * @return
+   */
+   public Encounter getUsersPriorEncounter(int storyId, int userId) {
+	   
+	   Encounter pE;
+	 
+	   SQLiteDatabase db = this.getReadableDatabase();
+	   
+	   Cursor cursor = db.query(TABLE_ENCOUNTERS, null, 
+			   ENCOUNTERS_USER + "=? AND " + ENCOUNTERS_STORY + "=?", new String[]{String.valueOf(userId), String.valueOf(storyId)}, null, null, null);
+		if (cursor.moveToFirst()) {
+			pE = new Encounter(Integer.parseInt(cursor.getString(0)), cursor.getInt(1), cursor.getInt(2),
+					cursor.getInt(3), cursor.getInt(4), cursor.getInt(5), cursor.getInt(6), 
+					cursor.getInt(7));
+			Log.i("Previous Encounter Fetched: ", "Previous History User: " + pE.getUser());
+		} else {
+			Log.i("ENCOUNTER DB", "user has no prior encounter here");
+			 cursor.close();
+			 db.close();
+			 return null;
+		}
+
+		cursor.close();
+		db.close();
+		return pE;
+   }
+
+   // update Encounter
+   public void updateEncounter(Encounter e) {
+	   SQLiteDatabase db = this.getWritableDatabase();
+
+	   ContentValues values = new ContentValues();
+	   values.put(ENCOUNTERS_STORY, e.getStory());
+	   values.put(ENCOUNTERS_HEAR, e.getHear());
+	   values.put(ENCOUNTERS_SEE, e.getSee());
+	   values.put(ENCOUNTERS_SMELL, e.getSmell());
+	   values.put(ENCOUNTERS_TASTE, e.getTaste());
+	   values.put(ENCOUNTERS_TOUCH, e.getTouch());
+
+	   //update row
+	   db.update(TABLE_ENCOUNTERS, values, ENCOUNTERS_USER + " = ?", 
+			   new String[] { String.valueOf(e.getUser())});
+	   db.close();
+   }
+
+   // Add new Encounter
+   public void createEncounter(Encounter e) {
+	   SQLiteDatabase db = this.getWritableDatabase();
+	   
+	   ContentValues values = new ContentValues();
+	   values.put(ENCOUNTERS_USER, e.getUser());
+	   values.put(ENCOUNTERS_STORY, e.getStory());
+	   values.put(ENCOUNTERS_HEAR, e.getHear());
+	   values.put(ENCOUNTERS_SEE, e.getSee());
+	   values.put(ENCOUNTERS_SMELL, e.getSmell());
+	   values.put(ENCOUNTERS_TASTE, e.getTaste());
+	   values.put(ENCOUNTERS_TOUCH, e.getTouch());
+
+	   // insert a new row
+	   db.insert(TABLE_ENCOUNTERS, null, values);
+	   db.close();
+   }
+
+   // return number of Encounter for a Story
+   public int getEncounterCountForStory(int storyId){
+
+	   int num = 0;
+
+	   SQLiteDatabase db = this.getReadableDatabase();
+	   Cursor cursor = db.query(TABLE_ENCOUNTERS, null , ENCOUNTERS_STORY  + "=? ", 
+			   new String []{ String.valueOf(storyId)}, null, null, null);
+
+	   // looping through all rows and adding to list
+	   if (cursor.moveToFirst()) {
+		   do {
+	           num++;
+	        } while (cursor.moveToNext());
+	    } 
+	    
+	    cursor.close();
+	    db.close();
+	    
+       return num;
+	}
+
+    
+   /**
 	 * 
 	 * USER TABLE
 	 * All CRUD operations
 	 * 
 	 */
-    
-
-    
-    /**
-     * Add new user
-     * @param username
-     * @return
-     * 
-     */
+   // new User
     public void addUser(User user) {
     	SQLiteDatabase db = this.getWritableDatabase();
     	
@@ -384,6 +467,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	db.close();
     }
     
+    // get username from userId
     public String getUsernameOfAuthor(int userId) {
     	String username;
     	SQLiteDatabase db = this.getReadableDatabase();
@@ -400,11 +484,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	return username;
     }
     
-    /**
-     * Return a single user via username
-     * @param username
-     * @return User
-     */
+    // return User object from name
 	public User getUser(String username) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		User user;
@@ -424,9 +504,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return user;
 	}
 	
-	/**
-	 * update single user's login date
-	 */
+	// update User's login date
 	public int updateUserLoginDate(User user) {
 		SQLiteDatabase db = this.getWritableDatabase();
 

@@ -901,7 +901,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		boolean isWithinRange = false;
 		boolean isWithinBearing = false;
-		btnGetMessage.setEnabled(false);
+		//btnGetMessage.setEnabled(false); // UNCOMMENT ME AFTER TESTING
 		
 		if (journeyMode != 1) {
 			// exit journey mode
