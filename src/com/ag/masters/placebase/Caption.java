@@ -14,11 +14,13 @@ import android.widget.ImageView;
 import com.ag.masters.placebase.handlers.SDImageLoader;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryImage;
+import com.ag.masters.placebase.sqlite.User;
 
 public class Caption extends Activity {
 
 	Story story;
 	StoryImage image;
+	User user;
 	
 	EditText caption;
 	ImageView photoView;
@@ -36,14 +38,23 @@ public class Caption extends Activity {
 			if (tempStory != null) {
 				story = tempStory; // global var
 			}else {
-				throw new RuntimeException("SenseActivity: story passed was null");
+				throw new RuntimeException("CaptionActivity: story passed was null");
 			}
 
 			StoryImage tempImage = data.getParcelable("image");
 			if (tempImage != null) {
 				image = tempImage; // global var
 			}else {
-				throw new RuntimeException("SenseActivity: image passed was null");
+				throw new RuntimeException("CaptionActivity: image passed was null");
+			}
+
+			// get the user object
+			User tempUser = data.getParcelable("user");
+			if (tempUser != null) {
+				// and save into a global var
+				user = tempUser;
+			}else {
+				throw new RuntimeException("CaptionActivity: user passed was null");
 			}
 		}
 
@@ -75,6 +86,7 @@ public class Caption extends Activity {
 				// add parcels to Intent 
 				intent.putExtra("image", image);
 				intent.putExtra("story", story);
+				intent.putExtra("user", user);
 				// launch senses activity
 				startActivity(intent);
 			}

@@ -320,6 +320,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		});
 		
+		btnGetMessage.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent retrieveMedia = new Intent(MapActivity.this, RetrieveMedia.class);
+				retrieveMedia.putExtra("user", user);
+				retrieveMedia.putExtra("story", getStoryFromMarker(targetMarker));
+				startActivity(retrieveMedia);
+			}
+		});
+		
 		// set onClickListener for Record buttons
 		ImageButton btnVideo = (ImageButton) findViewById(R.id.btnVideo);
 		ImageButton btnAudio = (ImageButton) findViewById(R.id.btnAudio);

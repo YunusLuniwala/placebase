@@ -107,24 +107,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.ag.masters.placebase.RetrieveVideo"
-            android:label="@string/title_activity_retrieve_video"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.ag.masters.placebase.RetrieveAudio"
-            android:label="@string/title_activity_retrieve_audio"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+ 
         <activity
             android:name="com.ag.masters.placebase.RetrieveMedia"
             android:label="@string/title_activity_retrieve_image"

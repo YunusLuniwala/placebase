@@ -1,5 +1,7 @@
 package com.ag.masters.placebase;
 
+import java.util.List;
+
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -7,15 +9,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.View.OnClickListener;
+import android.widget.ImageButton;
+import android.widget.Toast;
+
+import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.sqlite.Story;
+import com.ag.masters.placebase.sqlite.User;
+import com.ag.masters.placebase.view.CommentFragment;
+import com.ag.masters.placebase.view.MediaFragment;
 
 public class RetrieveMedia extends FragmentActivity implements
 		ActionBar.TabListener {
@@ -34,20 +40,53 @@ public class RetrieveMedia extends FragmentActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-
+	private int mediaType = -1;
+	
+	// store references to the Fragments in the 
+	// main class when they are created
+	MediaFragment mMediaFragment;
+	CommentFragment mCommentFragment;
+	
+	// passed in from MapActivity
+	Story story;
+	User user;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_retrieve_media);
+		
+		// TODO: unpack user and story parcel
+		Bundle data = getIntent().getExtras();
 
+		if (data != null) {
+			// get the story object
+			Story tempStory = data.getParcelable("story");
+			if (tempStory != null) {
+				story = tempStory;
+			}else {
+				throw new RuntimeException("RetrieveMedia: story passed was null");
+			}
+
+			// get the user object
+			User tempUser = data.getParcelable("user");
+			if (tempUser != null) {
+				user = tempUser;
+			}else {
+				throw new RuntimeException("RetrieveMedia: user passed was null");
+			}
+		}
+		
+		// test 
+		mediaType = story.getMedia();
+			
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		// Create the adapter that will return a fragment for each of the three
+		// Create the adapter that will return a fragment for each of the two
 		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -59,11 +98,12 @@ public class RetrieveMedia extends FragmentActivity implements
 		mViewPager
 				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 					/** 
-					 * when A view is swipped....
+					 * when the view is swiped....
 					 */
 					@Override
 					public void onPageSelected(int position) {
 						actionBar.setSelectedNavigationItem(position);
+						prepareBehavior(position);
 					}
 				});
 
@@ -77,8 +117,24 @@ public class RetrieveMedia extends FragmentActivity implements
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
 		}
+		
+		
+		initMediaWidgets(mSectionsPagerAdapter.getItem(0));
+		initCommentWidgets(mSectionsPagerAdapter.getItem(1));
+		
 	}
-
+	
+	private void initMediaWidgets(Fragment fragment) {
+		// set onClickListeners for senseButtons
+		// store them as global 
+		
+		
+	}
+	
+	private void initCommentWidgets(Fragment fragment) {
+		
+		
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -90,23 +146,44 @@ public class RetrieveMedia extends FragmentActivity implements
 	 * when A tab is selected....
 	 */
 	@Override
-	public void onTabSelected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
-		// When the given tab is selected, switch to the corresponding page in
-		// the ViewPager.
+	public void onTabSelected(ActionBar.Tab tab,FragmentTransaction fragmentTransaction) {
 		mViewPager.setCurrentItem(tab.getPosition());
+		prepareBehavior(tab.getPosition());
 	}
 
 	@Override
-	public void onTabUnselected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
+	public void onTabUnselected(ActionBar.Tab tab,FragmentTransaction fragmentTransaction) {
 	}
 
 	@Override
-	public void onTabReselected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
+	public void onTabReselected(ActionBar.Tab tab,FragmentTransaction fragmentTransaction) {
 	}
 
+	
+	/**
+	 * called whenever the fragment is swipped or tabbed to
+	 * TODO: save encounter object for selected sense buttons when the user pages away
+	 * 
+	 * @param adapter position
+	 */
+	private void prepareBehavior(int pos) {
+		if (pos == 0) { 
+			prepareMedia();
+		} else if (pos == 1){ 
+			prepareComments();
+		}
+	}
+	
+	private void prepareMedia() {
+		Toast.makeText(this, "MEDIA TAB", Toast.LENGTH_SHORT).show();
+	}
+	
+	private void prepareComments() {
+		Toast.makeText(this, "COMMENTS TAB", Toast.LENGTH_SHORT).show();
+	}
+	
+	
+	
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -120,23 +197,32 @@ public class RetrieveMedia extends FragmentActivity implements
 		@Override
 		public Fragment getItem(int position) {
 			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
+			// CALLED ONLY ONCE. DO THE SETUP HERE!!!
+			// Return the Media or Comments fragment
+			// pass mediaType as arg to set ViewStub for the particular media 
+			// TODO: where do we program the controls for video and audio views?
 			Fragment fragment = null;
-			if (position == 0) {
-				fragment = new DummySectionFragment(); // change to  GetPhotoFragment
-				
-				Bundle args = new Bundle();
-				args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
-				fragment.setArguments(args);
 			
-			} else if (position == 1) {
-				fragment = new DummySectionFragment(); // change to CommentPhotoFragment
+			if (position == 0) {
+				fragment = new MediaFragment();
 				
+				mMediaFragment = (MediaFragment) fragment;
+				
+				// pass an arg to MediaFragment so we can load the right stub
 				Bundle args = new Bundle();
-				args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+				args.putInt("mediaType", mediaType);
 				fragment.setArguments(args);
+				
+				//Log.v(getClass().getSimpleName(), "Fragment 0 called in getItem");
+				
+			} else if (position == 1) {
+				fragment = new CommentFragment();
+				
+				mCommentFragment = (CommentFragment) fragment;
+				//Log.v(getClass().getSimpleName(), "Fragment 1 called in getItem");
+			
 			}
+
 			return fragment;
 		}
 
@@ -158,31 +244,5 @@ public class RetrieveMedia extends FragmentActivity implements
 		}
 	}
 
-	/**
-	 * A dummy fragment representing a section of the app, but that simply
-	 * displays dummy text.
-	 */
-	public static class DummySectionFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		public static final String ARG_SECTION_NUMBER = "section_number";
-
-		public DummySectionFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			// Create a new TextView and set its text to the fragment's section
-			// number argument value.
-			TextView textView = new TextView(getActivity());
-			textView.setGravity(Gravity.CENTER);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return textView;
-		}
-	}
 
 }

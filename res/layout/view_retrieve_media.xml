@@ -76,7 +76,7 @@
                 android:layout_height="wrap_content" />
 
             <ImageButton
-                android:id="@+id/imageButton1"
+                android:id="@+id/btn_to_map"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@android:color/transparent"
