@@ -161,20 +161,21 @@ containing a value of this type.
         public static final int ic_close=0x7f02001b;
         public static final int ic_compass=0x7f02001c;
         public static final int ic_launcher=0x7f02001d;
-        public static final int ic_map_marker=0x7f02001e;
-        public static final int ic_mute=0x7f02001f;
-        public static final int ic_muteoff=0x7f020020;
-        public static final int ic_mylocation=0x7f020021;
-        public static final int ic_record_audio=0x7f020022;
-        public static final int ic_record_photo=0x7f020023;
-        public static final int ic_record_video=0x7f020024;
-        public static final int ic_sense_hear=0x7f020025;
-        public static final int ic_sense_see=0x7f020026;
-        public static final int ic_sense_smell=0x7f020027;
-        public static final int ic_sense_taste=0x7f020028;
-        public static final int ic_sense_touch=0x7f020029;
-        public static final int logo_placebase=0x7f02002a;
-        public static final int markerbubble=0x7f02002b;
+        public static final int ic_map=0x7f02001e;
+        public static final int ic_map_marker=0x7f02001f;
+        public static final int ic_mute=0x7f020020;
+        public static final int ic_muteoff=0x7f020021;
+        public static final int ic_mylocation=0x7f020022;
+        public static final int ic_record_audio=0x7f020023;
+        public static final int ic_record_photo=0x7f020024;
+        public static final int ic_record_video=0x7f020025;
+        public static final int ic_sense_hear=0x7f020026;
+        public static final int ic_sense_see=0x7f020027;
+        public static final int ic_sense_smell=0x7f020028;
+        public static final int ic_sense_taste=0x7f020029;
+        public static final int ic_sense_touch=0x7f02002a;
+        public static final int logo_placebase=0x7f02002b;
+        public static final int markerbubble=0x7f02002c;
     }
     public static final class id {
         public static final int accelY=0x7f050032;
@@ -202,7 +203,7 @@ containing a value of this type.
         public static final int btn_record_taste=0x7f050048;
         public static final int btn_record_touch=0x7f050047;
         public static final int btn_takePhoto=0x7f050040;
-        public static final int btn_to_map=0x7f050075;
+        public static final int btn_to_map=0x7f050074;
         public static final int caption_title=0x7f050006;
         public static final int comments_container=0x7f05006f;
         public static final int cont_senses=0x7f050054;
@@ -248,7 +249,7 @@ containing a value of this type.
         public static final int media_taste=0x7f05007a;
         public static final int media_touch=0x7f05007b;
         public static final int menu_settings=0x7f05007d;
-        public static final int meta_geo=0x7f050074;
+        public static final int meta_geo=0x7f050075;
         public static final int meta_timestamp=0x7f050073;
         public static final int msgavailable=0x7f050053;
         public static final int new_user_name=0x7f05003b;

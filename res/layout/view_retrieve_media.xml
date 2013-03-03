@@ -18,17 +18,18 @@
         <RelativeLayout
             android:id="@+id/media_stubs_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="fill_parent"
+            android:layout_weight="0.94" >
 
             <ViewStub
                 android:id="@+id/audio_stub"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout="@layout/view_audio" />
 
             <ViewStub
                 android:id="@+id/image_stub"
-                android:layout_width="wrap_content"
+                android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout="@layout/view_image" />
 
@@ -37,52 +38,56 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:layout="@layout/view_video" />
-
         </RelativeLayout>
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/story_senses"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#33ffffff"
-            android:gravity="right" >
+    <LinearLayout
+        android:id="@+id/story_senses"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.05"
+        android:background="#33ffffff"
+        android:gravity="right" >
 
-            <ImageView
-                android:id="@+id/story_hear"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:src="@drawable/ic_sense_hear" />
+        <ImageView
+            android:id="@+id/story_hear"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_sense_hear"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/story_see"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:src="@drawable/ic_sense_see" />
+        <ImageView
+            android:id="@+id/story_see"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_sense_see"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/story_smell"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:src="@drawable/ic_sense_smell" />
+        <ImageView
+            android:id="@+id/story_smell"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_sense_smell"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/story_taste"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:src="@drawable/ic_sense_taste" />
+        <ImageView
+            android:id="@+id/story_taste"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_sense_taste"
+            android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/story_touch"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_margin="3dp"
-                android:src="@drawable/ic_sense_touch" />
-
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/story_touch"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_margin="3dp"
+            android:src="@drawable/ic_sense_touch"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -90,7 +95,9 @@
         android:id="@+id/media_meta"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.24"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_weight="0.20"
         android:paddingTop="5dp" >
 
         <LinearLayout
@@ -155,20 +162,24 @@
             <TextView
                 android:id="@+id/meta_timestamp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="timestamp"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/meta_geo"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="dummy"
+                android:textSize="12sp" />
 
             <ImageButton
                 android:id="@+id/btn_to_map"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="56dp"
+                android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/bg_black_trans" />
+                android:src="@drawable/ic_map" />
 
         </LinearLayout>
     </LinearLayout>

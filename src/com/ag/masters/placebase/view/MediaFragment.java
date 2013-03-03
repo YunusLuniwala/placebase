@@ -14,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,6 +99,31 @@ public class MediaFragment extends Fragment  {
         TextView metaGeo = (TextView) v.findViewById(R.id.meta_geo);
         metaGeo.setText(setGeo());
 		
+        // story attributes
+        ImageView storyHear = (ImageView) v.findViewById(R.id.story_hear);
+        ImageView storySee = (ImageView) v.findViewById(R.id.story_see);
+        ImageView storySmell = (ImageView) v.findViewById(R.id.story_smell);
+        ImageView storyTaste = (ImageView) v.findViewById(R.id.story_taste);
+        ImageView storyTouch = (ImageView) v.findViewById(R.id.story_touch);
+        
+        if(story.getHear() == 1) {
+        	storyHear.setVisibility(View.VISIBLE);
+        }
+        if(story.getSee() == 1) {
+        	storySee.setVisibility(View.VISIBLE);
+        }
+        if(story.getSmell() == 1) {
+        	storySmell.setVisibility(View.VISIBLE);
+        }
+        if(story.getTaste() == 1) {
+        	storyTaste.setVisibility(View.VISIBLE);
+        }
+        if(story.getTouch() == 1) {
+        	storyTouch.setVisibility(View.VISIBLE);
+        }
+        
+        
+        // user input
 		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
 		imageButtons.add(_btnHear);
 		imageButtons.add(_btnSee);
@@ -125,7 +151,7 @@ public class MediaFragment extends Fragment  {
 							encounter.setSee(1);
 						} else {
 							_btnSee.setBackgroundResource(R.drawable.btn_sense_bg_false);
-							story.setSee(0);
+							encounter.setSee(0);
 						}
 						Log.i("SENSE ACTIVITY", "See btn clicked");
 					} else if  (v == _btnSmell) {
