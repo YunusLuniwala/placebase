@@ -8,8 +8,11 @@
         android:id="@+id/media_stubs"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.74"
+        android:layout_weight="0.60"
         android:background="#000000"
+        android:baselineAligned="true"
+        android:clipChildren="true"
+        android:clipToPadding="true"
         android:orientation="vertical" >
 
         <RelativeLayout
@@ -20,17 +23,20 @@
             <ViewStub
                 android:id="@+id/audio_stub"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent" />
+                android:layout_height="fill_parent"
+                android:layout="@layout/view_audio" />
 
             <ViewStub
                 android:id="@+id/image_stub"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent" />
+                android:layout_height="fill_parent"
+                android:layout="@layout/view_image" />
 
             <ViewStub
                 android:id="@+id/video_stub"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent" />
+                android:layout_height="fill_parent"
+                android:layout="@layout/view_video" />
 
         </RelativeLayout>
 
@@ -84,14 +90,12 @@
         android:id="@+id/media_meta"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="-30dp"
         android:layout_weight="0.24"
         android:paddingTop="5dp" >
 
         <LinearLayout
             android:id="@+id/encounters_container"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight=".3"
             android:orientation="vertical" >
@@ -108,14 +112,16 @@
                 android:id="@+id/title_encounters"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/encounters" />
+                android:text="@string/encounters"
+                android:textAllCaps="true"
+                android:textSize="10sp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/comments_container"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight=".3"
             android:orientation="vertical" >
 
             <TextView
@@ -130,7 +136,10 @@
                 android:id="@+id/title_comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/comments" />
+                android:text="@string/comments"
+                android:textAllCaps="true"
+                android:textSize="10sp" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -138,7 +147,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:layout_weight=".4"
+            android:layout_weight="3.29"
             android:gravity="right"
             android:orientation="vertical"
             android:paddingTop="10dp" >
@@ -155,8 +164,8 @@
 
             <ImageButton
                 android:id="@+id/btn_to_map"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/bg_black_trans" />
@@ -168,15 +177,22 @@
         android:id="@+id/media_senses"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.19"
+        android:layout_weight="0.21"
+        android:background="#cccccc"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/senses_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/i_sense_it" />
-
+            android:layout_marginBottom="4dp"
+            android:background="#44ffffff"
+            android:gravity="center"
+            android:paddingBottom="1dp"
+            android:paddingTop="1dp"
+            android:text="@string/i_sense_it"
+            android:textAllCaps="true" />
+            
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

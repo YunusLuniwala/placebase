@@ -12,16 +12,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ag.masters.placebase.MapActivity;
 import com.ag.masters.placebase.R;
+import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
 
 public class MediaFragment extends Fragment  {
+
+	DatabaseHelper dbh;
 
 	int mediaType;
 	
@@ -48,6 +55,8 @@ public class MediaFragment extends Fragment  {
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
+		dbh = new DatabaseHelper(getActivity());
 		
 		// save parcel objects in global vars
 		story = getArguments().getParcelable("story");
@@ -84,11 +93,10 @@ public class MediaFragment extends Fragment  {
         numComments.setText(Integer.toString(4)); // temporary
         
         TextView metaTime = (TextView) v.findViewById(R.id.meta_timestamp);
-        //metaTime.setText(functionThatReturnsTheString()); // temporary
+        metaTime.setText(setTimestampAndAuthor()); 
         
         TextView metaGeo = (TextView) v.findViewById(R.id.meta_geo);
-        //metaGeo.setText(functionThatReturnsTheString()); // temporary
-        
+        metaGeo.setText(setGeo());
 		
 		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
 		imageButtons.add(_btnHear);
@@ -103,48 +111,48 @@ public class MediaFragment extends Fragment  {
 				@Override
 				public void onClick(View v) {
 					if(v == _btnHear) {
-						if(story.getHear() == 0) {
+						if(encounter.getHear() == 0) {
 							_btnHear.setBackgroundResource(R.drawable.btn_sense_bg_true);
-							story.setHear(1);
+							encounter.setHear(1);
 						} else {
 							_btnHear.setBackgroundResource(R.drawable.btn_sense_bg_false);
-							story.setHear(0);
+							encounter.setHear(0);
 						}
 						Log.i("SENSE ACTIVITY", "Hear btn clicked");
 					} else if (v == _btnSee) {
-						if(story.getSee() == 0) {
+						if(encounter.getSee() == 0) {
 							_btnSee.setBackgroundResource(R.drawable.btn_sense_bg_true);
-							story.setSee(1);
+							encounter.setSee(1);
 						} else {
 							_btnSee.setBackgroundResource(R.drawable.btn_sense_bg_false);
 							story.setSee(0);
 						}
 						Log.i("SENSE ACTIVITY", "See btn clicked");
 					} else if  (v == _btnSmell) {
-						if(story.getSmell() == 0) {
+						if(encounter.getSmell() == 0) {
 							_btnSmell.setBackgroundResource(R.drawable.btn_sense_bg_true);
-							story.setSmell(1);
+							encounter.setSmell(1);
 						} else {
 							_btnSmell.setBackgroundResource(R.drawable.btn_sense_bg_false);
-							story.setSmell(0);
+							encounter.setSmell(0);
 						}
 						Log.i("SENSE ACTIVITY", "Smell btn clicked");
 					} else if  (v == _btnTaste) {
-						if(story.getTaste() == 0) {
+						if(encounter.getTaste() == 0) {
 							_btnTaste.setBackgroundResource(R.drawable.btn_sense_bg_true);
-							story.setTaste(1);
+							encounter.setTaste(1);
 						} else {
 							_btnTaste.setBackgroundResource(R.drawable.btn_sense_bg_false);
-							story.setTaste(0);
+							encounter.setTaste(0);
 						}
 						Log.i("SENSE ACTIVITY", "Taste btn clicked");
 					} else if (v == _btnTouch) {
-						if(story.getTouch() == 0) {
+						if(encounter.getTouch() == 0) {
 							_btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_true);
-							story.setTouch(1);
+							encounter.setTouch(1);
 						} else {
 							_btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_false);
-							story.setTouch(0);
+							encounter.setTouch(0);
 						}
 						Log.i("SENSE ACTIVITY", "Touch btn clicked");
 					}
@@ -154,7 +162,17 @@ public class MediaFragment extends Fragment  {
 			
 		}
 		// subsitute the view stub based on the mediaType
-		
+		switch(mediaType) {
+		case (Global.AUDIO_CAPTURE):
+			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
+			break;
+		case (Global.IMAGE_CAPTURE):
+			View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
+			break;
+		case (Global.VIDEO_CAPTURE):
+			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
+			break;
+		}
         
         // return the view
         return v;
@@ -174,14 +192,69 @@ public class MediaFragment extends Fragment  {
 
 	}
 
+	/**
+	 * Assembles a String with the Time and Author name 
+	 * pulled from the Story object
+	 */
+	private String setTimestampAndAuthor() {
 
+		dbh.openDataBase();
+		String author = dbh.getUsernameOfAuthor(story.getUser());
+		dbh.close();
+
+		String timeAgo = formatInterval(story.getTimestamp());
+		String text = timeAgo + " by " + author;
+
+		return text;
+
+	}
 	
 	/**
-	 * GETTERS AND SETTERS
-	 * 
+	 * Assembles a String with the Geographic coordinates
+	 * pulled from the Story object
+	 * @return
 	 */
+	private String setGeo() {
+		String lat = Double.toString(story.getLat());
+		String lng = Double.toString(story.getLng());
+		String text = "(" + lat + ", " + lng + ")";
+		return text;
+	}
 	
+	/**
+	 * format time interval to display in info window
+	 * @param timeStamp
+	 * @return
+	 */
+	public String formatInterval(String timeStamp) {
 
+		DateHandler myDateHandler = new DateHandler();
+		String thisInterval;
+
+		if(timeStamp != null) {
+			// handle String formation based on authored date
+			int interval = myDateHandler.getDaysAgo(timeStamp);
+
+			switch (interval) {
+			case 0:
+				thisInterval = "today";
+				break;
+			case 1:
+				thisInterval = Integer.toString(interval) + " day ago";
+				break;
+			default:
+				thisInterval = Integer.toString(interval) + " days ago";
+				break;
+			}
+		} else {
+			thisInterval = "";
+			Toast.makeText(getActivity(), "timeStamp is null", Toast.LENGTH_SHORT).show();
+		}
+		
+		// return String value to populate TextView in InfoWindow
+		return thisInterval;
+
+	}
 
 	
 

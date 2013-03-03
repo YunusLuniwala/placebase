@@ -4,12 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/view_caption"
+    <VideoView
+        android:id="@+id/videoView1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:gravity="center"
-        android:text="Comments" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

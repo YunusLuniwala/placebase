@@ -384,6 +384,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	db.close();
     }
     
+    public String getUsernameOfAuthor(int userId) {
+    	String username;
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	Cursor cursor = db.query(TABLE_USERS, new String[] {USERS_ID, USERS_NAME}, USERS_ID + "=?", 
+				new String[]{String.valueOf(userId)}, null, null, null);
+		if (cursor.moveToFirst()) {
+			username = cursor.getString(1);
+		} else {
+			username = null; // fail to return story id
+		}
+    	
+    	cursor.close();
+    	db.close();
+    	return username;
+    }
+    
     /**
      * Return a single user via username
      * @param username
