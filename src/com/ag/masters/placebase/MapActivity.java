@@ -125,8 +125,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
 
-
-
 	// device dimensions
 	private int screenHeight;
 	private int screenWidth;
@@ -165,7 +163,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private ImageButton btnRecordMedia;
 	private FrameLayout layoutRecordMedia2;
 	private boolean isRecordOptionsShowing;
-
+	private boolean isInfoWindowShowing;
+	
 	// journey Block Views
 	RelativeLayout journeyBlock;
 	Button btnGetMessage;
@@ -283,6 +282,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAzimuth.setText("0.00");
 		//testPitch.setText("0.00");
 		//testRoll.setText("0.00");
+		
 
 		myCriteria = new Criteria();
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -290,7 +290,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
 		// initialize the state of media recording
-		isRecordOptionsShowing = false; 
+		isRecordOptionsShowing = false;
+		// the Info Window is not showing to start
+		isInfoWindowShowing = false;
 
 		// define views in journey block
 		journeyBlock = (RelativeLayout) findViewById(R.id.journeyblock);
@@ -867,9 +869,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		if(journeyMode == 1) {
 			journeyMode = 0;
-			
+			updateJourneyMode();	
 		}
-		updateJourneyMode();
+		
+		// stop rotating for a second.
+		rotateView = false;
+		// and set flag that the InfoWindow is Showing
+		isInfoWindowShowing = true;
 		
 		return false;
 		
@@ -889,8 +895,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		targetLocation.setLatitude(target.latitude);
 		targetLocation.setLongitude(target.longitude);
 
+		// start rotating again
+		rotateView = true;
+		// it's true! We're journeying!
 		journeyMode = 1;
-
+		
+		// TODO: here... move the map!
+		
 		updateJourneyBlockImage(targetMarker);
 		updateJourneyMode(); // also called onLocationChanged()
 
@@ -901,11 +912,23 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onMapClick(LatLng point) {
+		
+		Log.v("MAP", "MAP CLICKED. isInfoWindowShowing = " + Boolean.toString(isInfoWindowShowing));
+		
 		// exit strategy: hide the media buttons if they are showing
 		if(isRecordOptionsShowing == true) {
 			//Toast.makeText(getApplicationContext(), "map was clicked", Toast.LENGTH_LONG).show();
 			hideMediaButtons();
 		}
+		
+		if(isInfoWindowShowing == true) {
+			// start rotating again
+			rotateView = true;
+			updateJourneyMode();
+			isInfoWindowShowing = false;
+		}
+		Log.v("MAP", "MAP CLICKED. isInfoWindowShowing = " + Boolean.toString(isInfoWindowShowing));
+		
 	}
 
 	private void updateJourneyBlockImage(Marker marker) {
@@ -1265,7 +1288,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			accelVals = lowPass(event.values, accelVals);
 
 			//gravity = event.values.clone();
-
 			gravity = accelVals;
 
 			//test
