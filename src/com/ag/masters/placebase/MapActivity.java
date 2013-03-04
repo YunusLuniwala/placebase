@@ -147,7 +147,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 * 0 ² x ² 1 ; a smaller value basically means more smoothing
 	 * See: http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
 	 */
-	static final float ALPHA = 0.2f;
+	static final float ALPHA = 0.5f;
 	protected float[] accelVals;
 
 	double azimuth = 0;
@@ -864,8 +864,15 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	@Override
 	public boolean onMarkerClick(Marker marker) {
-		// TODO Auto-generated method stub
+
+		if(journeyMode == 1) {
+			journeyMode = 0;
+			
+		}
+		updateJourneyMode();
+		
 		return false;
+		
 	}
 	//------------------------------------------------------------------------------------------
 	@Override
