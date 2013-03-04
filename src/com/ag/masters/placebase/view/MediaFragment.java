@@ -118,6 +118,7 @@ public class MediaFragment extends Fragment  {
 				// save senses to the database? or do this onDestory so we don't have to repeat it for other "back" operations?
 				Intent intent = new Intent(getActivity(), MapActivity.class);
 				intent.putExtra("user", user);
+				intent.putExtra("journeyMode", 0);
 				getActivity().startActivity(intent);
 			}
 		});
@@ -241,7 +242,7 @@ public class MediaFragment extends Fragment  {
 			
 		}
 		// subsitute the view stub based on the mediaType
-		/*switch(mediaType) {
+		switch(mediaType) {
 		case (Global.AUDIO_CAPTURE):
 			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
 			break;
@@ -251,7 +252,7 @@ public class MediaFragment extends Fragment  {
 		case (Global.VIDEO_CAPTURE):
 			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
 			break;
-		}*/
+		}
         
         // return the view
         return v;

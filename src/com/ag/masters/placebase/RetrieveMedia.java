@@ -1,5 +1,13 @@
 package com.ag.masters.placebase;
-
+/**
+ * Implements horizontal view paging
+ * with PageAdapter and the ActionBar API
+ * 
+ * http://android-developers.blogspot.com/2011/08/horizontal-view-swiping-with-viewpager.html
+ * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
+ * http://mobile.tutsplus.com/tutorials/android/android-user-interface-design-horizontal-view-paging/
+ * 
+ */
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.os.Bundle;

@@ -9,7 +9,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
@@ -40,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -80,17 +80,17 @@ public class MapActivity extends Activity
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
 	public static final int ZOOM_LEVEL = 16;
-	
+
 	private static final int TARGET_BEARING = 20;
 	private static final int TARGET_RANGE = 5;
-	
+
 	private GoogleMap mMap;	
 	private DatabaseHelper dbh;
-	
+
 	private List<Story> allStories;
-	
+
 	private User user;
-	
+
 	// journey mode 
 	private static int journeyMode = -1;
 	private Location myCurrentLocation = null;	
@@ -118,18 +118,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private TextView testAzimuth;
 	private TextView testPitch;
 	private TextView testRoll;
-	
+	private TextView thisBearing;
+
 	// device location services (GPS)
 	private LocationManager myLocationManager;
 	private OnLocationChangedListener myLocationListener;
 	private Criteria myCriteria;
-	
-	
-	
+
+
+
 	// device dimensions
 	private int screenHeight;
 	private int screenWidth;
-	
+
 	// Map Camera CancellableCalbacks for animations 
 	private CancelableCallback enableAnimation; 
 
@@ -148,14 +149,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	static final float ALPHA = 0.2f;
 	protected float[] accelVals;
-	
+
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
-	
+
 	// helper classes
 	private static DateHandler myDateHandler;
 	private static SDImageLoader imageLoader;
-	
+
 	private boolean rotateView = true;
 	private boolean firstFix = true;
 	private static CameraPosition MYLOCATION;
@@ -164,7 +165,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private ImageButton btnRecordMedia;
 	private FrameLayout layoutRecordMedia2;
 	private boolean isRecordOptionsShowing;
-	
+
 	// journey Block Views
 	RelativeLayout journeyBlock;
 	Button btnGetMessage;
@@ -174,7 +175,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	ImageView compass;
 	ImageView alignmentIcon;
 	ImageView photo;
-	
+
 	// Animation
 	private ObjectAnimator slideUpHalfway;
 	private ObjectAnimator slideDown;
@@ -182,29 +183,29 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	// hard reference to saved URIs to use onActivityResult
 	private Uri mCaptureImageUri;
 	private Uri mCaptureVideoUri;
-	
-	
-	
-	
+
+
+
+
 	//------------------------------------------------------------------------------------------
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		setContentView(R.layout.activity_map);
-		
+
 		dbh = new DatabaseHelper(this);
 
 		imageLoader = new SDImageLoader();
-		
+
 		Bundle data = getIntent().getExtras();
 		if (data != null) {
-			
+
 			boolean returnFromStory = data.getBoolean("returnFromStory");
 			if (returnFromStory) {
 				Log.v(getClass().getSimpleName(), "User returned from authoring story");
 				//TODO: something to the marker in the db so the user knows which one is hers
 			}
-			
+
 			// get the story object
 			User tempUser = data.getParcelable("user");
 			if (tempUser != null) {
@@ -213,18 +214,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// TODO: shouldn't this be the last thing to happen in the login activity class? 
 				// So that we can check for notifications and display the immediately when the map starts up?
 				int updateDB = dbh.updateUserLoginDate(user);
+				dbh.close();
 				Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
 			} else {
 				// test with default user
 				user = new User("ashton", "pass", "0");
 				//throw new RuntimeException("MapActivity: user passed was null");
 			}
+			// you've returned from a journey, so hide the block
+			int tempJourneyMode = data.getInt("journeyMode");
+			if (tempJourneyMode != 0) {
+				return;			
+			} else {
+				journeyMode = tempJourneyMode;
+			}
 		}
-		
-		
-		
-		//dbh.close();
-		
+
+
+
+
+
+
 		setUpMapIfNeeded();
 		// define a callback for animateCamera
 		// when we have finished an animation, resume rotation
@@ -244,7 +254,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		calculateScreenDimensions();
 		myDateHandler = new DateHandler();
-			
+
 		// testPrintouts. Delete when done
 		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
 		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
@@ -261,7 +271,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
 		testPitch = (TextView) findViewById(R.id.testPitch);
 		testRoll = (TextView) findViewById(R.id.testRoll);
-		
+
+		thisBearing = (TextView) findViewById(R.id.test_thisBearing);
+
 		//testGeoX.setText("0.00");
 		//testGeoY.setText("0.00");
 		//testGeoZ.setText("0.00");
@@ -289,7 +301,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		alignmentIcon = (ImageView) findViewById(R.id.ic_alignment);
 		compass = (ImageView) findViewById(R.id.ic_compass);
 		photo = (ImageView) findViewById(R.id.ic_info_media);
-		
+
 		// TODO: not the best... a swipe gesture would be better here
 		btnCloseJourneyPanel.setLongClickable(true); 
 		// set up click listener on close button for journey panel
@@ -300,8 +312,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				updateJourneyMode();
 			}
 		});
-		
-		
+		// check that we are not in journey mode,
+		// and hide the journey block if we are not.
+		if(journeyMode != 1) {
+			updateJourneyMode();
+		}
+
 		// define media buttons and layouts as globals
 		layoutRecordMedia2 = (FrameLayout) findViewById(R.id.recordBtnLayout2);
 		btnRecordMedia = (ImageButton) findViewById(R.id.btnRecordMain);
@@ -319,7 +335,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 
 		});
-		
+
 		btnGetMessage.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -329,7 +345,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startActivity(retrieveMedia);
 			}
 		});
-		
+
 		// set onClickListener for Record buttons
 		ImageButton btnVideo = (ImageButton) findViewById(R.id.btnVideo);
 		ImageButton btnAudio = (ImageButton) findViewById(R.id.btnAudio);
@@ -340,14 +356,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaptureVideo();
 			}
 		});
-		
+
 		btnAudio.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				startCaptureAudio();
 			}
 		});
-		
+
 		btnPhoto.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -356,35 +372,31 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		});
 
 
-		// check that we are not in journey mode,
-		// and hide the journey block if we are not.
-		if(journeyMode != 1) {
-			updateJourneyMode();
-		}
+
 
 	}
-	
+
 
 	@Override
 	protected void onResume() {
-		
+
 		super.onResume();
 		setUpMapIfNeeded();
-		
-	
+
+
 		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		//Register for location updates using a Criteria, and a callback on the specified looper thread.
 		myLocationManager.requestLocationUpdates(
-				400L, 		// minTime
+				4000L, 		// minTime
 				1.0f,		// minDistance
 				myCriteria,	// criteria
 				this, 		// listener
 				null);		// intent
-	
+
 		mMap.setMyLocationEnabled(true);
 		// replaces the location source of the my-location layer
 		mMap.setLocationSource(this);
-	
+
 		// register sensor listeners
 		mySensorManager.registerListener(this, 
 				mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 
@@ -394,8 +406,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				mySensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), 
 				SensorManager
 				.SENSOR_DELAY_NORMAL);
-	
-	
+
+
 	}
 
 	@Override
@@ -403,20 +415,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		super.onPause();
 		/* Disable the my-location layer (this causes our LocationSource to be automatically deactivated.) */
 		mySensorManager.unregisterListener(this);
-	
+
 		myLocationManager.removeUpdates(this);
 		mMap.setMyLocationEnabled(false);
 		mMap.setLocationSource(null);
-		
+
 		//dbh.close();
 	}
 
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		dbh.close();
 	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
+
 	/**
 	 * use built-in camera to record photos
 	 * save files to root
@@ -424,21 +443,21 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void startCaptureImage() {
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 		if(isAvailable(getApplicationContext(), intent)) {
-			
+
 			// Hiyo, holy shitballs. what a pain this was
 			// http://stackoverflow.com/questions/4184951/get-path-of-image-from-action-image-capture-intent
-			
+
 			// define the filename
 			String filename = Environment.getExternalStorageDirectory().getAbsolutePath() 
 					+ String.valueOf(System.currentTimeMillis()) 
 					+ ".jpg";
-			
+
 			Log.i("IMAGE INTENT" , filename);
-			
+
 			ContentValues values = new ContentValues();
 			values.put(MediaStore.Images.Media.TITLE, filename);
 			mCaptureImageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-			
+
 			// must specify the URI where the image will be stored
 			// as a global variable to access in onActivityResult
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, mCaptureImageUri);
@@ -460,7 +479,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			startActivityForResult(intent, Global.AUDIO_CAPTURE);
 		}
 	}
-	
+
 	/**
 	 * use built-in video camera
 	 * save files to root
@@ -473,8 +492,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			startActivityForResult(intent, Global.VIDEO_CAPTURE);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Handle Results from Recording Activities
 	 */
@@ -486,7 +505,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		// only start the new activity if the recording was not cancelled
 		if (resultCode == RESULT_OK)  {
-			
+
 			// create new story object
 			Story story = new Story();
 			// create a new media object
@@ -495,11 +514,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			StoryVideo video = new StoryVideo();
 			// create a new media object
 			StoryAudio audio = new StoryAudio();
-			
+
 			// create new Intent for video, audio (not photo)
 			// so we can add parcels to it.
 			Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
-			
+
 			// also check to see that the request code is OK
 			switch(requestCode) {
 			case Global.IMAGE_CAPTURE:
@@ -532,7 +551,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaption.putExtra("user", user);
 				// start SensesActivity
 				startActivity(startCaption);
-				
+
 				break;
 
 			case Global.VIDEO_CAPTURE:
@@ -548,7 +567,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					cursor.close();
 					Log.i("VIDEO-CAPTURE", capturedVideoFilePath);
 
-					
+
 					// and store the filepath in the StoryVideo object
 					video.setUri(capturedVideoFilePath);	
 
@@ -558,7 +577,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 				story.setUser(user.getId());
 				story.setMedia(Global.VIDEO_CAPTURE);
-				
+
 				// pass in StoryVideo parcel
 				startSenses.putExtra("video", video);
 				// pass in Story parcel
@@ -566,7 +585,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// start SensesActivity
 				startSenses.putExtra("user", user);
 				startActivity(startSenses);
-				
+
 				break;
 
 			case Global.AUDIO_CAPTURE:
@@ -582,7 +601,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					// read String from the database column
 					String audioFilePath = cursor.getString(index);
 					cursor.close();
-					
+
 					// store the filepath in the StoryAudio object
 					audio.setUri(audioFilePath);
 
@@ -606,7 +625,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 
 
-			
+
 		}
 	}
 
@@ -632,19 +651,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		ImageButton btnShowMyLocation = (ImageButton) findViewById(R.id.btnShowMyLocation);
 
 		btnShowMyLocation.setOnClickListener(new OnClickListener() { 
-		
+
 			@Override
 			public void onClick(final View v) {
 				// stop rotating for a second.
 				rotateView = false;
-				
+
 				if(myCurrentLocation != null) {
 					mMap.animateCamera(
 							CameraUpdateFactory.newLatLngZoom(
 									new LatLng(
 											myCurrentLocation.getLatitude(), 
 											myCurrentLocation.getLongitude()), 
-									ZOOM_LEVEL), new CancelableCallback() {
+											ZOOM_LEVEL), new CancelableCallback() {
 								@Override
 								public void onFinish() {
 									rotateView = true;				
@@ -654,13 +673,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 									rotateView = true;
 								}
 							});
-					
+
 				}
 			}
 		});
 	}
-			
-	
+
+
 
 
 	//------------------------------------------------------------------------------------------
@@ -692,7 +711,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				mMedia = null;
 				break;
 			}
-			 
+
 
 			Drawable mIconDrawable = new BitmapDrawable(res, mIcon);
 			//Drawable mCompassDrawable = new BitmapDrawable(res, mCompass);
@@ -759,11 +778,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	private void addMarkersToMap() {
 
-		
+
 		//dbh.openDataBase();	
 		allStories = dbh.getAllStories();
-		
-		
+
+
 		if(allStories != null) {
 			for (int i=0; i<allStories.size(); i++) {
 				Story s = allStories.get(i);
@@ -775,7 +794,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				Marker thisMarker = mMap.addMarker(new MarkerOptions()
 				.position(ll)
 				.icon(BitmapDescriptorFactory.fromBitmap(ic)));
-				
+
 				// and store that marker's ID into the Story instance
 				// to pull up the correct information onInfoWindowClick
 				String markerId = thisMarker.getId();
@@ -784,9 +803,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		} else {
 			Toast.makeText(this, "no stories in db", Toast.LENGTH_LONG).show();
 		}
-		
+
 		//dbh.close();
-		
+
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -853,18 +872,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	public void onInfoWindowClick(Marker marker) {
 
 		setMyLocationMarker();
-		
+
 		// store marker as global
 		targetMarker = marker;
-		
+
 		// store Location in a global var
 		LatLng target = marker.getPosition();
 		targetLocation = new Location("Target");
 		targetLocation.setLatitude(target.latitude);
 		targetLocation.setLongitude(target.longitude);
-		
+
 		journeyMode = 1;
-		
+
 		updateJourneyBlockImage(targetMarker);
 		updateJourneyMode(); // also called onLocationChanged()
 
@@ -881,7 +900,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			hideMediaButtons();
 		}
 	}
-	
+
 	private void updateJourneyBlockImage(Marker marker) {
 		getStoryFromMarker(marker);
 		Story thisStory = getStoryFromMarker(marker);
@@ -898,11 +917,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void updateJourneyMode() {
 
 		// note: update journeyMode before calling this function
-		
+
 		boolean isWithinRange = false;
 		boolean isWithinBearing = false;
 		//btnGetMessage.setEnabled(false); // UNCOMMENT ME AFTER TESTING
-		
+
 		if (journeyMode != 1) {
 			// exit journey mode
 			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
@@ -913,9 +932,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// called when we FIRST enter journey mode
 				journeyBlock.setVisibility(View.VISIBLE); // change for animation?
 				targetMarker.hideInfoWindow();
-				
+
 				LatLngBounds.Builder builder = new LatLngBounds.Builder();
-				
+
 				builder.include(myMarker.getPosition());
 				builder.include(targetMarker.getPosition());
 				builder.build();
@@ -928,7 +947,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// set boundaries so myLocation and the destination marker are both visible on the screen
 				// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
 			}
-			
+
 			// calculate new values for bearing and distance to target
 			calculateDistanceToTarget();
 			calculateBearingToTarget();
@@ -936,6 +955,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			int intDistance = (int)targetDistance;
 			// update Views with new values for bearing and distance
 			journeyBearing.setText(Float.toString(targetBearing));
+			
 			journeyDistance.setText(Integer.toString(intDistance));
 			// rotate the compass to reflect device bearing to target
 			compass.setRotation(targetBearing);
@@ -944,25 +964,25 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			if (targetBearing >= -(TARGET_BEARING) && targetBearing <= TARGET_BEARING) {
 				isWithinBearing = true;
 			}
-			
+
 			if (targetDistance <= TARGET_RANGE) {
 				isWithinRange = true;
 			}
-			
+
 			// change icon to reflect true or false alignment
 			if (isWithinBearing == true) {
 				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_true));
 			} else {
 				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_false));
 			}
-			
+
 			if(isWithinRange == true) {
 				// make text green
 				journeyDistance.setTextColor(Color.GREEN);				
 			} else {
 				journeyDistance.setTextColor(Color.BLACK);
 			}
-			
+
 			if (isWithinRange && isWithinBearing) {
 				btnGetMessage.setEnabled(true);
 			}
@@ -981,10 +1001,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// round to a whole number
 			targetDistance = Math.round(targetDistance);
 			return targetDistance;
-			
+
 		} else return 0;
 	}
-	
+
 	/**
 	 * Called in Journey mode
 	 * 
@@ -1001,7 +1021,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			targetBearing = Math.round(targetBearing);
 			// spit out a value from -180 to 0 , and 0 - 180
 			targetBearing = targetBearing >= 180 ? -(360 - targetBearing): targetBearing;
-			
+
 			return targetBearing;
 		}
 		else return 0;
@@ -1012,7 +1032,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 * @param azimuth
 	 */
 	private void setDeviceBearing(double azimuth) {
-		
+
 		bearing = (float) azimuth;
 		if (!rotateView) {
 			//bearing = 0;
@@ -1022,16 +1042,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// and round to a whole number
 			bearing = Math.round(bearing);
 		}
-	
+
 		if(journeyMode == 1) {
 			updateJourneyMode();
 		}
-		
+
 		if(rotateView) {
 			rotateMyCamera();
 		}
 	}
-	
+
 	//------------------------------------------------------------------------------------------
 	private void setMyLocationMarker() {
 		// http://androiddev.orkitra.com/?p=3933	
@@ -1083,14 +1103,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if(mMap.isMyLocationEnabled() && mMap.getMyLocation() != null) {
 			if(rotateView && !firstFix) {
 
-			CameraPosition cameraPosition = new CameraPosition.Builder()
-			.target(mMap.getCameraPosition().target)      
-			.zoom(mMap.getCameraPosition().zoom)               
-			.bearing(bearing)                
-			.tilt(mMap.getCameraPosition().tilt)                   
-			.build();               
-			
-			mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
+				CameraPosition cameraPosition = new CameraPosition.Builder()
+				.target(mMap.getCameraPosition().target)      
+				.zoom(mMap.getCameraPosition().zoom)               
+				.bearing(bearing)                
+				.tilt(mMap.getCameraPosition().tilt)                   
+				.build();               
+
+				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
 			}
 		}
 	}
@@ -1110,7 +1130,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			screenWidth = display.getWidth();
 		}
 	}
-	
+
 	private Story getStoryFromMarker(Marker marker) {
 		// "m0" format 
 		// We can reliably query the array of story objects based
@@ -1129,26 +1149,28 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onLocationChanged(Location location) {
-	
+		
+		Log.v("LOCATION", "onLocationChanged: ");
+		
 		if (myLocationListener != null) {
 			myLocationListener.onLocationChanged(location);
-			
+
 			// save device location to global variable.
 			myCurrentLocation = mMap.getMyLocation();
-			
+
 			if(firstFix) { // we have gotten the first fix on myLocation
 				// set the MyLocation button position to a global variable
 				MYLOCATION = new CameraPosition.Builder()
-					.target(new LatLng(
-							myCurrentLocation.getLatitude(), 
-							myCurrentLocation.getLongitude()))
-					.zoom(ZOOM_LEVEL)
-					.bearing(mMap.getCameraPosition().bearing)
-					.tilt(0)
-					.build();
-	
+				.target(new LatLng(
+						myCurrentLocation.getLatitude(), 
+						myCurrentLocation.getLongitude()))
+						.zoom(ZOOM_LEVEL)
+						.bearing(mMap.getCameraPosition().bearing)
+						.tilt(0)
+						.build();
+
 				//animate the camera to this place
-				mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
+				/* mMap.animateCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION), new CancelableCallback() {
 					@Override
 					public void onFinish() {
 						rotateView = true;
@@ -1161,24 +1183,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 						// set firstFix to false so it runs only once
 						firstFix = false;
 					}
-				});			
+				});		
+				 */
+				mMap.moveCamera(CameraUpdateFactory.newCameraPosition(MYLOCATION));
+				rotateView = true;
+				firstFix = false;
 			}
-	
-			// test
-			testMyLocation.setText(
-					"My lat: " + myCurrentLocation.getLatitude() + "\n" +
-					"My lon: " + myCurrentLocation.getLongitude());
-	
+
+			
+			Log.v("LOCATION", "My lat: " + myCurrentLocation.getLatitude() + "\n" +"My lo n: " + myCurrentLocation.getLongitude());
+			
+			
 			// if we are journeying. 
 			// update myMarker's location
 			if (journeyMode == 1) {
 				updateJourneyMode();
 				setMyLocationMarker();
 			}
-	
+
 		}
-	
-	
+
+
 	}
 
 
@@ -1219,23 +1244,23 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	//------------------------------------------------------------------------------------------	
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		
+
 		// http://stackoverflow.com/questions/4819626/android-phone-orientation-overview-including-compass 
 		// http://stackoverflow.com/questions/4020048/finding-orientation-using-getrotationmatrix-and-getorientation?rq=1
 		// If the sensor data is unreliable return
 		//if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
-			//return;
+		//return;
 
 		// Gets the value of the sensor that has been changed
 		switch (event.sensor.getType()) {  
 		case Sensor.TYPE_ACCELEROMETER:
 			accelVals = event.values.clone();
 			accelVals = lowPass(event.values, accelVals);
-			
+
 			//gravity = event.values.clone();
-			
+
 			gravity = accelVals;
-			
+
 			//test
 			/*testAccelX.setText(Float.toString(gravity[0]));
 			testAccelY.setText(Float.toString(gravity[1]));
@@ -1272,18 +1297,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 
 	}	
-	
+
 	/**
 	 * @see http://en.wikipedia.org/wiki/Low-pass_filter#Algorithmic_implementation
 	 * @see http://developer.android.com/reference/android/hardware/Sensor.html#TYPE_ACCELEROMETER
 	 */
 	protected float[] lowPass( float[] input, float[] output ) {
-	    if ( output == null ) return input;
+		if ( output == null ) return input;
 
-	    for ( int i=0; i<input.length; i++ ) {
-	        output[i] = output[i] + ALPHA * (input[i] - output[i]);
-	    }
-	    return output;
+		for ( int i=0; i<input.length; i++ ) {
+			output[i] = output[i] + ALPHA * (input[i] - output[i]);
+		}
+		return output;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -1305,7 +1330,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 * customizes the look of marker infoWindow
 	 */
 	class CustomInfoWindowAdapter implements InfoWindowAdapter {
-	
+
 		private final View mWindow;
 
 		/**
@@ -1327,9 +1352,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		 */
 		@Override
 		public View getInfoWindow(Marker marker) { 
-			
+
 			Story thisStory = getStoryFromMarker(marker);
-			
+
 			// assign views
 			ImageView perspective = (ImageView) mWindow.findViewById(R.id.ic_perspective);	// perspective image
 			TextView daysAgo = (TextView) mWindow.findViewById(R.id.daysago); 				// days ago				 
@@ -1341,7 +1366,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			ImageView media = (ImageView) mWindow.findViewById(R.id.ic_info_media);
 
 			if (thisStory != null ) {
-				
+
 				switch (thisStory.getMedia()) {
 				case Global.IMAGE_CAPTURE:
 					media.setImageResource(R.drawable.ic_record_photo);
@@ -1353,10 +1378,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					media.setImageResource(R.drawable.ic_record_audio);
 					break;
 				}
-				
-				
+
+
 				daysAgo.setText(formatInterval(thisStory.getTimestamp()));
-			
+
 				// display background resources for assigned senses
 				if(thisStory.getHear() == 1) { 
 					hear.setBackgroundResource(R.drawable.btn_sense_bg_true);
@@ -1387,8 +1412,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				} else {
 					touch.setBackgroundResource(R.drawable.btn_sense_bg_false);
 				}
-				
-				
+
+
 				//int perspectiveUri = 0; 
 				// this was a resource ID. Will now probably be a string
 				if(thisStory.getPerspectiveUri() != null) {
@@ -1398,27 +1423,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					//imageLoader.load(thisStory.getPerspectiveUri(), perspective);
 				} else {
 					// Passing 0 to setImageResource will clear the image view.
-	                 int perspectiveUri = 0;
-	                 perspective.setImageResource(perspectiveUri);
-	                // Log.v(getClass().getSimpleName(), "Perspective URI is null");
+					int perspectiveUri = 0;
+					perspective.setImageResource(perspectiveUri);
+					// Log.v(getClass().getSimpleName(), "Perspective URI is null");
 				}
-				
-				
-				
+
+
+
 
 			}
-			
+
 			return mWindow;
 		}
 
 
-		
+
 		@Override
 		public View getInfoContents(Marker marker) {
 			// TODO Auto-generated method stub
 			return null;
 		}
-		
+
 		/**
 		 * format time interval to display in info window
 		 * @param timeStamp
@@ -1447,7 +1472,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				thisInterval = "";
 				Toast.makeText(MapActivity.this, "timeStamp is null", Toast.LENGTH_SHORT).show();
 			}
-			
+
 			// return String value to populate TextView in InfoWindow
 			return thisInterval;
 
