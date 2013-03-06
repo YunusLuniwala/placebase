@@ -25,19 +25,29 @@
                 android:id="@+id/audio_stub"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout="@layout/view_audio" />
+                android:layout="@layout/view_audio"
+                android:visibility="gone" />
 
             <ViewStub
                 android:id="@+id/image_stub"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:layout="@layout/view_image" />
+                android:layout="@layout/view_image"
+                android:visibility="gone" />
 
             <ViewStub
                 android:id="@+id/video_stub"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:layout="@layout/view_video" />
+                android:layout="@layout/view_video"
+                android:visibility="gone" />
+
+            <VideoView
+                android:id="@+id/video_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true" />
+
         </RelativeLayout>
     </LinearLayout>
 

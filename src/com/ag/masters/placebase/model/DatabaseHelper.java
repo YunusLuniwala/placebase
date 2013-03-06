@@ -20,6 +20,9 @@ import android.util.Log;
 
 import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
+import com.ag.masters.placebase.sqlite.StoryAudio;
+import com.ag.masters.placebase.sqlite.StoryImage;
+import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
 
 /**
@@ -335,12 +338,87 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * 
 	 */
     
+    // create one StoryImage
+    public void createStoryImage(StoryImage image) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+	    values.put(PHOTOS_STORY, image.getStory()); 
+	    values.put(PHOTOS_URI, image.getUri());
+	    values.put(PHOTOS_CAPTION, image.getCaption());
+
+	    Log.d("Inserting...", "Inserting into " + TABLE_PHOTOS);
+	    db.insert(TABLE_PHOTOS, null, values);
+
+	    db.close();
+    }
+
+    // return one StoryImage from Story _id
+    public StoryImage getStoryImage(int storyId) {
+    	SQLiteDatabase db = this.getReadableDatabase();
+
+    	Cursor cursor = db.query(TABLE_PHOTOS, null , PHOTOS_STORY + "=? ", 
+    			new String []{ String.valueOf(storyId)}, null, null, null);
+
+    	if(cursor.moveToFirst()){
+    		StoryImage image = new StoryImage(
+    				Integer.parseInt(cursor.getString(0)),
+    				cursor.getInt(1),
+    				cursor.getString(2),
+    				cursor.getString(3));
+    		cursor.close();
+    		db.close();
+    		return image;
+    	} else {
+    		cursor.close();
+    		db.close();
+    		return null;
+    	}	
+    }
+    
 	/**
 	 * 
 	 * VIDEO TABLE
 	 * All CRUD operations
 	 * 
 	 */
+    
+    // create one Video
+    public void createStoryVideo(StoryVideo video) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+	    values.put(VIDEOS_STORY, video.getStory()); 
+	    values.put(VIDEOS_URI, video.getUri());
+	    
+	    Log.d("Inserting...", "Inserting into " + TABLE_VIDEOS);
+	    db.insert(TABLE_VIDEOS, null, values);
+		
+		db.close();
+    }
+    
+    
+    // return one Video from Story _id
+    public StoryVideo getStoryVideo(int storyId) {
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	
+    	Cursor cursor = db.query(TABLE_VIDEOS, null , VIDEOS_STORY + "=? ", 
+				new String []{ String.valueOf(storyId)}, null, null, null);
+    	
+    	if(cursor.moveToFirst()){
+    	StoryVideo video = new StoryVideo(
+    			Integer.parseInt(cursor.getString(0)),
+    			cursor.getInt(1),
+    			cursor.getString(2));
+    		cursor.close();
+    		db.close();
+    		return video;
+    	} else {
+    		cursor.close();
+        	db.close();
+        	return null;
+    	}	
+    }
 
 	/**
 	 * 
@@ -348,8 +426,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 * All CRUD operations
 	 * 
 	 */
-    
-    
+    // create one StoryAudio row
+    public void createStoryAudio(StoryAudio audio) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+	    values.put(AUDIO_STORY, audio.getStory()); 
+	    values.put(AUDIO_URI, audio.getUri());
+	    
+	    Log.d("Inserting...", "Inserting into " + TABLE_AUDIO);
+	    db.insert(TABLE_AUDIO, null, values);
+
+	    db.close();
+    }
+
+    // return one StoryAudio from Story _id
+    public StoryAudio getStoryAudio(int storyId) {
+    	SQLiteDatabase db = this.getReadableDatabase();
+
+    	Cursor cursor = db.query(TABLE_AUDIO, null , AUDIO_STORY + "=? ", 
+    			new String []{ String.valueOf(storyId)}, null, null, null);
+
+    	if(cursor.moveToFirst()){
+    		StoryAudio audio = new StoryAudio(
+    				Integer.parseInt(cursor.getString(0)),
+    				cursor.getInt(1),
+    				cursor.getString(2));
+    		cursor.close();
+    		db.close();
+    		return audio;
+    	} else {
+    		cursor.close();
+    		db.close();
+    		return null;
+    	}	
+    }
+
+
     /**
  	 * 
  	 * ENCOUNTER TABLE
@@ -430,18 +543,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	   int num = 0;
 
 	   SQLiteDatabase db = this.getReadableDatabase();
-	   Cursor cursor = db.query(TABLE_ENCOUNTERS, null , ENCOUNTERS_STORY  + "=? ", 
+	   Cursor cursor = db.query(TABLE_ENCOUNTERS, null, ENCOUNTERS_STORY  + "=?", 
 			   new String []{ String.valueOf(storyId)}, null, null, null);
 
-	   // looping through all rows and adding to list
-	   if (cursor.moveToFirst()) {
-		   do {
-	           num++;
-	        } while (cursor.moveToNext());
-	    } 
-	    
-	    cursor.close();
-	    db.close();
+	   num = cursor.getCount();
+	   cursor.close();
+	   db.close();
 	    
        return num;
 	}

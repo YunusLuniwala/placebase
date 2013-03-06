@@ -118,7 +118,7 @@ public class ConfirmTrace extends Activity {
 			break;
 		case Global.VIDEO_CAPTURE:
 			video.setStory(newStoryKey);
-			//dbh.createStoryVideo();
+			dbh.createStoryVideo(video);
 			break;
 		case Global.AUDIO_CAPTURE:
 			audio.setStory(newStoryKey);
@@ -135,7 +135,7 @@ public class ConfirmTrace extends Activity {
 			public void run() {
 				// what you want to run after the delay
 				Intent returnToMap = new Intent(ConfirmTrace.this, MapActivity.class);
-				returnToMap.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				//returnToMap.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				returnToMap.putExtra("returnFromStory", true);
 				//returnToMap.putExtra("user", user);
 				startActivity(returnToMap);

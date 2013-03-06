@@ -134,10 +134,11 @@ public class PerspectiveActivity extends Activity implements
 		cameraView = (CameraView) this.findViewById(R.id.view_preview);
 		pictureButton = (ImageButton) this.findViewById(R.id.btn_takePhoto);
 		pictureButton.setOnClickListener(this);
-		pictureButton.setEnabled(false); // start the button disabled until we have a location fix
+		//pictureButton.setEnabled(false); // start the button disabled until we have a location fix
 		
 		 LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		 overlay = inflater.inflate(R.layout.location_progress, null);
+		 overlay.setVisibility(View.INVISIBLE);
 		 FrameLayout container = (FrameLayout) findViewById(R.id.perspective_layout);
 		 container.addView(overlay);
 		
@@ -160,7 +161,8 @@ public class PerspectiveActivity extends Activity implements
 				.SENSOR_DELAY_NORMAL);
 		// register location listener
 		myLocationManager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER,
+				LocationManager.NETWORK_PROVIDER,
+				//LocationManager.GPS_PROVIDER,
 				0,
 				0,
 				(LocationListener) this);
@@ -286,13 +288,15 @@ public class PerspectiveActivity extends Activity implements
 	@Override
 	public void onLocationChanged(Location location) {
 		// disallow the user from saving a photo until the location
-		// has been set and is accurate within 10 meters
-		if(location.getAccuracy() < 10) {
-			pictureButton.setEnabled(true);
-			overlay.setVisibility(View.INVISIBLE);
-		} else {
-			pictureButton.setEnabled(false);
-			overlay.setVisibility(View.VISIBLE);
+		// has been set and is accurate within 10 meters, if using GPS
+		if(location.getProvider() == LocationManager.GPS_PROVIDER) {
+			if(location.getAccuracy() < 10) {
+				pictureButton.setEnabled(true);
+				overlay.setVisibility(View.INVISIBLE);
+			} else {
+				pictureButton.setEnabled(false);
+				overlay.setVisibility(View.VISIBLE);
+			}
 		}
 
 	}

@@ -12,11 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.ag.masters.placebase.MapActivity;
 import com.ag.masters.placebase.R;
@@ -25,6 +26,9 @@ import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
+import com.ag.masters.placebase.sqlite.StoryAudio;
+import com.ag.masters.placebase.sqlite.StoryImage;
+import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
 
 public class MediaFragment extends Fragment  {
@@ -42,6 +46,11 @@ public class MediaFragment extends Fragment  {
 	Story story;
 	User user;
 	Encounter encounter;
+	
+	// only one of these will not be null
+	StoryImage image;
+	StoryVideo video;
+	StoryAudio audio;
 	
 	// encounter shtuff
 	int numEncountersInDb;
@@ -71,13 +80,18 @@ public class MediaFragment extends Fragment  {
 		// ENCOUNTERS
 		// initialize 
 		encounter = new Encounter(story.getId(), user.getId());
-		
+		Encounter priorEncounter = null;
 		
 		dbh.openDataBase();
+		
 		// get stored encounter count for this story
-		numEncountersInDb = dbh.getEncounterCountForStory(story.getId());
-		// check if this is user's first encounter
-		Encounter priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());
+		if(story.getId() != 0) { // check first that we have a story object
+			numEncountersInDb = dbh.getEncounterCountForStory(story.getId());
+			Log.d("MEDIA RETRIEVAL" , "number of encounters saved in database : " + numEncountersInDb);
+			// check if this is user's first encounter
+			priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());	
+		}
+		
 		dbh.close();
 		
 		// if this is the first time, add one to the number returned from the db.
@@ -102,6 +116,8 @@ public class MediaFragment extends Fragment  {
 		// inflate the layout
 		View v = inflater.inflate(R.layout.view_retrieve_media, container, false);
 		
+		
+		
 		// sense buttons
 		_btnHear = (ImageButton) v.findViewById(R.id.media_hear);
 		_btnSee = (ImageButton) v.findViewById(R.id.media_see);
@@ -122,6 +138,10 @@ public class MediaFragment extends Fragment  {
 				getActivity().startActivity(intent);
 			}
 		});
+		
+		// clear the view stub
+		RelativeLayout stubContainer = (RelativeLayout) v.findViewById(R.id.media_stubs_container);
+		//stubContainer.removeView();
 		
 		// Fields to populate from Story data  
         TextView numComments = (TextView) v.findViewById(R.id.num_comments);
@@ -243,17 +263,25 @@ public class MediaFragment extends Fragment  {
 		}
 		// subsitute the view stub based on the mediaType
 		switch(mediaType) {
+		// reflactor with one viewStub that loads a different layout file .... 
+			
 		case (Global.AUDIO_CAPTURE):
-			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
+			//View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
 			break;
 		case (Global.IMAGE_CAPTURE):
-			View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
-			break;
+			//View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
+			
+		break;
 		case (Global.VIDEO_CAPTURE):
-			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
+			//View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
+			VideoView videoView = (VideoView) v.findViewById(R.id.video_view);
+			
+			String pathToVideo = "";
+			//videoView.setVideoPath(path)
+			
 			break;
 		}
-        
+		
         // return the view
         return v;
 	}
