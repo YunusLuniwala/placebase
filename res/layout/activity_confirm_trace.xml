@@ -5,6 +5,7 @@
     tools:context=".ConfirmTrace" >
 
     <LinearLayout
+        android:id="@+id/confirm_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
@@ -19,30 +20,67 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical" >
 
-                <TextView
-                    android:id="@+id/story_confirm"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_weight=".3"
-                    android:gravity="center"
-                    android:text="@string/story_confirm" />
+                    android:layout_weight=".1"
+                    android:gravity="center" >
 
-                <TextView
-                    android:id="@+id/storyConfirmAddl"
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|center_horizontal"
+                        android:text="@string/story_confirm"
+                        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_toEndOf="@id/story_confirm"
+                    android:layout_height="wrap_content"
                     android:layout_weight=".3"
-                    android:gravity="center"
-                    android:text="@string/story_confirm_addl" />
+                    android:background="#33b5e5"
+                    android:gravity="center" >
+
+                    <TextView
+                        android:id="@+id/storyConfirmAddl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_weight=".3"
+                        android:gravity="center"
+                        android:text="@string/story_confirm_addl"
+                        android:textColor="#ffffff"
+                        android:textSize="30sp" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".3" >
+                </RelativeLayout>
 
             </LinearLayout>
 
-            <RelativeLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight=".3" >
-            </RelativeLayout>
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginRight="94dp"
+                android:layout_marginTop="58dp" >
+
+                <ImageView
+                    android:id="@+id/bg_marker"
+                    android:layout_width="match_parent"
+                    android:layout_height="272dp"
+                    android:layout_gravity="bottom"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/bg_marker" />
+
+            </FrameLayout>
 
         </RelativeLayout>
     </LinearLayout>

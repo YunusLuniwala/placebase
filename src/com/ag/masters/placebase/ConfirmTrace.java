@@ -12,16 +12,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 
 public class ConfirmTrace extends Activity {
 
 	
 	/**
-	 * TODO: this is where you will return after recording the perspective photo
 	 * 
 	 * GRAB the lat, lng, uri, bearing from the image metadata 
-	 * (bearing might need to be adjusted to work with MapActivity parameteres)
+	 * (bearing might need to be adjusted to work with MapActivity parameters)
 	 * record the timestamp
 	 * 
 	 * save the story to the database
@@ -81,6 +81,7 @@ public class ConfirmTrace extends Activity {
 						StoryImage tempImage = data.getParcelable("media");
 						if(tempImage != null) {
 							image = tempImage;
+							//Log.d("CAPTION", "image caption is : " + image.getCaption());
 						} else {
 							throw new RuntimeException("SenseActivity: image passed was null");
 						}
@@ -104,17 +105,17 @@ public class ConfirmTrace extends Activity {
 					}
 				}
 		
-		// write story data to db
+		// write Story to database
 		dbh.createStory(story);
 		// query id of the row
 		int newStoryKey;
 		newStoryKey = dbh.getStoryId(story.getTimestamp());
 		// set foreign key
-		// and write image/audio/video data to db
+		// and write image/audio/video data to database
 		switch(story.getMedia()) {
 		case Global.IMAGE_CAPTURE:
 			image.setStory(newStoryKey);
-			//dbh.createStoryImage();
+			dbh.createStoryImage(image);
 			break;
 		case Global.VIDEO_CAPTURE:
 			video.setStory(newStoryKey);
@@ -122,14 +123,13 @@ public class ConfirmTrace extends Activity {
 			break;
 		case Global.AUDIO_CAPTURE:
 			audio.setStory(newStoryKey);
-			//dbh.createStoryAudio();
+			dbh.createStoryAudio(audio);
 			break;
 		}
 		
 		dbh.close();
 		
 		// delay for a few seconds before you redirect to map
-		
 		runnable = new Runnable() {
 			@Override
 			public void run() {

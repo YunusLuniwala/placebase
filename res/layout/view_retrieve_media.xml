@@ -19,7 +19,15 @@
             android:id="@+id/media_stubs_container"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="0.94" >
+            android:layout_weight="0.94"
+            android:gravity="center" >
+
+            <ViewStub
+                android:id="@+id/media_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="133dp"
+                android:layout_marginTop="21dp" />
 
             <ViewStub
                 android:id="@+id/audio_stub"
@@ -37,7 +45,7 @@
 
             <ViewStub
                 android:id="@+id/video_stub"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout="@layout/view_video"
                 android:visibility="gone" />
@@ -46,7 +54,8 @@
                 android:id="@+id/video_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true" />
+                android:layout_alignParentLeft="true"
+                android:visibility="gone" />
 
         </RelativeLayout>
     </LinearLayout>

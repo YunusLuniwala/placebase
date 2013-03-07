@@ -30,7 +30,7 @@
     <string name="perspective_instructions2">Take a picture to record it.</string>
     <string name="perspective_get_psyched">Get Ready</string>
     <string name="perspective_record_cta">Record Perspective</string>
-    <string name="story_confirm">Success!</string>
+    <string name="story_confirm">Success.</string>
     <string name="story_confirm_addl">You left a trace.</string>
     <string name="jouney_distance">METERS AWAY</string>
     <string name="title_activity_confirm_trace">ConfirmTrace</string>

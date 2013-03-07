@@ -12,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +24,7 @@ import android.widget.VideoView;
 import com.ag.masters.placebase.MapActivity;
 import com.ag.masters.placebase.R;
 import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.handlers.SDImageLoader;
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Encounter;
@@ -77,13 +80,15 @@ public class MediaFragment extends Fragment  {
 		story = getArguments().getParcelable("story");
 		user = getArguments().getParcelable("user");
 		
-		// ENCOUNTERS
-		// initialize 
+		// key to query specific media object
+		mediaType = story.getMedia();
+		
+		// initialize encounter object
 		encounter = new Encounter(story.getId(), user.getId());
 		Encounter priorEncounter = null;
 		
+		// get prior encounters
 		dbh.openDataBase();
-		
 		// get stored encounter count for this story
 		if(story.getId() != 0) { // check first that we have a story object
 			numEncountersInDb = dbh.getEncounterCountForStory(story.getId());
@@ -91,7 +96,6 @@ public class MediaFragment extends Fragment  {
 			// check if this is user's first encounter
 			priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());	
 		}
-		
 		dbh.close();
 		
 		// if this is the first time, add one to the number returned from the db.
@@ -113,11 +117,9 @@ public class MediaFragment extends Fragment  {
 			usersFirstEncounter = false;
 		}
 		
-		// inflate the layout
+		// inflate the xml layout
 		View v = inflater.inflate(R.layout.view_retrieve_media, container, false);
-		
-		
-		
+
 		// sense buttons
 		_btnHear = (ImageButton) v.findViewById(R.id.media_hear);
 		_btnSee = (ImageButton) v.findViewById(R.id.media_see);
@@ -135,7 +137,8 @@ public class MediaFragment extends Fragment  {
 				Intent intent = new Intent(getActivity(), MapActivity.class);
 				intent.putExtra("user", user);
 				intent.putExtra("journeyMode", 0);
-				getActivity().startActivity(intent);
+				//getActivity().startActivity(intent);
+				getActivity().onBackPressed();
 			}
 		});
 		
@@ -261,28 +264,67 @@ public class MediaFragment extends Fragment  {
 			});
 			
 		}
-		// subsitute the view stub based on the mediaType
+		
+		// open the DB, cuz you're making calls to to retrieve
+		// media connected to the Story object
+		dbh.openDataBase();
+		
+		// populate the viewStub based on the mediaType
 		switch(mediaType) {
 		// reflactor with one viewStub that loads a different layout file .... 
 			
 		case (Global.AUDIO_CAPTURE):
 			//View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
 			break;
+		
 		case (Global.IMAGE_CAPTURE):
-			//View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
+			// inflate the image view stub
+			View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
 			
-		break;
+			// get image from DB
+			image = dbh.getStoryImage(story.getId());
+			String imagePath = image.getUri();
+			String imageCaption = image.getCaption();
+			Log.d("IMAGE VIEWER", "image path: " + imagePath);
+			
+			// load image
+			ImageView frame = (ImageView) v.findViewById(R.id.media_image);
+			SDImageLoader loader = new SDImageLoader();
+			loader.load(image.getUri(), frame);
+			
+			//load caption
+			TextView caption = (TextView) v.findViewById(R.id.view_caption);
+			Log.d("CAPTION", "image caption is : " + imageCaption);
+			caption.setText(imageCaption);
+			
+			break;
+			
 		case (Global.VIDEO_CAPTURE):
-			//View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
-			VideoView videoView = (VideoView) v.findViewById(R.id.video_view);
 			
-			String pathToVideo = "";
-			//videoView.setVideoPath(path)
+			// inflate the video view stub
+			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
+			
+			//populate the story object from DB call
+			video = dbh.getStoryVideo(story.getId());
+			String path = video.getUri();
+			Log.d("VIDEO PLAYER", "video path: " + path);
+			
+			// set up the video view and media controller
+			VideoView videoView = (VideoView) v.findViewById(R.id.video_view);
+			videoView.setMediaController(new MediaController(getActivity()));
+			
+			// set path and start playing
+			videoView.setVideoPath(path);
+			videoView.start();
+			videoView.requestFocus();
 			
 			break;
 		}
 		
-        // return the view
+		// close the db
+		dbh.close();
+		
+        // return the entire view
         return v;
 	}
 	

@@ -346,32 +346,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	    values.put(PHOTOS_STORY, image.getStory()); 
 	    values.put(PHOTOS_URI, image.getUri());
 	    values.put(PHOTOS_CAPTION, image.getCaption());
-
+	    
 	    Log.d("Inserting...", "Inserting into " + TABLE_PHOTOS);
 	    db.insert(TABLE_PHOTOS, null, values);
-
-	    db.close();
+		
+		db.close();
     }
-
-    // return one StoryImage from Story _id
+    
+ // return one StoryImage from Story _id
     public StoryImage getStoryImage(int storyId) {
     	SQLiteDatabase db = this.getReadableDatabase();
 
-    	Cursor cursor = db.query(TABLE_PHOTOS, null , PHOTOS_STORY + "=? ", 
+    	Cursor cursor = db.query(TABLE_PHOTOS, null, PHOTOS_STORY + "=? ", 
     			new String []{ String.valueOf(storyId)}, null, null, null);
 
     	if(cursor.moveToFirst()){
-    		StoryImage image = new StoryImage(
-    				Integer.parseInt(cursor.getString(0)),
-    				cursor.getInt(1),
-    				cursor.getString(2),
-    				cursor.getString(3));
+    		StoryImage image = new StoryImage();
+    		
+    		image.setUri(cursor.getString(2));
+    		
+    		String caption = cursor.getString(3);
+    		image.setCaption(caption);
+    				
     		cursor.close();
     		db.close();
+    	    Log.d("Retrieving...", "Retrieving from " + TABLE_PHOTOS);
+    	    Log.d("Retrieving...", "CAPTION is " + caption);
     		return image;
     	} else {
     		cursor.close();
     		db.close();
+    		Log.d("Retrieving...", "Could not retrieve from " + TABLE_PHOTOS);
     		return null;
     	}	
     }
@@ -412,10 +417,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     			cursor.getString(2));
     		cursor.close();
     		db.close();
+    		Log.d("Retrieving...", "Retrieving from " + TABLE_VIDEOS);
     		return video;
     	} else {
     		cursor.close();
         	db.close();
+        	Log.d("Retrieving...", "Could not retrieve from " + TABLE_VIDEOS);
         	return null;
     	}	
     }
@@ -452,12 +459,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     				Integer.parseInt(cursor.getString(0)),
     				cursor.getInt(1),
     				cursor.getString(2));
+    		Log.d("Retrieving...", "Retrieving from " + TABLE_AUDIO);
     		cursor.close();
     		db.close();
     		return audio;
     	} else {
     		cursor.close();
     		db.close();
+    		Log.d("Retrieving...", "Could not retieve from " + TABLE_AUDIO);
     		return null;
     	}	
     }

@@ -94,6 +94,7 @@ public class StoryImage implements Parcelable{
 		dest.writeInt(_id);
 		dest.writeInt(_story);
 		dest.writeString(_uri);
+		dest.writeString(_caption);
 	}
 	
 	/**
@@ -110,6 +111,7 @@ public class StoryImage implements Parcelable{
 		_id = in.readInt();
 		_story = in.readInt();
 		_uri = in.readString();
+		_caption = in.readString();
 	}
 	
 	/**
