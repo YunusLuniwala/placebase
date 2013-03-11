@@ -1,14 +1,18 @@
 package com.ag.masters.placebase.view;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -17,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -34,59 +39,64 @@ import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
 
-public class MediaFragment extends Fragment  {
+public class MediaFragment extends Fragment implements OnPreparedListener, MediaController.MediaPlayerControl {
 
 	DatabaseHelper dbh;
 
 	int mediaType;
-	
+
+	MediaPlayer mp; 
+	MediaController mc;
+	SeekBar progress;
+	boolean pausing = false;
+
 	ImageButton _btnHear;
 	ImageButton _btnSee;
 	ImageButton _btnSmell;
 	ImageButton _btnTaste;
 	ImageButton _btnTouch;
-	
+
 	Story story;
 	User user;
 	Encounter encounter;
-	
+
 	// only one of these will not be null
 	StoryImage image;
 	StoryVideo video;
 	StoryAudio audio;
-	
+
 	// encounter shtuff
 	int numEncountersInDb;
 	int numEncountersActual;
 	boolean usersFirstEncounter = true;
-	
+
 	public MediaFragment() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		
+
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
 		dbh = new DatabaseHelper(getActivity());
-		
+
 		// save parcel objects in global vars
 		story = getArguments().getParcelable("story");
 		user = getArguments().getParcelable("user");
-		
+
 		// key to query specific media object
 		mediaType = story.getMedia();
-		
+
 		// initialize encounter object
 		encounter = new Encounter(story.getId(), user.getId());
 		Encounter priorEncounter = null;
-		
+
 		// get prior encounters
 		dbh.openDataBase();
 		// get stored encounter count for this story
@@ -97,7 +107,7 @@ public class MediaFragment extends Fragment  {
 			priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());	
 		}
 		dbh.close();
-		
+
 		// if this is the first time, add one to the number returned from the db.
 		if(priorEncounter == null) {
 			numEncountersActual = numEncountersInDb + 1; 
@@ -116,7 +126,7 @@ public class MediaFragment extends Fragment  {
 			encounter = priorEncounter;
 			usersFirstEncounter = false;
 		}
-		
+
 		// inflate the xml layout
 		View v = inflater.inflate(R.layout.view_retrieve_media, container, false);
 
@@ -126,11 +136,11 @@ public class MediaFragment extends Fragment  {
 		_btnSmell = (ImageButton) v.findViewById(R.id.media_smell);
 		_btnTaste = (ImageButton) v.findViewById(R.id.media_taste);
 		_btnTouch = (ImageButton) v.findViewById(R.id.media_touch);
-		
+
 		// back to map btn
 		ImageButton _btnToMap = (ImageButton) v.findViewById(R.id.btn_to_map);
 		_btnToMap.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				// save senses to the database? or do this onDestory so we don't have to repeat it for other "back" operations?
@@ -141,48 +151,48 @@ public class MediaFragment extends Fragment  {
 				getActivity().onBackPressed();
 			}
 		});
-		
+
 		// clear the view stub
 		RelativeLayout stubContainer = (RelativeLayout) v.findViewById(R.id.media_stubs_container);
 		//stubContainer.removeView();
-		
+
 		// Fields to populate from Story data  
-        TextView numComments = (TextView) v.findViewById(R.id.num_comments);
-        numComments.setText(Integer.toString(getArguments().getInt("mediaType"))); // TODO: actual data
-        
-        TextView numEncounters = (TextView) v.findViewById(R.id.num_encounters);
-        numEncounters.setText(Integer.toString(numEncountersActual));
-        
-        TextView metaTime = (TextView) v.findViewById(R.id.meta_timestamp);
-        metaTime.setText(setTimestampAndAuthor()); 
-        
-        TextView metaGeo = (TextView) v.findViewById(R.id.meta_geo);
-        metaGeo.setText(setGeo());
-		
-        // story attributes
-        ImageView storyHear = (ImageView) v.findViewById(R.id.story_hear);
-        ImageView storySee = (ImageView) v.findViewById(R.id.story_see);
-        ImageView storySmell = (ImageView) v.findViewById(R.id.story_smell);
-        ImageView storyTaste = (ImageView) v.findViewById(R.id.story_taste);
-        ImageView storyTouch = (ImageView) v.findViewById(R.id.story_touch);
-        
-        if(story.getHear() == 1) {
-        	storyHear.setVisibility(View.VISIBLE);
-        }
-        if(story.getSee() == 1) {
-        	storySee.setVisibility(View.VISIBLE);
-        }
-        if(story.getSmell() == 1) {
-        	storySmell.setVisibility(View.VISIBLE);
-        }
-        if(story.getTaste() == 1) {
-        	storyTaste.setVisibility(View.VISIBLE);
-        }
-        if(story.getTouch() == 1) {
-        	storyTouch.setVisibility(View.VISIBLE);
-        }
-        
-        // pre-populate sense buttons based on user's prior encounter
+		TextView numComments = (TextView) v.findViewById(R.id.num_comments);
+		numComments.setText(Integer.toString(getArguments().getInt("mediaType"))); // TODO: actual data
+
+		TextView numEncounters = (TextView) v.findViewById(R.id.num_encounters);
+		numEncounters.setText(Integer.toString(numEncountersActual));
+
+		TextView metaTime = (TextView) v.findViewById(R.id.meta_timestamp);
+		metaTime.setText(setTimestampAndAuthor()); 
+
+		TextView metaGeo = (TextView) v.findViewById(R.id.meta_geo);
+		metaGeo.setText(setGeo());
+
+		// story attributes
+		ImageView storyHear = (ImageView) v.findViewById(R.id.story_hear);
+		ImageView storySee = (ImageView) v.findViewById(R.id.story_see);
+		ImageView storySmell = (ImageView) v.findViewById(R.id.story_smell);
+		ImageView storyTaste = (ImageView) v.findViewById(R.id.story_taste);
+		ImageView storyTouch = (ImageView) v.findViewById(R.id.story_touch);
+
+		if(story.getHear() == 1) {
+			storyHear.setVisibility(View.VISIBLE);
+		}
+		if(story.getSee() == 1) {
+			storySee.setVisibility(View.VISIBLE);
+		}
+		if(story.getSmell() == 1) {
+			storySmell.setVisibility(View.VISIBLE);
+		}
+		if(story.getTaste() == 1) {
+			storyTaste.setVisibility(View.VISIBLE);
+		}
+		if(story.getTouch() == 1) {
+			storyTouch.setVisibility(View.VISIBLE);
+		}
+
+		// pre-populate sense buttons based on user's prior encounter
 		if(encounter.getHear() == 1) {
 			_btnHear.setBackgroundResource(R.drawable.btn_sense_bg_true);
 		}
@@ -198,19 +208,19 @@ public class MediaFragment extends Fragment  {
 		if(encounter.getTouch() == 1) {
 			_btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_true);
 		}
-		
-        // user input
+
+		// user input
 		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
 		imageButtons.add(_btnHear);
 		imageButtons.add(_btnSee);
 		imageButtons.add(_btnSmell);
 		imageButtons.add(_btnTaste);
 		imageButtons.add(_btnTouch);
-	
+
 		// add on click listeners
 		for(int i = 0; i < imageButtons.size(); i ++) {
 			imageButtons.get(i).setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
 					if(v == _btnHear) {
@@ -259,89 +269,146 @@ public class MediaFragment extends Fragment  {
 						}
 						Log.i("SENSE ACTIVITY", "Touch btn clicked");
 					}
-					
+
 				}
 			});
-			
+
 		}
-		
+
 		// open the DB, cuz you're making calls to to retrieve
 		// media connected to the Story object
 		dbh.openDataBase();
-		
+
 		// populate the viewStub based on the mediaType
 		switch(mediaType) {
 		// reflactor with one viewStub that loads a different layout file .... 
-			
+
 		case (Global.AUDIO_CAPTURE):
-			//View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
-			break;
-		
+			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
+		ImageButton btnPlay = (ImageButton) v.findViewById(R.id.btn_play);
+		ImageButton btnPause = (ImageButton) v.findViewById(R.id.btn_pause);
+		progress = (SeekBar) v.findViewById(R.id.progress);
+
+		// get audio from database
+		audio = dbh.getStoryAudio(story.getId());
+
+		final String audioPath = audio.getUri();
+
+		/*Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.parse(audioPath), "video/3gpp");
+			startActivity(intent);*/
+
+		mp = new MediaPlayer();
+		mp.setOnPreparedListener(this);
+
+		mc = new MediaController(getActivity());
+
+		try {
+			mp.setDataSource(audioPath);
+			mp.prepare();
+			mp.start();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+
+		btnPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(audioPath != null) {
+					if (pausing) {
+						pausing = false;
+						mp.start();
+
+					} else {
+						pausing = true;
+						mp.stop();
+					}
+				}
+			}
+		});
+
+
+		break;
+
 		case (Global.IMAGE_CAPTURE):
 			// inflate the image view stub
 			View imageStub = ((ViewStub) v.findViewById(R.id.image_stub)).inflate();
-			
-			// get image from DB
-			image = dbh.getStoryImage(story.getId());
-			String imagePath = image.getUri();
-			String imageCaption = image.getCaption();
-			Log.d("IMAGE VIEWER", "image path: " + imagePath);
-			
-			// load image
-			ImageView frame = (ImageView) v.findViewById(R.id.media_image);
-			SDImageLoader loader = new SDImageLoader();
-			loader.load(image.getUri(), frame);
-			
-			//load caption
-			TextView caption = (TextView) v.findViewById(R.id.view_caption);
-			Log.d("CAPTION", "image caption is : " + imageCaption);
-			caption.setText(imageCaption);
-			
-			break;
-			
+
+		// get image from DB
+		image = dbh.getStoryImage(story.getId());
+		String imagePath = image.getUri();
+		String imageCaption = image.getCaption();
+		Log.d("IMAGE VIEWER", "image path: " + imagePath);
+
+		// load image
+		ImageView frame = (ImageView) v.findViewById(R.id.media_image);
+		SDImageLoader loader = new SDImageLoader();
+		loader.load(image.getUri(), frame);
+
+		//load caption
+		TextView caption = (TextView) v.findViewById(R.id.view_caption);
+		Log.d("CAPTION", "image caption is : " + imageCaption);
+		caption.setText(imageCaption);
+
+		break;
+
 		case (Global.VIDEO_CAPTURE):
-			
+
 			// inflate the video view stub
 			View videoStub = ((ViewStub) v.findViewById(R.id.video_stub)).inflate();
-			
-			//populate the story object from DB call
-			video = dbh.getStoryVideo(story.getId());
-			String path = video.getUri();
-			Log.d("VIDEO PLAYER", "video path: " + path);
-			
-			// set up the video view and media controller
-			VideoView videoView = (VideoView) v.findViewById(R.id.video_view);
-			videoView.setMediaController(new MediaController(getActivity()));
-			
-			// set path and start playing
-			videoView.setVideoPath(path);
-			videoView.start();
-			videoView.requestFocus();
-			
-			break;
+
+		//populate the story object from DB call
+		video = dbh.getStoryVideo(story.getId());
+		String path = video.getUri();
+		Log.d("VIDEO PLAYER", "video path: " + path);
+
+		// set up the video view and media controller
+		VideoView videoView = (VideoView) v.findViewById(R.id.video_view);
+		videoView.setMediaController(new MediaController(getActivity()));
+
+		// set path and start playing
+		videoView.setVideoPath(path);
+		videoView.start();
+		videoView.requestFocus();
+
+		break;
 		}
-		
+
 		// close the db
 		dbh.close();
-		
-        // return the entire view
-        return v;
+
+		// return the entire view
+		return v;
 	}
-	
+
 	@Override
 	public void onAttach(Activity activity) {
 		// TODO Auto-generated method stub
 		super.onAttach(activity);
-		
+
 	}
-	
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 
 	}
-	
+
 	/**
 	 * save the Encounter to the DB when the activity is Paused
 	 */
@@ -349,7 +416,7 @@ public class MediaFragment extends Fragment  {
 	public void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		
+
 		// write encounter to the database
 		dbh.openDataBase();
 		if(usersFirstEncounter) {
@@ -359,7 +426,7 @@ public class MediaFragment extends Fragment  {
 			// update
 			dbh.updateEncounter(encounter);
 		}
-		
+
 		dbh.close();
 	}
 
@@ -379,7 +446,7 @@ public class MediaFragment extends Fragment  {
 		return text;
 
 	}
-	
+
 	/**
 	 * Assembles a String with the Geographic coordinates
 	 * pulled from the Story object
@@ -391,7 +458,7 @@ public class MediaFragment extends Fragment  {
 		String text = "(" + lat + ", " + lng + ")";
 		return text;
 	}
-	
+
 	/**
 	 * format time interval to display in info window
 	 * @param timeStamp
@@ -421,12 +488,123 @@ public class MediaFragment extends Fragment  {
 			thisInterval = "";
 			Toast.makeText(getActivity(), "timeStamp is null", Toast.LENGTH_SHORT).show();
 		}
-		
+
 		// return String value to populate TextView in InfoWindow
 		return thisInterval;
 
 	}
 
-	
+	/* @Override
+	public void run() {
+
+		// TODO Auto-generated method stub
+		int currentPosition = 0;
+		if(mediaType == Global.AUDIO_CAPTURE) {
+			int total = mp.getDuration();
+			Log.d("MEDIA PLAYER", "total duration is: " + Integer.toString(total));
+			progress.setMax(total);
+			while (mp != null && currentPosition < total) {
+				try {
+					Thread.sleep(1000);
+					currentPosition = mp.getCurrentPosition();
+				} catch (InterruptedException e) {
+					return;
+				} catch (Exception e) {
+					return;
+				}
+				progress.setProgress(currentPosition);
+			}
+		}
+
+	}
+	 */
+
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		if(mediaType == Global.AUDIO_CAPTURE) {
+			mp.stop();
+			mp.release();
+		}
+	}
+	/*
+	@Override
+	  public boolean onTouchEvent(MotionEvent event) {
+	    //the MediaController will hide after 3 seconds - tap the screen to make it appear again
+	    mc.show();
+	    return false;
+	  }
+	 */
+
+	@Override
+	public boolean canPause() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean canSeekBackward() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean canSeekForward() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int getBufferPercentage() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getCurrentPosition() {
+		// TODO Auto-generated method stub
+		return mp.getCurrentPosition();
+	}
+
+	@Override
+	public int getDuration() {
+		// TODO Auto-generated method stub
+		return mp.getDuration();
+	}
+
+	@Override
+	public boolean isPlaying() {
+		// TODO Auto-generated method stub
+		return mp.isPlaying();
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+		mp.pause();
+	}
+
+	@Override
+	public void seekTo(int pos) {
+		// TODO Auto-generated method stub
+		mp.seekTo(pos);
+
+	}
+
+	@Override
+	public void start() {
+		// TODO Auto-generated method stub
+		mp.start();
+	}
+
+	@Override
+	public void onPrepared(MediaPlayer mp) {
+		// TODO Auto-generated method stub
+
+	}
+
+
 
 }

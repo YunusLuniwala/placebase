@@ -39,7 +39,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -58,6 +57,7 @@ import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.CancelableCallback;
@@ -70,6 +70,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -101,6 +103,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private static Location targetLocation;
 	private static float targetBearing = 0;
 	private static float targetDistance = 0;
+	
+	private CircleOptions myCircleOptions;
+	private Circle circle;
 
 	// print out test variables to screen
 	private TextView testMyLocation;
@@ -228,10 +233,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				journeyMode = tempJourneyMode;
 			}
 		}
-
-
-
-
 
 
 		setUpMapIfNeeded();
@@ -372,10 +373,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaptureImage();
 			}
 		});
-
-
-
-
+		
+		// create circle to indicate journey marker
+		// https://developers.google.com/maps/documentation/android/reference/com/google/android/gms/maps/model/CircleOptions
+		myCircleOptions = new CircleOptions();
+		myCircleOptions.fillColor(0x7733b5e5);
+		myCircleOptions.radius(5);
+		myCircleOptions.strokeWidth(0);
 	}
 
 
@@ -877,13 +881,20 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// and set flag that the InfoWindow is Showing
 		isInfoWindowShowing = true;
 		
+		// add a circle to indicate the current marker selected 
+		myCircleOptions.center(marker.getPosition());
+		if(circle != null) {
+			circle.remove();
+		}
+		circle = mMap.addCircle(myCircleOptions);
+		
 		return false;
 		
 	}
 	//------------------------------------------------------------------------------------------
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-
+		
 		setMyLocationMarker();
 
 		// store marker as global
@@ -897,8 +908,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		// start rotating again
 		rotateView = true;
+		
 		// it's true! We're journeying!
 		journeyMode = 1;
+		isInfoWindowShowing = false;
 		
 		// TODO: here... move the map!
 		
@@ -925,7 +938,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// start rotating again
 			rotateView = true;
 			updateJourneyMode();
-			isInfoWindowShowing = false;
+			if(circle != null) {
+				circle.remove();
+			}
+			
 		}
 		Log.v("MAP", "MAP CLICKED. isInfoWindowShowing = " + Boolean.toString(isInfoWindowShowing));
 		
@@ -947,7 +963,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void updateJourneyMode() {
 
 		// note: update journeyMode before calling this function
-
+		boolean isInfoWindowShowing = false;
 		boolean isWithinRange = false;
 		boolean isWithinBearing = false;
 		//btnGetMessage.setEnabled(false); // UNCOMMENT ME AFTER TESTING
@@ -955,27 +971,40 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if (journeyMode != 1) {
 			// exit journey mode
 			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
+			if(circle != null) {
+				circle.remove();
+			}
 			removeMyLocationMarker();
 		} else {
 			// enter journey mode
+			// shrink map height
+			View map = findViewById(R.id.map);
+			
+			
+			map.invalidate();
+			
+			
+			//map.layout(0, map.getHeight()/2, r, b) map.getHeight()
+			
 			if(journeyBlock.getVisibility() == View.INVISIBLE) { 
+				
 				// called when we FIRST enter journey mode
 				journeyBlock.setVisibility(View.VISIBLE); // change for animation?
 				targetMarker.hideInfoWindow();
-
+				
+				
+				// create the bounding box that will contain both
+				// the target and the device location
 				LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
 				builder.include(myMarker.getPosition());
 				builder.include(targetMarker.getPosition());
-				builder.build();
-
-				VisibleRegion vr = mMap.getProjection().getVisibleRegion();
-				double left = vr.latLngBounds.southwest.longitude;
-				double top = vr.latLngBounds.northeast.latitude;
-				double right = vr.latLngBounds.northeast.longitude;
-				double bottom = vr.latLngBounds.southwest.latitude;
+				LatLngBounds targetView = builder.build();
 				// set boundaries so myLocation and the destination marker are both visible on the screen
-				// CameraUpdateFactory.newLatLngBounds(LatLbgBounds bounds, int padding (in px));
+				rotateView = false;
+				CameraUpdate update = CameraUpdateFactory.newLatLngBounds(targetView, 100);
+				mMap.animateCamera(update, enableAnimation);
+				
+				
 			}
 
 			// calculate new values for bearing and distance to target

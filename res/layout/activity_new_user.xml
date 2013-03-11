@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_skittles"
     tools:context=".NewUser" >
 
         <LinearLayout
@@ -12,7 +13,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight=".6"
+                android:layout_weight=".7"
                 android:orientation="vertical" >
 
                 <TextView
@@ -20,23 +21,29 @@
                     style="?android:attr/listSeparatorTextViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/sign_up_title" />
+                    android:text="@string/sign_up_title"
+                    android:textColor="#ffffff" />
 
                 <TextView
                     android:id="@+id/signup_instructions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:paddingBottom="20dp"
+                    android:background="#66000000"
+                    android:padding="10dp"
+                    android:paddingBottom="25dp"
                     android:text="@string/sign_up_instructions"
-                    android:textSize="20sp" />
+                    android:textColor="#ffffff"
+                    android:textSize="15sp" />
+
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight=".3"
-                android:orientation="vertical" >
+                android:layout_weight=".2"
+                android:background="#66000000"
+                android:orientation="vertical"
+                android:padding="5dp" >
 
                 <EditText
                     android:id="@+id/new_user_name"
@@ -44,7 +51,9 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="your username"
-                    android:inputType="textPersonName" />
+                    android:inputType="textPersonName"
+                    android:textColor="#ffffff"
+                    android:textColorHint="#ffffff" />
 
                 <EditText
                     android:id="@+id/new_user_password"
@@ -52,7 +61,10 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="password"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:textColor="#ffffff"
+                    android:textColorHint="#ffffff" />
+
             </LinearLayout>
 
             <Button

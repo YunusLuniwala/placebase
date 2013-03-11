@@ -4,31 +4,42 @@
     android:layout_height="match_parent"
     tools:context=".Login" >
 
-   <LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="20dp" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/login_title"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="20dp" >
+            android:text="@string/login_title" />
 
-            <TextView
-                android:id="@+id/login_title"
-                style="?android:attr/listSeparatorTextViewStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login_title" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:padding="10dp" >
 
             <TextView
                 android:id="@+id/login_instructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:layout_marginTop="28dp"
-                android:gravity="center"
+                android:gravity="left"
                 android:text="@string/login_instructions" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:background="#66000000"
+            android:orientation="vertical"
+            android:padding="10dp" >
 
             <EditText
                 android:id="@+id/form_username"
@@ -37,7 +48,9 @@
                 android:layout_marginTop="22dp"
                 android:ems="10"
                 android:hint="username"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:textColor="#ffffff"
+                android:textColorHint="#ffffff" />
 
             <EditText
                 android:id="@+id/form_password"
@@ -45,20 +58,26 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="password"
-                android:inputType="textPassword" />
-
-            <Button
-                android:id="@+id/btn_confirmlogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center|bottom"
-                android:text="@string/btn_done" />
+                android:inputType="textPassword"
+                android:textColor="#ffffff"
+                android:textColorHint="#ffffff" />
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
+            <Button
+                android:id="@+id/btn_confirmlogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:minWidth="90dp"
+                android:text="@string/btn_done" />
 
-
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

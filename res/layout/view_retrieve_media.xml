@@ -23,13 +23,6 @@
             android:gravity="center" >
 
             <ViewStub
-                android:id="@+id/media_stub"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="133dp"
-                android:layout_marginTop="21dp" />
-
-            <ViewStub
                 android:id="@+id/audio_stub"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -48,13 +41,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout="@layout/view_video"
-                android:visibility="gone" />
-
-            <VideoView
-                android:id="@+id/video_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:visibility="gone" />
 
         </RelativeLayout>
@@ -168,19 +154,21 @@
 
         <LinearLayout
             android:id="@+id/geo_user_container"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
+            android:layout_gravity="top"
             android:layout_weight="3.29"
-            android:gravity="right"
+            android:gravity="right|top"
             android:orientation="vertical"
             android:paddingTop="10dp" >
 
             <TextView
                 android:id="@+id/meta_timestamp"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="right"
                 android:text="timestamp"
+                android:textAllCaps="true"
                 android:textSize="10sp" />
 
             <TextView
@@ -192,8 +180,8 @@
 
             <ImageButton
                 android:id="@+id/btn_to_map"
-                android:layout_width="56dp"
-                android:layout_height="48dp"
+                android:layout_width="48dp"
+                android:layout_height="36dp"
                 android:background="@android:color/transparent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_map" />
