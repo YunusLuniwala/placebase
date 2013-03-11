@@ -1,7 +1,9 @@
 package com.ag.masters.placebase;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
@@ -38,8 +40,11 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -76,7 +81,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.VisibleRegion;
 
 public class MapActivity extends Activity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
@@ -971,6 +975,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		if (journeyMode != 1) {
 			// exit journey mode
 			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
+			
+			//expand(findViewById(R.id.mapHolder), false);
+			
 			if(circle != null) {
 				circle.remove();
 			}
@@ -978,18 +985,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		} else {
 			// enter journey mode
 			// shrink map height
-			View map = findViewById(R.id.map);
-			
-			
-			map.invalidate();
-			
-			
+			View map = findViewById(R.id.mapHolder);
+			//map.invalidate();
+			// TODO: change the height of the map to be shorter. 
+
 			//map.layout(0, map.getHeight()/2, r, b) map.getHeight()
 			
 			if(journeyBlock.getVisibility() == View.INVISIBLE) { 
 				
 				// called when we FIRST enter journey mode
 				journeyBlock.setVisibility(View.VISIBLE); // change for animation?
+				
+				//expand(findViewById(R.id.mapHolder), true);
+				
 				targetMarker.hideInfoWindow();
 				
 				
@@ -1380,6 +1388,55 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onRestoreInstanceState(savedInstanceState);
+	}
+	
+	public static Animation expand(final View v, final boolean expand) {
+	    try {
+	        Method m = v.getClass().getDeclaredMethod("onMeasure", int.class, int.class);
+	        m.setAccessible(true);
+	        m.invoke(
+	            v,
+	            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+	            MeasureSpec.makeMeasureSpec(((View)v.getParent()).getMeasuredWidth(), MeasureSpec.AT_MOST)
+	        );
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	    }
+	    
+	    // get initial height of the view
+	    final int initialHeight = v.getMeasuredHeight();
+	    
+	    if (expand) {
+	    	v.getLayoutParams().height = 0;
+	    }
+	    else {
+	    	v.getLayoutParams().height = initialHeight;
+	    }
+	    v.setVisibility(View.VISIBLE);
+	    
+	    Animation a = new Animation() {
+	    	@Override
+	        protected void applyTransformation(float interpolatedTime, Transformation t) {
+	            int newHeight = 0;
+	            if (expand) {
+	            	newHeight = (int) (initialHeight * interpolatedTime);
+	            } else {
+	            	newHeight = (int) (initialHeight * (1 - interpolatedTime));
+	            }
+	            v.getLayoutParams().height = newHeight;	            
+	            v.requestLayout();
+	            
+	            if (interpolatedTime == 1 && !expand)
+	            	v.setVisibility(View.GONE);
+	        }
+
+	        @Override
+	        public boolean willChangeBounds() {
+	            return true;
+	        }
+	    };
+	    a.setDuration(4000);
+	    return a;
 	}
 
 	/**

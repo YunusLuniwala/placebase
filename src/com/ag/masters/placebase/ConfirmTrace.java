@@ -1,5 +1,14 @@
 package com.ag.masters.placebase;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.Menu;
+import android.widget.ImageView;
+
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Story;
@@ -7,13 +16,6 @@ import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
-import android.view.Menu;
 
 public class ConfirmTrace extends Activity {
 
@@ -48,7 +50,7 @@ public class ConfirmTrace extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_confirm_trace);
 		
-		dbh = new DatabaseHelper(this);
+		/*dbh = new DatabaseHelper(this);
 		
 		dbh.openDataBase();
 		
@@ -128,7 +130,14 @@ public class ConfirmTrace extends Activity {
 		}
 		
 		dbh.close();
+		*/
 		
+		ImageView aniView = (ImageView) findViewById(R.id.bg_marker);
+		ObjectAnimator fadeOut = ObjectAnimator.ofFloat(aniView, "alpha",0f);
+		fadeOut.setDuration(3000);
+		AnimatorSet animatorSet = new AnimatorSet();
+		animatorSet.play(fadeOut);
+		animatorSet.start();
 		// delay for a few seconds before you redirect to map
 		runnable = new Runnable() {
 			@Override
