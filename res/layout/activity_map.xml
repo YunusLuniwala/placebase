@@ -4,7 +4,7 @@
     android:id="@+id/map_view"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:gravity="clip_horizontal"
+    android:gravity="center"
     android:visibility="visible"
     tools:context=".MapActivity" >
 
@@ -24,24 +24,40 @@
     <RelativeLayout
         android:id="@+id/journeyblock"
         android:layout_width="match_parent"
-        android:layout_height="260dp"
+        android:layout_height="280dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="48dp"
-        android:background="@android:color/black" >
+        android:layout_marginBottom="48dp" >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <Button
-                android:id="@+id/btn_record_perspective"
-                style="@android:color/black"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:longClickable="true"
-                android:minHeight="18dip" />
+                android:layout_height="58dp"
+                android:gravity="fill_vertical" >
+
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:cropToPadding="true"
+                    android:scaleType="center"
+                    android:src="@drawable/bg_closetab" />
+
+                <ImageButton
+                    android:id="@+id/closejourneyblock"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="false"
+                    android:layout_marginBottom="3dp"
+                    android:background="@android:color/transparent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_close" />
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -171,6 +187,7 @@
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
+
         </LinearLayout>
     </RelativeLayout>
 
@@ -220,6 +237,7 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_record_photo" />
         </RelativeLayout>
+
     </FrameLayout>
     
       

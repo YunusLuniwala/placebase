@@ -154,7 +154,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 * 0 ² x ² 1 ; a smaller value basically means more smoothing
 	 * See: http://en.wikipedia.org/wiki/Low-pass_filter#Discrete-time_realization
 	 */
-	static final float ALPHA = 0.5f;
+	static final float ALPHA = 0.2f;
 	protected float[] accelVals;
 
 	double azimuth = 0;
@@ -177,7 +177,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	// journey Block Views
 	RelativeLayout journeyBlock;
 	Button btnGetMessage;
-	Button btnCloseJourneyPanel;
+	ImageButton btnCloseJourneyPanel;
 	TextView journeyBearing;
 	TextView journeyDistance;
 	ImageView compass;
@@ -304,7 +304,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		journeyBearing = (TextView) findViewById(R.id.journey_bearing); // change to an ImageView of the Bearing Icon
 		journeyDistance = (TextView) findViewById(R.id.journey_distance);
 		btnGetMessage = (Button) findViewById(R.id.journey_claim);
-		btnCloseJourneyPanel = (Button) findViewById(R.id.btn_record_perspective);
+		btnCloseJourneyPanel = (ImageButton) findViewById(R.id.closejourneyblock);
 		alignmentIcon = (ImageView) findViewById(R.id.ic_alignment);
 		compass = (ImageView) findViewById(R.id.ic_compass);
 		photo = (ImageView) findViewById(R.id.ic_info_media);

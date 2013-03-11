@@ -50,7 +50,7 @@ public class ConfirmTrace extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_confirm_trace);
 		
-		/*dbh = new DatabaseHelper(this);
+		dbh = new DatabaseHelper(this);
 		
 		dbh.openDataBase();
 		
@@ -130,8 +130,10 @@ public class ConfirmTrace extends Activity {
 		}
 		
 		dbh.close();
-		*/
 		
+		
+		// animate the property
+		// http://www.vogella.com/articles/AndroidAnimation/article.html
 		ImageView aniView = (ImageView) findViewById(R.id.bg_marker);
 		ObjectAnimator fadeOut = ObjectAnimator.ofFloat(aniView, "alpha",0f);
 		fadeOut.setDuration(3000);
