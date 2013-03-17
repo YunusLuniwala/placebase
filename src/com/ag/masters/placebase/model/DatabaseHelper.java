@@ -92,13 +92,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		private static final String AUDIO_URI = "uri";
 		
 	//Comment Table info
-	private static final String TABLE_COMMENTS = "comment";
+	public static final String TABLE_COMMENTS = "comment";
 		//column names
-		private static final String COMMENTS_ID = "_id";
-		private static final String COMMENTS_STORY = "story";
-		private static final String COMMENTS_USER = "user";
-		private static final String COMMENTS_BODY = "body";
-		private static final String COMMENTS_TIMESTAMP = "timestamp";
+		public static final String COMMENTS_ID = "_id";
+		public static final String COMMENTS_STORY = "story";
+		public static final String COMMENTS_USER = "user";
+		public static final String COMMENTS_BODY = "body";
+		public static final String COMMENTS_TIMESTAMP = "timestamp";
 			
 	// Encounter Table info
 	private static final String TABLE_ENCOUNTERS = "encounters";
@@ -492,14 +492,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	return numComments;
     }
     
-    /**
- 	 * 
- 	 * ENCOUNTER TABLE
- 	 * All CRUD operations
- 	 * 
- 	 */   
+ 
     
+    
+  public void createComment(int userId, int storyId, String body, String timestamp) {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(COMMENTS_STORY, storyId);
+		values.put(COMMENTS_USER, userId);
+		values.put(COMMENTS_BODY, body);
+		values.put(COMMENTS_TIMESTAMP, timestamp);
+		
+		db.insert(TABLE_COMMENTS, null, values);
+		db.close();
+		Log.i("DATABASE", "new comment added to database for story" + Integer.toString(storyId));
+	}
+  
+  
+  public Cursor getAllCommentsForStory(int storyId) {
+	  
+	  SQLiteDatabase db = this.getReadableDatabase();
+	  
+	  Cursor cursor = null;
+	  cursor = db.query(TABLE_COMMENTS,null,COMMENTS_STORY + "=?", new String[] {String.valueOf(storyId)}, null,null,COMMENTS_ID);
+	  if(cursor != null) {
+		  cursor.moveToFirst();
+		  Log.v("DATABASE", Integer.toString(cursor.getCount()) + " comments retrieved for story: " + Integer.toString(storyId));
+	  } else {
+		  Log.v("DATABASE", "NO COMMENTS are available for story: " + Integer.toString(storyId));  
+	  }
+	  return cursor; 
+	  // DID NOT CLOSE CURSOR OR DATABASE
+	  // must do this in Activity
+	  
+  }
+  
   /**
+	 * 
+	 * ENCOUNTER TABLE
+	 * All CRUD operations
+	 * 
+	 */  
+
+/**
    * Returns a prior Encounter if the user has one at this place
    * @param storyId
    * @param userId
@@ -582,10 +619,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
        return num;
 	}
 
-    
-   
-   
-   /**
+    /**
 	 * 
 	 * USER TABLE
 	 * All CRUD operations

@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/comments"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <TextView
-        android:id="@+id/empty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="No comments yet. Be the first." />
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
 
     <LinearLayout
         android:id="@+id/editCommentBox"
@@ -29,7 +17,7 @@
             android:id="@+id/commentsTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Leave a Comment"
+            android:text="Why not leave a note?"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#ffffff"
             android:textSize="14sp" />
@@ -53,7 +41,12 @@
             android:focusable="false"
             android:text="Submit"
             android:textColor="#ffffff" />
-
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
 
 </LinearLayout>

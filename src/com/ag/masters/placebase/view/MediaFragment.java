@@ -87,7 +87,7 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 		super.onCreate(savedInstanceState);
 		// get parcel from FragmentActivity
 		FragmentActivity fa = (RetrieveMedia)getActivity();
-		Log.v("FRAGMENT", fa.getClass().getSimpleName());
+		
 		Intent launchingIntent = fa.getIntent();
 		Bundle data = launchingIntent.getExtras();
 
