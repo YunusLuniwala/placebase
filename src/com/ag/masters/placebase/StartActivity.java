@@ -51,6 +51,7 @@ public class StartActivity extends Activity {
 				Intent loginActivity = new Intent(StartActivity.this, Login.class);
 				loginActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(loginActivity);
+				finish();
 			}
 		});
 
@@ -64,6 +65,7 @@ public class StartActivity extends Activity {
 				Intent newUserActivity = new Intent(StartActivity.this, NewUser.class);
 				newUserActivity.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(newUserActivity);
+				finish();
 			}
 		});
 

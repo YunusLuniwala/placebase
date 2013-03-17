@@ -107,5 +107,13 @@ public class NewUser extends Activity {
 		getMenuInflater().inflate(R.menu.activity_new_user, menu);
 		return true;
 	}
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		Intent backToSplash = new Intent(this, StartActivity.class);
+		startActivity(backToSplash);
+	}
 
 }

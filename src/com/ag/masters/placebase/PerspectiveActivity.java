@@ -130,6 +130,17 @@ public class PerspectiveActivity extends Activity implements
 				break;
 			}
 		}
+
+		// close btn
+		ImageButton close = (ImageButton) findViewById(R.id.btn_close_caption);
+		close.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(PerspectiveActivity.this, MapActivity.class);
+				startActivity(intent);
+			}
+		});
+
 		
 		cameraView = (CameraView) this.findViewById(R.id.view_preview);
 		pictureButton = (ImageButton) this.findViewById(R.id.btn_takePhoto);
@@ -274,6 +285,7 @@ public class PerspectiveActivity extends Activity implements
 			intent.putExtra("media", audio);
 			break;
 		}
+		intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		startActivity(intent);
 	}
 	

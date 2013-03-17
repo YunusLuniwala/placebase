@@ -446,6 +446,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		super.onStop();
 	}
 
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		
+		// if you press back while in journey mode, then just exit out of journey mode
+		if(journeyMode == 1) {
+			journeyMode = 0;
+			updateJourneyMode();
+		} else {
+			super.onBackPressed();
+		}
+	}
+	
 	/**
 	 * use built-in camera to record photos
 	 * save files to root
@@ -560,6 +573,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaption.putExtra("story", story);
 				startCaption.putExtra("user", user);
 				// start SensesActivity
+				startCaption.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(startCaption);
 
 				break;
@@ -594,6 +608,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startSenses.putExtra("story", story);
 				// start SensesActivity
 				startSenses.putExtra("user", user);
+				startSenses.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(startSenses);
 
 				break;
@@ -626,6 +641,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					startSenses.putExtra("story", story);
 					startSenses.putExtra("user", user);
 					// start SensesActivity
+					startSenses.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 					startActivity(startSenses);
 
 					break;

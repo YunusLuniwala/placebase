@@ -45,16 +45,14 @@ public class RetrieveMedia extends FragmentActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-
-	
 	// store references to the Fragments in the 
 	// main class when they are created
 	private MediaFragment mMediaFragment;
 	private CommentFragment mCommentFragment;
 	
 	// passed in from MapActivity
-	private Story story;
-	private User user;
+	public Story story;
+	public User user;
 	
 	private Encounter encounter;
 	
@@ -79,6 +77,8 @@ public class RetrieveMedia extends FragmentActivity implements
 			Story tempStory = data.getParcelable("story");
 			if (tempStory != null) {
 				story = tempStory;
+				// set the media type	
+				mediaType = story.getMedia();
 			}else {
 				throw new RuntimeException("RetrieveMedia: story passed was null");
 			}
@@ -92,20 +92,8 @@ public class RetrieveMedia extends FragmentActivity implements
 			}
 		}
 		
-		// ENCOUNTERS
-		//create a new encounter object
-		dbh.openDataBase();
-		//dbh.getAllEncounters();
-		encounter = new Encounter();
-		// read encounters from database, and create a new encounter object
 		
-		// use this number to set the text for the view  
-		dbh.close();
-		
-		// set the media type
-		// TODO: load in the correct view stub, based on this value		
-		mediaType = story.getMedia();
-		
+				
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -226,35 +214,36 @@ public class RetrieveMedia extends FragmentActivity implements
 			// CALLED ONLY ONCE. DO THE SETUP HERE!!!
 			// Return the Media or Comments fragment
 			// pass mediaType as arg to set ViewStub for the particular media 
-			// TODO: where do we program the controls for video and audio views?
-			Fragment fragment = null;
 			
 			if (position == 0) {
-				fragment = new MediaFragment();
-				
+				Fragment fragment = new MediaFragment();
 				mMediaFragment = (MediaFragment) fragment;
-				
 				// pass an arg to MediaFragment so we can load the right stub
-				Bundle args = new Bundle();
-				// to determine the viewStub to inflate
-				args.putInt("mediaType", mediaType);
-				// to populate the fields
-				args.putParcelable("story", story);
-				args.putParcelable("user", user);
-				args.putParcelable("encounter", encounter);
-				fragment.setArguments(args);
 				
+				// INSTEAD of passing these into a new parcel,
+				// We get them from the Activity inside the Fragment 
+				// Bundle args = new Bundle();
+				// to determine the viewStub to inflate
+				//args.putInt("mediaType", mediaType);
+				// to populate the fields
+				//args.putParcelable("story", story);
+				//args.putParcelable("user", user);
+				//args.putParcelable("encounter", encounter);
+				//fragment.setArguments(args);
+				
+				
+				return mMediaFragment;
 				//Log.v(getClass().getSimpleName(), "Fragment 0 called in getItem");
 				
 			} else if (position == 1) {
-				fragment = new CommentFragment();
-				
+				Fragment fragment = new CommentFragment();
 				mCommentFragment = (CommentFragment) fragment;
+				return mCommentFragment;
 				//Log.v(getClass().getSimpleName(), "Fragment 1 called in getItem");
 			
 			}
 
-			return fragment;
+			return null;
 		}
 
 		@Override

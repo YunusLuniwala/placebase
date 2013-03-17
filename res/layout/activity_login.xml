@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     tools:context=".Login" >
 
     <LinearLayout
@@ -20,7 +21,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
+            android:gravity="center"
             android:padding="10dp" >
 
             <TextView
@@ -31,12 +32,11 @@
                 android:layout_marginTop="28dp"
                 android:gravity="left"
                 android:text="@string/login_instructions" />
-
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="182dp"
             android:background="#66000000"
             android:orientation="vertical"
             android:padding="10dp" >
@@ -50,7 +50,10 @@
                 android:hint="username"
                 android:inputType="textPersonName"
                 android:textColor="#ffffff"
-                android:textColorHint="#ffffff" />
+                android:textColorHint="#ffffff" >
+
+                <requestFocus />
+            </EditText>
 
             <EditText
                 android:id="@+id/form_password"
@@ -62,20 +65,29 @@
                 android:textColor="#ffffff"
                 android:textColorHint="#ffffff" />
 
+            <Button
+                android:id="@+id/btn_confirmlogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="90dp"
+                android:text="@string/btn_done" />
+
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="217dp"
+            android:layout_weight="4.25" >
 
-            <Button
-                android:id="@+id/btn_confirmlogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:minWidth="90dp"
-                android:text="@string/btn_done" />
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="false"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bg_newuser" />
 
         </RelativeLayout>
     </LinearLayout>

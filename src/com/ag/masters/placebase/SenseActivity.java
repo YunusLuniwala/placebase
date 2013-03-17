@@ -107,8 +107,9 @@ public class SenseActivity extends Activity {
 		});
 		
 		// record perspective button
-		Button record = (Button) findViewById(R.id.btn_record_perspective);
-		record.setOnClickListener(new OnClickListener() {
+		ImageButton record = (ImageButton) findViewById(R.id.btn_toPerspective);
+		Button record2 = (Button) findViewById(R.id.btn_toPerspective2);
+		record.setOnClickListener( new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -127,12 +128,37 @@ public class SenseActivity extends Activity {
 					intent.putExtra("media", audio);
 					break;
 				}
-				
+				intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(intent);
 				
 			}
 		});
 		
+		record2.setOnClickListener( new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(SenseActivity.this, PerspectiveActivity.class);
+				intent.putExtra("story", story);
+				intent.putExtra("user", user);
+				
+				switch(story.getMedia()) {
+				case Global.IMAGE_CAPTURE:
+					intent.putExtra("media", image);
+					break;
+				case Global.VIDEO_CAPTURE:
+					intent.putExtra("media", video);
+					break;
+				case Global.AUDIO_CAPTURE:
+					intent.putExtra("media", audio);
+					break;
+				}
+				intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				startActivity(intent);
+				
+			}
+		});
+
 		// add Click Listeners to sense Buttons
 		setUpSenseBtns();
 		

@@ -471,7 +471,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     	}	
     }
 
-
+    
+    /**
+ 	 * 
+ 	 * COMMENTS TABLE
+ 	 * All CRUD operations
+ 	 * 
+ 	 */ 
+    
+    public int getCommentCount(int storyId) {
+    	
+    	int numComments = 0;
+    	
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	Cursor cursor = db.query(TABLE_COMMENTS, null, COMMENTS_STORY + "=?", new String[] {String.valueOf(storyId)}, null, null, null);
+    	numComments = cursor.getCount();
+    	cursor.close();
+    	db.close();
+    	
+    	return numComments;
+    }
+    
     /**
  	 * 
  	 * ENCOUNTER TABLE
@@ -563,6 +583,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	}
 
     
+   
+   
    /**
 	 * 
 	 * USER TABLE

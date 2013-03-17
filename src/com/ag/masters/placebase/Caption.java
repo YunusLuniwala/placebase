@@ -10,11 +10,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.ag.masters.placebase.handlers.SDImageLoader;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.User;
+
 
 public class Caption extends Activity {
 

@@ -56,6 +56,7 @@ public class Login extends Activity {
 				startAddAccount.putExtras(userInfo);
 				
 				startActivityForResult(startAddAccount,GET_ACCOUNT);
+				
 			}
 		});	
 	}
@@ -83,6 +84,7 @@ public class Login extends Activity {
 				    	// add the account object
 				    	goToMap.putExtra("user", user);
 				    	startActivity(goToMap);
+				    	finish();
 				    }
 					break;
 				case RESULT_CANCELED:
@@ -109,8 +111,14 @@ public class Login extends Activity {
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
-		
-		
+	}
+	
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		super.onBackPressed();
+		Intent backToSplash = new Intent(this, StartActivity.class);
+		startActivity(backToSplash);
 	}
 	
 	

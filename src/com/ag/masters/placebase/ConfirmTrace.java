@@ -149,6 +149,7 @@ public class ConfirmTrace extends Activity {
 				//returnToMap.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				returnToMap.putExtra("returnFromStory", true);
 				//returnToMap.putExtra("user", user);
+				returnToMap.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(returnToMap);
 			}
 		};		

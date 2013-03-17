@@ -11,7 +11,7 @@
     <string name="login_title">Good to see you</string>
     <string name="login_instructions">Enter your username and password</string>
     <string name="sign_up_title">Join</string>
-    <string name="sign_up_instructions">PlaceBase lets you record and retrieve geotagged messages.\n\nGet personal with the spaces around you where people have stood before.</string>
+    <string name="sign_up_instructions">PlaceBase lets you record and retrieve geotagged messages. Get personal with the spaces around you where people have stood before.</string>
     <string name="sign_up_username">Select a username:</string>
     <string name="sign_up_password">Enter a password:</string>
     <string name="sign_up_btn">Create New Account</string>
@@ -24,7 +24,7 @@
     <string name="title_activity_sense">SenseActivity</string>
     <string name="recordsense_title">The Five Senses</string>
     <string name="confirm_recording">Message Recorded!</string>
-    <string name="recordsense_instructions">What should others use to retrieve your story?</string>
+    <string name="recordsense_instructions">How will people sense your story?</string>
     <string name="perspective_title">Your Perspective</string>
     <string name="perspective_instructions">Face the direction you want people to stand in.</string>
     <string name="perspective_instructions2">Take a picture to record it.</string>
@@ -36,7 +36,7 @@
     <string name="title_activity_confirm_trace">ConfirmTrace</string>
     <string name="title_activity_caption">Caption</string>
     <string name="caption_hint">What happened here?</string>
-    <string name="btn_done">Done</string>
+    <string name="btn_done">Next</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_new_user">NewUser</string>
     <string name="title_activity_user">Checking User</string>
@@ -53,6 +53,6 @@
     <string name="comment">comment</string>
     <string name="comment_hint">What do you think?...</string>
     <string name="encounters">encounters</string>
-    <string name="i_sense_it">I sense it</string>
+    <string name="i_sense_it">What do you sense?</string>
 
 </resources>

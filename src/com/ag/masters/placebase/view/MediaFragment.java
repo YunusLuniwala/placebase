@@ -10,17 +10,17 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +28,7 @@ import android.widget.VideoView;
 
 import com.ag.masters.placebase.MapActivity;
 import com.ag.masters.placebase.R;
+import com.ag.masters.placebase.RetrieveMedia;
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.SDImageLoader;
 import com.ag.masters.placebase.model.DatabaseHelper;
@@ -47,7 +48,7 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 
 	MediaPlayer mp; 
 	MediaController mc;
-	SeekBar progress;
+	
 	boolean pausing = false;
 
 	ImageButton _btnHear;
@@ -59,17 +60,23 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 	Story story;
 	User user;
 	Encounter encounter;
-
+	
 	// only one of these will not be null
 	StoryImage image;
 	StoryVideo video;
 	StoryAudio audio;
 
 	// encounter shtuff
+	Encounter priorEncounter;
 	int numEncountersInDb;
 	int numEncountersActual;
 	boolean usersFirstEncounter = true;
+	// comment shtuff
+	int numComments;
 
+	
+	
+	
 	public MediaFragment() {
 		// TODO Auto-generated constructor stub
 	}
@@ -78,7 +85,20 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		// get parcel from FragmentActivity
+		FragmentActivity fa = (RetrieveMedia)getActivity();
+		Log.v("FRAGMENT", fa.getClass().getSimpleName());
+		Intent launchingIntent = fa.getIntent();
+		Bundle data = launchingIntent.getExtras();
 
+		story = data.getParcelable("story");
+		user = data.getParcelable("user");
+		// key to query specific media object
+		mediaType = story.getMedia();
+		
+		// initialize encounter object
+		encounter = new Encounter(story.getId(), user.getId());
+		priorEncounter = null;
 	}
 
 	@Override
@@ -87,24 +107,25 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 		dbh = new DatabaseHelper(getActivity());
 
 		// save parcel objects in global vars
-		story = getArguments().getParcelable("story");
-		user = getArguments().getParcelable("user");
+		//story = getArguments().getParcelable("story");
+		//user = getArguments().getParcelable("user");
 
-		// key to query specific media object
-		mediaType = story.getMedia();
 
-		// initialize encounter object
-		encounter = new Encounter(story.getId(), user.getId());
-		Encounter priorEncounter = null;
+		
 
 		// get prior encounters
 		dbh.openDataBase();
 		// get stored encounter count for this story
 		if(story.getId() != 0) { // check first that we have a story object
 			numEncountersInDb = dbh.getEncounterCountForStory(story.getId());
-			Log.d("MEDIA RETRIEVAL" , "number of encounters saved in database : " + numEncountersInDb);
+			Log.d("ENCOUNTERS" , "number of encounters saved in database: " + numEncountersInDb);
 			// check if this is user's first encounter
-			priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());	
+			priorEncounter = dbh.getUsersPriorEncounter(story.getId(), user.getId());
+			
+			// get the number of comments for this story 
+			numComments = dbh.getCommentCount(story.getId());
+			Log.d("COMMENTS" , "number of comments saved in database: " + numComments);
+			
 		}
 		dbh.close();
 
@@ -143,23 +164,17 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 
 			@Override
 			public void onClick(View v) {
-				// save senses to the database? or do this onDestory so we don't have to repeat it for other "back" operations?
 				Intent intent = new Intent(getActivity(), MapActivity.class);
 				intent.putExtra("user", user);
-				intent.putExtra("journeyMode", 0);
-				//getActivity().startActivity(intent);
+				// mimick the back button
 				getActivity().onBackPressed();
 			}
 		});
 
-		// clear the view stub
-		RelativeLayout stubContainer = (RelativeLayout) v.findViewById(R.id.media_stubs_container);
-		//stubContainer.removeView();
-
-		// Fields to populate from Story data  
+		// comments/ encounter counts and story attributes
 		TextView numComments = (TextView) v.findViewById(R.id.num_comments);
-		numComments.setText(Integer.toString(getArguments().getInt("mediaType"))); // TODO: actual data
-
+		numComments.setText(Integer.toString(this.numComments));
+		
 		TextView numEncounters = (TextView) v.findViewById(R.id.num_encounters);
 		numEncounters.setText(Integer.toString(numEncountersActual));
 
@@ -168,8 +183,7 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 
 		TextView metaGeo = (TextView) v.findViewById(R.id.meta_geo);
 		metaGeo.setText(setGeo());
-
-		// story attributes
+		
 		ImageView storyHear = (ImageView) v.findViewById(R.id.story_hear);
 		ImageView storySee = (ImageView) v.findViewById(R.id.story_see);
 		ImageView storySmell = (ImageView) v.findViewById(R.id.story_smell);
@@ -278,35 +292,39 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 		// open the DB, cuz you're making calls to to retrieve
 		// media connected to the Story object
 		dbh.openDataBase();
-
 		// populate the viewStub based on the mediaType
-		switch(mediaType) {
-		// reflactor with one viewStub that loads a different layout file .... 
-
+		switch(mediaType) { 
+		// AUDIO
 		case (Global.AUDIO_CAPTURE):
 			View audioStub = ((ViewStub) v.findViewById(R.id.audio_stub)).inflate();
-		ImageButton btnPlay = (ImageButton) v.findViewById(R.id.btn_play);
-		ImageButton btnPause = (ImageButton) v.findViewById(R.id.btn_pause);
-		progress = (SeekBar) v.findViewById(R.id.progress);
+			LinearLayout audioView = (LinearLayout) v.findViewById(R.id.inflated_audio);
+			
+			final ImageButton btnPlay = (ImageButton) v.findViewById(R.id.btn_play);
+			btnPlay.setImageDrawable((getResources().getDrawable(R.drawable.ic_media_pause)));
+			
+			//ImageButton btnPause = (ImageButton) v.findViewById(R.id.btn_pause);
+			//progress = (SeekBar) v.findViewById(R.id.progress);
 
-		// get audio from database
-		audio = dbh.getStoryAudio(story.getId());
-
-		final String audioPath = audio.getUri();
-
-		/*Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.parse(audioPath), "video/3gpp");
-			startActivity(intent);*/
-
-		mp = new MediaPlayer();
-		mp.setOnPreparedListener(this);
-
-		mc = new MediaController(getActivity());
+			// get audio from database
+			audio = dbh.getStoryAudio(story.getId());
+			
+			final String audioPath = audio.getUri();
+			//Log.v("AUDIO PATH", audioPath);
+			
+			// create a media player to play back audio file
+			mp = new MediaPlayer();
+			mp.setOnPreparedListener(this);
+			
+			// create a media Controller 
+			// mc = new MediaController(getActivity());
+			
 
 		try {
 			mp.setDataSource(audioPath);
 			mp.prepare();
 			mp.start();
+			//mc.setMediaPlayer((MediaPlayerControl) mp);
+			//mc.show();
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -324,7 +342,6 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 
 
 		btnPlay.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
@@ -332,15 +349,16 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 					if (pausing) {
 						pausing = false;
 						mp.start();
-
+						btnPlay.setImageDrawable((getResources().getDrawable(R.drawable.ic_media_pause)));
 					} else {
 						pausing = true;
 						mp.stop();
+						btnPlay.setImageDrawable((getResources().getDrawable(R.drawable.ic_media_play)));
 					}
 				}
 			}
 		});
-
+		
 
 		break;
 
@@ -417,19 +435,26 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 		// TODO Auto-generated method stub
 		super.onPause();
 
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		
 		// write encounter to the database
 		dbh.openDataBase();
 		if(usersFirstEncounter) {
 			// write new
 			dbh.createEncounter(encounter);
+			Log.v("DESTROY MEDIA FRAGMENT", "writing user's FIRST encounter to DB");
 		} else {
 			// update
 			dbh.updateEncounter(encounter);
+			Log.v("DESTROY MEDIA FRAGMENT", "writing user's SUBSEQUENT encounter to DB");
 		}
-
 		dbh.close();
 	}
-
+	
 	/**
 	 * Assembles a String with the Time and Author name 
 	 * pulled from the Story object
@@ -529,14 +554,15 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 			mp.release();
 		}
 	}
-	/*
-	@Override
-	  public boolean onTouchEvent(MotionEvent event) {
-	    //the MediaController will hide after 3 seconds - tap the screen to make it appear again
-	    mc.show();
-	    return false;
-	  }
-	 */
+
+	//	
+//	@Override
+//	  public boolean onTouchEvent(MotionEvent event) {
+//	    //the MediaController will hide after 3 seconds - tap the screen to make it appear again
+//	    mc.show();
+//	    return false;
+//	  }
+	
 
 	@Override
 	public boolean canPause() {

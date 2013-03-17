@@ -28,7 +28,7 @@
                     android:id="@+id/signup_instructions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#66000000"
+                    android:background="#88000000"
                     android:padding="10dp"
                     android:paddingBottom="25dp"
                     android:text="@string/sign_up_instructions"
@@ -40,7 +40,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight=".2"
+                android:layout_weight=".3"
                 android:background="#66000000"
                 android:orientation="vertical"
                 android:padding="5dp" >
@@ -53,7 +53,7 @@
                     android:hint="your username"
                     android:inputType="textPersonName"
                     android:textColor="#ffffff"
-                    android:textColorHint="#ffffff" />
+                    android:textColorHint="#cccccc" />
 
                 <EditText
                     android:id="@+id/new_user_password"
@@ -63,17 +63,17 @@
                     android:hint="password"
                     android:inputType="textPassword"
                     android:textColor="#ffffff"
-                    android:textColorHint="#ffffff" />
+                    android:textColorHint="#cccccc" />
+
+                <Button
+                    android:id="@+id/btn_new_user"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/sign_up_btn" />
 
             </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_new_user"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="bottom"
-                android:layout_weight=".1"
-                android:text="@string/sign_up_btn" />
 
         </LinearLayout>
 
