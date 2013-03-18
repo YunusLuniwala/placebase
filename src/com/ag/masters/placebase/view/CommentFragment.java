@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter.ViewBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ag.masters.placebase.R;
@@ -140,6 +142,29 @@ public class CommentFragment extends Fragment {
 				from, 
 				to, 
 				0);
+		
+		adapter.setViewBinder(new ViewBinder() {
+			@Override
+			public boolean setViewValue(View aView, Cursor aCursor, int aColumnIndex) {
+				
+				if(aColumnIndex == aCursor.getColumnIndex(DatabaseHelper.COMMENTS_TIMESTAMP)) {
+					
+					TextView textView = (TextView) aView;
+					
+					String rawDate = aCursor.getString(aColumnIndex);
+					int daysPassed = dateHandler.getDaysAgo(rawDate);
+					if (daysPassed == 0) {
+						textView.setText("posted today");
+					} else {
+						textView.setText("posted " + dateHandler.getDaysAgo(rawDate) + " days ago");
+					}
+					return true;
+				}
+				
+				return false;
+			}
+		});
+		
 		// assign adapter to ListView
 		commentsList.setAdapter(adapter); 
 	}
