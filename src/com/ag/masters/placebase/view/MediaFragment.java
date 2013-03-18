@@ -17,11 +17,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -99,19 +99,13 @@ public class MediaFragment extends Fragment implements OnPreparedListener, Media
 		// initialize encounter object
 		encounter = new Encounter(story.getId(), user.getId());
 		priorEncounter = null;
+		
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		dbh = new DatabaseHelper(getActivity());
-
-		// save parcel objects in global vars
-		//story = getArguments().getParcelable("story");
-		//user = getArguments().getParcelable("user");
-
-
-		
 
 		// get prior encounters
 		dbh.openDataBase();

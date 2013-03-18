@@ -516,7 +516,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	  SQLiteDatabase db = this.getReadableDatabase();
 	  
 	  Cursor cursor = null;
-	  cursor = db.query(TABLE_COMMENTS,null,COMMENTS_STORY + "=?", new String[] {String.valueOf(storyId)}, null,null,COMMENTS_ID);
+	  cursor = db.query(TABLE_COMMENTS,null,COMMENTS_STORY + "=?", new String[] {String.valueOf(storyId)}, null,null, COMMENTS_ID + " DESC");
 	  if(cursor != null) {
 		  cursor.moveToFirst();
 		  Log.v("DATABASE", Integer.toString(cursor.getCount()) + " comments retrieved for story: " + Integer.toString(storyId));

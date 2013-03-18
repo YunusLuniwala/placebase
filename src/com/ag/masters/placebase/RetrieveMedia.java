@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.ag.masters.placebase.model.DatabaseHelper;
@@ -28,8 +29,6 @@ import com.ag.masters.placebase.view.MediaFragment;
 
 public class RetrieveMedia extends FragmentActivity implements
 		ActionBar.TabListener {
-
-	DatabaseHelper dbh;
 	
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -50,18 +49,14 @@ public class RetrieveMedia extends FragmentActivity implements
 	private MediaFragment mMediaFragment;
 	private CommentFragment mCommentFragment;
 	
+	DatabaseHelper dbh;
 	// passed in from MapActivity
 	public Story story;
 	public User user;
-	
-	private Encounter encounter;
-	
 	// determine which viewStub to sub
 	private int mediaType = -1;
 	
-	/**
-	 * ON CREATE
-	 */
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -69,11 +64,10 @@ public class RetrieveMedia extends FragmentActivity implements
 		
 		dbh = new DatabaseHelper(this);
 		
-		// TODO: unpack user and story parcel
+		// unpack parcel
 		Bundle data = getIntent().getExtras();
-
 		if (data != null) {
-			// get the story object
+			// get the STORY object
 			Story tempStory = data.getParcelable("story");
 			if (tempStory != null) {
 				story = tempStory;
@@ -82,8 +76,7 @@ public class RetrieveMedia extends FragmentActivity implements
 			}else {
 				throw new RuntimeException("RetrieveMedia: story passed was null");
 			}
-
-			// get the user object
+			// get the USER object
 			User tempUser = data.getParcelable("user");
 			if (tempUser != null) {
 				user = tempUser;
@@ -92,14 +85,15 @@ public class RetrieveMedia extends FragmentActivity implements
 			}
 		}
 		
-		
-				
-		// Set up the action bar.
+		// Set up the action bar with tabs
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		//Remove title bar (and comment out menu)
+		actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayShowHomeEnabled(false);
 
-		// Create the adapter that will return a fragment for each of the two
-		// primary sections of the app.
+		// Create the adapter that will return a fragment for each of the two Fragments
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
@@ -131,28 +125,13 @@ public class RetrieveMedia extends FragmentActivity implements
 					.setText(mSectionsPagerAdapter.getPageTitle(i))
 					.setTabListener(this));
 		}
-		
-		
-		initMediaWidgets(mSectionsPagerAdapter.getItem(0));
-		initCommentWidgets(mSectionsPagerAdapter.getItem(1));
-		
 	}
 	
-	private void initMediaWidgets(Fragment fragment) {
-		// set onClickListeners for senseButtons
-		// store them as global 
-		
-		
-	}
-	
-	private void initCommentWidgets(Fragment fragment) {
-		
-		
-	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_retrieve_image, menu);
+		// Do not show a menu on media retrieval
+		//getMenuInflater().inflate(R.menu.activity_retrieve_image, menu);
 		return true;
 	}
 
@@ -189,15 +168,13 @@ public class RetrieveMedia extends FragmentActivity implements
 	}
 	
 	private void switchToMedia() {
-		Toast.makeText(this, "MEDIA TAB", Toast.LENGTH_SHORT).show();
+		
 	}
 	
 	private void switchToComments() {
-		Toast.makeText(this, "COMMENTS TAB", Toast.LENGTH_SHORT).show();
+		
 	}
-	
-	
-	
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -211,38 +188,18 @@ public class RetrieveMedia extends FragmentActivity implements
 		@Override
 		public Fragment getItem(int position) {
 			// getItem is called to instantiate the fragment for the given page.
-			// CALLED ONLY ONCE. DO THE SETUP HERE!!!
+			// CALLED ONLY ONCE. DO SETUP HERE!
 			// Return the Media or Comments fragment
 			// pass mediaType as arg to set ViewStub for the particular media 
-			
 			if (position == 0) {
 				Fragment fragment = new MediaFragment();
 				mMediaFragment = (MediaFragment) fragment;
-				// pass an arg to MediaFragment so we can load the right stub
-				
-				// INSTEAD of passing these into a new parcel,
-				// We get them from the Activity inside the Fragment 
-				// Bundle args = new Bundle();
-				// to determine the viewStub to inflate
-				//args.putInt("mediaType", mediaType);
-				// to populate the fields
-				//args.putParcelable("story", story);
-				//args.putParcelable("user", user);
-				//args.putParcelable("encounter", encounter);
-				//fragment.setArguments(args);
-				
-				
 				return mMediaFragment;
-				//Log.v(getClass().getSimpleName(), "Fragment 0 called in getItem");
-				
 			} else if (position == 1) {
 				Fragment fragment = new CommentFragment();
 				mCommentFragment = (CommentFragment) fragment;
 				return mCommentFragment;
-				//Log.v(getClass().getSimpleName(), "Fragment 1 called in getItem");
-			
 			}
-
 			return null;
 		}
 
