@@ -2,7 +2,9 @@ package com.ag.masters.placebase;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -11,6 +13,8 @@ import android.widget.Toast;
 
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.UserActivity;
+import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.User;
 
 public class NewUser extends Activity {
@@ -81,8 +85,21 @@ public class NewUser extends Activity {
 				    }
 				    else{
 				    	Intent goToMap = new Intent(this, MapActivity.class);
-				    	// pass the user parcel to the map activity
-				    	goToMap.putExtra("user", user);
+				    	
+				    	// update login date
+				    	DatabaseHelper dbh = new DatabaseHelper(this);
+						int updateDB = dbh.updateUserLoginDate(user);
+						dbh.close();
+						Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
+						
+						
+				    	// add user to shared preference
+				    	SharedPreferences settings = getSharedPreferences(Global.PREFS, 0);
+				    	SharedPreferences.Editor editor = settings.edit();
+				    	editor.putInt("user", user.getId());
+				    	editor.commit();
+				    	
+				    	
 				    	startActivity(goToMap);
 				    }
 					break;

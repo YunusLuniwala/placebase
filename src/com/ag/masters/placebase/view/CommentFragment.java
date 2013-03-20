@@ -1,3 +1,12 @@
+/**
+ * Fragment
+ * Displays list of comments
+ * 
+ * @tut: load objects from the database using a SimpleCursorAdapter
+ * http://www.mysamplecode.com/2012/07/android-listview-cursoradapter-sqlite.html
+ * 
+ */
+
 package com.ag.masters.placebase.view;
 
 import android.content.Context;
@@ -69,7 +78,7 @@ public class CommentFragment extends Fragment {
 		View v = inflater.inflate(R.layout.view_retrieve_comments, container, false);
 		submit = (Button) v.findViewById(R.id.btn_submitComment);
 		commentField = (EditText) v.findViewById(R.id.commentField);
-        commentsList = (ListView) v.findViewById(R.id.list);
+        commentsList = (ListView) v.findViewById(R.id.user_places_list);
         
         //call adapter to populate the list with all comments
         populateList(); 

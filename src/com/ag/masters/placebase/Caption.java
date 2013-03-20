@@ -2,7 +2,9 @@ package com.ag.masters.placebase;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -10,10 +12,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.ag.masters.placebase.handlers.SDImageLoader;
+import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.User;
@@ -51,15 +52,17 @@ public class Caption extends Activity {
 				throw new RuntimeException("CaptionActivity: image passed was null");
 			}
 
-			// get the user object
-			User tempUser = data.getParcelable("user");
-			if (tempUser != null) {
-				// and save into a global var
-				user = tempUser;
-			}else {
-				throw new RuntimeException("CaptionActivity: user passed was null");
-			}
+//			// get the user object
+//			User tempUser = data.getParcelable("user");
+//			if (tempUser != null) {
+//				// and save into a global var
+//				user = tempUser;
+//			}else {
+//				throw new RuntimeException("CaptionActivity: user passed was null");
+//			}
 		}
+		
+		
 
 		/* UI buttons*/
 		Button btnDone = (Button) findViewById(R.id.btn_caption_done);
@@ -89,7 +92,7 @@ public class Caption extends Activity {
 				// add parcels to Intent 
 				intent.putExtra("image", image);
 				intent.putExtra("story", story);
-				intent.putExtra("user", user);
+				//intent.putExtra("user", user);
 				// launch senses activity
 				startActivity(intent);
 			}

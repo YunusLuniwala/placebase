@@ -51,14 +51,14 @@ public class SenseActivity extends Activity {
 				throw new RuntimeException("SenseActivity: story passed was null");
 			}
 
-			// get the user object
-			User tempUser = data.getParcelable("user");
-			if (tempUser != null) {
-				// and save into a global var
-				user = tempUser;
-			}else {
-				throw new RuntimeException("SenseActivity: user passed was null");
-			}
+//			// get the user object
+//			User tempUser = data.getParcelable("user");
+//			if (tempUser != null) {
+//				// and save into a global var
+//				user = tempUser;
+//			}else {
+//				throw new RuntimeException("SenseActivity: user passed was null");
+//			}
 		}
 
 		if(story != null) {
@@ -92,9 +92,7 @@ public class SenseActivity extends Activity {
 			}
 		}
 
-		
-		// test
-		//story = new Story();
+
 
 		// close btn
 		ImageButton close = (ImageButton) findViewById(R.id.btn_close_caption);
@@ -115,7 +113,7 @@ public class SenseActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(SenseActivity.this, PerspectiveActivity.class);
 				intent.putExtra("story", story);
-				intent.putExtra("user", user);
+				//intent.putExtra("user", user);
 				
 				switch(story.getMedia()) {
 				case Global.IMAGE_CAPTURE:
@@ -140,7 +138,7 @@ public class SenseActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(SenseActivity.this, PerspectiveActivity.class);
 				intent.putExtra("story", story);
-				intent.putExtra("user", user);
+				//intent.putExtra("user", user);
 				
 				switch(story.getMedia()) {
 				case Global.IMAGE_CAPTURE:

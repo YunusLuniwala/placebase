@@ -65,15 +65,15 @@ public class ConfirmTrace extends Activity {
 						throw new RuntimeException("ConfirmTrace: story passed was null");
 					}
 				}
-				// get the story object
-				User tempUser = data.getParcelable("user");
-				if (tempUser != null) {
-					user = tempUser;
-				} else {
-					// test with default user
-					user = new User("ashton", "pass", "0");
-					throw new RuntimeException("ConfirmTrace: user passed was null");
-				}
+//				// get the story object
+//				User tempUser = data.getParcelable("user");
+//				if (tempUser != null) {
+//					user = tempUser;
+//				} else {
+//					// test with default user
+//					user = new User("ashton", "pass", "0");
+//					throw new RuntimeException("ConfirmTrace: user passed was null");
+//				}
 
 				if(story != null) {
 					// get the correct media object from parcel 
@@ -149,7 +149,8 @@ public class ConfirmTrace extends Activity {
 				//returnToMap.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				returnToMap.putExtra("returnFromStory", true);
 				//returnToMap.putExtra("user", user);
-				returnToMap.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				//returnToMap.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+				returnToMap.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(returnToMap);
 			}
 		};		

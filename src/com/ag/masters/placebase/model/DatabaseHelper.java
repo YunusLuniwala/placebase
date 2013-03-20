@@ -47,19 +47,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// Encounter Table info
 	private static final String TABLE_STORIES = "stories";
 		//column names
-		private static final String STORIES_ID = "_id";
+		public static final String STORIES_ID = "_id";
 		private static final String STORIES_USER = "user";
-		private static final String STORIES_MEDIA = "media";
-		private static final String STORIES_HEAR = "hear";
-		private static final String STORIES_SEE = "see";
+		public static final String STORIES_MEDIA = "media";
+		public static final String STORIES_HEAR = "hear";
+		public static final String STORIES_SEE = "see";
 		private static final String STORIES_SMELL = "smell";
 		private static final String STORIES_TASTE = "taste";
 		private static final String STORIES_TOUCH = "touch";
-		private static final String STORIES_LAT = "lat";
-		private static final String STORIES_LNG = "lng";
-		private static final String STORIES_BEARING = "bearing";
-		private static final String STORIES_TIMESTAMP = "timestamp";
-		private static final String STORIES_PERSPECTIVE = "perspective";
+		public static final String STORIES_LAT = "lat";
+		public static final String STORIES_LNG = "lng";
+		public static final String STORIES_BEARING = "bearing";
+		public static final String STORIES_TIMESTAMP = "timestamp";
+		public static final String STORIES_PERSPECTIVE = "perspective";
 		
 	// User Table info
 	private static final String TABLE_USERS = "users";
@@ -285,6 +285,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		
 		return allStories;
 	}
+    
+    public ArrayList<Story> getAllStoriesForUser(int userId) {
+    	SQLiteDatabase db = this.getWritableDatabase();
+
+    	ArrayList<Story> stories = new ArrayList<Story>();
+
+    	Cursor cursor = db.query(TABLE_STORIES, null, STORIES_USER + "=?", new String[]{String.valueOf(userId)}, null, null, null);
+    	
+    	if (cursor.moveToFirst()) {
+	        do {
+	            Story s = new Story();
+	            s.setId(Integer.parseInt(cursor.getString(0)));
+	            s.setUser(cursor.getInt(1));
+	            s.setMedia(cursor.getInt(2));
+	            s.setHear(cursor.getInt(3));
+	            s.setSee(cursor.getInt(4));
+	            s.setSmell(cursor.getInt(5));
+	            s.setTaste(cursor.getInt(6));
+	            s.setTouch(cursor.getInt(7));
+	            s.setLat(cursor.getDouble(8));
+				s.setLng(cursor.getDouble(9));
+				s.setBearing(cursor.getFloat(10));
+				s.setTimestamp(cursor.getString(11));
+				s.setPerspectiveUri(cursor.getString(12));
+	            // add story to arrayList
+	            stories.add(s);
+	            
+	        } while (cursor.moveToNext());
+	        Log.v("DATABASE", Integer.toString(cursor.getCount()) + " stories retrieved for user: " + Integer.toString(userId));
+	    }  else {
+	    	Log.v("DATABASE", "NO STORIES are available for  user: " + Integer.toString(userId));  
+	    }
+   
+
+    	cursor.close();
+    	db.close();
+
+    	return stories; 
+    }
+
 
     // create new story
     public void createStory(Story story) {
@@ -667,6 +707,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		} else {
 			user = new User();
 			user.setId(0);
+			user.setName(null);
+			user.setPassword(null);
+			user.setDate("0");
+		}
+		cursor.close();
+		db.close();
+		return user;
+	}
+	
+	//return User object from id
+	public User getUser(int id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		User user;
+		Cursor cursor = db.query(TABLE_USERS, null, USERS_ID + "=?", 
+				new String[]{String.valueOf(id)}, null, null, null);
+		if (cursor.moveToFirst()) {
+			user = new User(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), cursor.getString(3));
+		} else {
+			user = new User();
+			user.setId(-1);
 			user.setName(null);
 			user.setPassword(null);
 			user.setDate("0");

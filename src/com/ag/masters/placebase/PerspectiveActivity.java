@@ -90,14 +90,14 @@ public class PerspectiveActivity extends Activity implements
 			}else {
 				throw new RuntimeException("SenseActivity: story passed was null");
 			}
-			// get the user object
-			User tempUser = data.getParcelable("user");
-			if (tempUser != null) {
-				// and save into a global var
-				user = tempUser;
-			}else {
-				throw new RuntimeException("SenseActivity: user passed was null");
-			}
+//			// get the user object
+//			User tempUser = data.getParcelable("user");
+//			if (tempUser != null) {
+//				// and save into a global var
+//				user = tempUser;
+//			}else {
+//				throw new RuntimeException("SenseActivity: user passed was null");
+//			}
 		}
 
 		if(story != null) {
@@ -273,7 +273,7 @@ public class PerspectiveActivity extends Activity implements
 		// start new Activity to confirm capture
 		Intent intent = new Intent(this, ConfirmTrace.class);
 		intent.putExtra("story", story);
-		intent.putExtra("user", user);
+		//intent.putExtra("user", user);
 		switch(story.getMedia()) {
 		case Global.IMAGE_CAPTURE:
 			intent.putExtra("media", image);

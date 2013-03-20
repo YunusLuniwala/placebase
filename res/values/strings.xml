@@ -54,5 +54,7 @@
     <string name="comment_hint">What do you think?...</string>
     <string name="encounters">encounters</string>
     <string name="i_sense_it">What do you sense?</string>
+    <string name="title_activity_user_places">My Places</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

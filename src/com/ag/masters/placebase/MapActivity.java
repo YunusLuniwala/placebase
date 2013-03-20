@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
@@ -205,6 +206,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		imageLoader = new SDImageLoader();
 
+		// get user as SharedPreference
+		SharedPreferences settings = getSharedPreferences(Global.PREFS, 0);
+		int tempUser = settings.getInt("user", -1);
+		
+		if (tempUser != -1) {
+			// get the user from the database 
+			user = dbh.getUser(tempUser);
+			Log.v("SHARED PREFS", "current User is: " + user.getName());
+			
+		} else {
+			Log.v("SHARED PREFS", "user was not set");
+		}
+		
 		Bundle data = getIntent().getExtras();
 		if (data != null) {
 
@@ -213,22 +227,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				Log.v(getClass().getSimpleName(), "User returned from authoring story");
 				//TODO: something to the marker in the db so the user knows which one is hers
 			}
-
-			// get the story object
-			User tempUser = data.getParcelable("user");
-			if (tempUser != null) {
-				user = tempUser;
-				// update the database to reflect the user's new login date
-				// TODO: shouldn't this be the last thing to happen in the login activity class? 
-				// So that we can check for notifications and display the immediately when the map starts up?
-				int updateDB = dbh.updateUserLoginDate(user);
-				dbh.close();
-				Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
-			} else {
-				// test with default user
-				user = new User("ashton", "pass", "0");
-				//throw new RuntimeException("MapActivity: user passed was null");
-			}
+			
 			// you've returned from a journey, so hide the block
 			int tempJourneyMode = data.getInt("journeyMode");
 			if (tempJourneyMode != 0) {
@@ -276,7 +275,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testPitch = (TextView) findViewById(R.id.testPitch);
 		testRoll = (TextView) findViewById(R.id.testRoll);
 
-		thisBearing = (TextView) findViewById(R.id.test_thisBearing);
+		
 
 		//testGeoX.setText("0.00");
 		//testGeoY.setText("0.00");
@@ -571,7 +570,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				startCaption.putExtra("image", image);
 				// pass in Story parcel
 				startCaption.putExtra("story", story);
-				startCaption.putExtra("user", user);
+				//startCaption.putExtra("user", user);
 				// start SensesActivity
 				startCaption.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(startCaption);
@@ -607,7 +606,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// pass in Story parcel
 				startSenses.putExtra("story", story);
 				// start SensesActivity
-				startSenses.putExtra("user", user);
+				//startSenses.putExtra("user", user);
 				startSenses.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				startActivity(startSenses);
 
@@ -639,7 +638,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					startSenses.putExtra("audio", audio);
 					// pass in Story parcel
 					startSenses.putExtra("story", story);
-					startSenses.putExtra("user", user);
+					//startSenses.putExtra("user", user);
 					// start SensesActivity
 					startSenses.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 					startActivity(startSenses);
@@ -879,7 +878,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			Toast.makeText(this, "Saved Spaces", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.user_places:
-			Toast.makeText(this, "user places", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(this, "user places", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(this, UserPlaces.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			//intent.putExtra("user", user);
+			startActivity(intent);
 			return true;	
 		}
 

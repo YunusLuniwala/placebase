@@ -1,11 +1,10 @@
 package com.ag.masters.placebase;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.database.SQLException;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.UserActivity;
 import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.sqlite.User;
 
 public class Login extends Activity {
@@ -74,15 +74,25 @@ public class Login extends Activity {
 				    	Toast loginError = Toast.makeText(Login.this , error , Toast.LENGTH_LONG);
 				    	loginError.show();
 				    } else{
-				    	//rest date of last login on date object
+				    	// reset date of last login on date object
 				    	DateHandler dateHandler = new DateHandler();
 				    	String date = dateHandler.getCurrentTimeAsString();
 				    	user.setDate(date);
 				    	
+				    	// update login date in database
+				    	DatabaseHelper dbh = new DatabaseHelper(this);
+						int updateDB = dbh.updateUserLoginDate(user);
+						dbh.close();
+						Log.d("Updated: ", "Update successful, inserted " + updateDB + " into row");
+				    	
 				    	Intent goToMap= new Intent(this,MapActivity.class);
 				    	
-				    	// add the account object
-				    	goToMap.putExtra("user", user);
+				    	// add user to shared preference
+				    	SharedPreferences settings = getSharedPreferences(Global.PREFS, 0);
+				    	SharedPreferences.Editor editor = settings.edit();
+				    	editor.putInt("user", user.getId());
+				    	editor.commit();
+				    	
 				    	startActivity(goToMap);
 				    	finish();
 				    }
