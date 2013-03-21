@@ -61,7 +61,7 @@
                 </RelativeLayout>
 
                 <ImageView
-                    android:id="@+id/imageView1"
+                    android:id="@+id/user_media_icon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="top"
@@ -126,7 +126,7 @@
                     android:src="@drawable/ic_close" />
 
                 <ImageView
-                    android:id="@+id/imageView1"
+                    android:id="@+id/user_media_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/progressbar_3" />

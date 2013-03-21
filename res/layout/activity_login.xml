@@ -80,7 +80,7 @@
             android:layout_weight="4.25" >
 
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/user_media_icon"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_alignParentEnd="false"

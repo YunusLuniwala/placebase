@@ -6,6 +6,8 @@
  * https://developers.google.com/maps/documentation/android/map#add_a_map_to_an_android_application
  * 
  * ListFragment
+ *  http://www.mysamplecode.com/2012/07/android-listview-cursoradapter-sqlite.html
+ *  http://geekswithblogs.net/bosuch/archive/2011/01/31/android---create-a-custom-multi-line-listview-bound-to-an.aspx
  */
 
 package com.ag.masters.placebase;
@@ -19,9 +21,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
 
+import com.ag.masters.placebase.handlers.DateHandler;
+import com.ag.masters.placebase.handlers.UserPlaceAdapter;
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.model.UserStoryObject;
+import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -30,11 +41,15 @@ public class UserPlaces extends Activity {
 	
 	private DatabaseHelper dbh;
 	private User user;
+	private int userId;
 	
 	private GoogleMap mMap;
 	private MapFragment mMapFragment;
 	
-	private ArrayList userStories;
+	private ListView lv;
+	
+	
+	private ArrayList<UserStoryObject> stories;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +57,10 @@ public class UserPlaces extends Activity {
 		setContentView(R.layout.activity_user_places);
 
 		dbh = new DatabaseHelper(this);
-
+		dbh.openDataBase();
 		// get user as SharedPreference
 		SharedPreferences settings = getSharedPreferences(Global.PREFS, 0);
-		int userId = settings.getInt("user", -1);
+		userId = settings.getInt("user", -1);
 		if (userId != -1) {
 			// get the user from the database 
 			user = dbh.getUser(userId);
@@ -60,26 +75,101 @@ public class UserPlaces extends Activity {
 		FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
 		fragmentTransaction.add(R.id.user_map, mMapFragment);
 		fragmentTransaction.commit();
-
+		// set up the map when it's ready to be operated on
 		setUpMapIfNeeded();
 		
+		// assemble information from database
+		stories = assembleData();
+		
+		lv = (ListView) findViewById(R.id.user_list);	
+		// associate the custom adapter with the listview
+		lv.setAdapter(new UserPlaceAdapter(this, stories, R.layout.listview_user_item_row));
+
+		setRowListeners();
+		
+	}
+
+	/**
+	 * create the object data structure
+	 * @return
+	 */
+	ArrayList<UserStoryObject> assembleData() {
+		
+		ArrayList<UserStoryObject>so = new ArrayList<UserStoryObject>();
 		
 		// get all items from the database and populate and ArrayList
-		userStories = dbh.getAllStoriesForUser(userId);
-		Log.v("STORIES RETURNED", Integer.toString(userStories.size()));
+		ArrayList<Story> userStories = dbh.getAllStoriesForUser(userId);
 		
-		displayListView();
+		for (int i = 0; i < userStories.size(); i++) {
+			Story s = userStories.get(i);
+			int id = s.getId();
+			
+			int numEncounters = dbh.getEncounterCountForStory(id);
+			int numComments = dbh.getCommentCount(id);
+			
+			Log.v("STORIES RETURNED", "num encounters: " + Integer.toString(numEncounters));
+			Log.v("STORIES RETURNED", "num comments: " + Integer.toString(numComments));
+			
+			// get all comments for this story 
+			ArrayList<String> times = dbh.getCommentTimestampArrayForStory(id);
+			
+			boolean isNew = false;
+			if(times.size() > 0) {
+				isNew = checkCommentIsNewerThan(times, 3);
+			}
+
+			UserStoryObject uso = new UserStoryObject(
+					s.getId(), s.getMedia(), s.getLat(), s.getLng(), s.getTimestamp(), s.getPerspectiveUri(), 
+					numComments, 
+					numEncounters,
+					isNew);
+					
+			
+			so.add(uso);
+		}
+		
+		Log.v("STORIES RETURNED", "Stories saved in UserStoryObject array: " + Integer.toString(so.size()));
+		
+		return so;
 		
 	}
 	
-	// http://www.mysamplecode.com/2012/07/android-listview-cursoradapter-sqlite.html
-	private void displayListView() {
+	/**
+	 * check if a row should be marked as having new activity
+	 * @param dates
+	 * @param num
+	 * @return
+	 */
+	private boolean checkCommentIsNewerThan(ArrayList<String> dates, int num) {
+		DateHandler handler = new DateHandler();
 		
-
-		
-		
+		for (int i = 0; i < dates .size(); i++) {
+			String date = dates.get(i);
+			int numDays = handler.getDaysAgo(date);
+			if (numDays <= num) {
+				return true;
+			}
+		}
+		return false;
 	}
 
+
+	public void setRowListeners() {
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+				// get the object at the clicked position
+				Object o = lv.getItemAtPosition(position);
+				// cast it back to a UserStoryObject 
+				UserStoryObject fullObject = (UserStoryObject) o;
+				
+				Toast.makeText(UserPlaces.this, "You have chosen : " + " " + fullObject.getLat(), Toast.LENGTH_LONG).show();
+				
+				//TODO: move the map to this object's geocoordinates
+			}
+
+		});
+	}
 	
 	private void setUpMapIfNeeded() {
 		if(mMap == null) {
@@ -103,6 +193,13 @@ public class UserPlaces extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.user_places, menu);
 		return true;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		dbh.close();
 	}
 
 }

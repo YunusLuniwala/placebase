@@ -569,6 +569,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	  
   }
   
+  public ArrayList<String> getCommentTimestampArrayForStory(int storyId) {
+	  ArrayList<String> times = new ArrayList<String>();
+	  
+	  SQLiteDatabase db = this.getReadableDatabase();
+	  Cursor cursor = db.query(TABLE_COMMENTS, new String[] {COMMENTS_STORY, COMMENTS_TIMESTAMP}, COMMENTS_STORY + "=?", 
+				new String[]{String.valueOf(storyId)}, null, null, null);
+	  if(cursor.moveToFirst()) {
+		  do {
+			String t = cursor.getString(1);
+			times.add(t);
+		  } while(cursor.moveToNext());
+	  }
+	  
+	  cursor.close();
+	  db.close();
+	  
+	  return times;
+  }
+  
   /**
 	 * 
 	 * ENCOUNTER TABLE
