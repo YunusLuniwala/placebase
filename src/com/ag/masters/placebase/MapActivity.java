@@ -391,7 +391,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		super.onResume();
 		setUpMapIfNeeded();
-
+		// mMap.clear();
+		//setUpMap();
+		//allStories.clear();
+		// refresh the marker view
+		
+				
+		
 
 		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		//Register for location updates using a Criteria, and a callback on the specified looper thread.
@@ -428,7 +434,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		myLocationManager.removeUpdates(this);
 		mMap.setMyLocationEnabled(false);
 		mMap.setLocationSource(null);
-
+		
 		//dbh.close();
 	}
 
@@ -807,7 +813,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		//dbh.openDataBase();	
 		allStories = dbh.getAllStories();
 
-
 		if(allStories != null) {
 			for (int i=0; i<allStories.size(); i++) {
 				Story s = allStories.get(i);
@@ -828,8 +833,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		} else {
 			Toast.makeText(this, "no stories in db", Toast.LENGTH_LONG).show();
 		}
-
-		//dbh.close();
 
 	}
 
@@ -878,10 +881,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			Toast.makeText(this, "Saved Spaces", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.user_places:
-			//Toast.makeText(this, "user places", Toast.LENGTH_SHORT).show();
+			
 			Intent intent = new Intent(this, UserPlaces.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			//intent.putExtra("user", user);
 			startActivity(intent);
 			return true;	
 		}
@@ -1219,11 +1220,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	private Story getStoryFromMarker(Marker marker) {
 		// "m0" format 
+		
 		// We can reliably query the array of story objects based
 		// on the key and id being the same (they are added in the order they are read in).
 		// No need to store a markerId with the story object
 		String markerId = marker.getId();
 		String markerNumId = markerId.substring(1);
+		Log.v("MARKER", "marker id " + markerNumId);
+		Log.v("NUMSTORIES", "num stories " + allStories.size());
 		int markerIntId = Integer.parseInt(markerNumId);
 		// grab the story object associated with this marker
 		Story story = allStories.get(markerIntId);

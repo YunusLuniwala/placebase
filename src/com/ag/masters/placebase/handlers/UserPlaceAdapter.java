@@ -6,6 +6,9 @@
  * 
  * formats and populates the fields
  * 
+ * sends callback from this adapter to its class using a CustomOnClickListener
+ * http://milesburton.com/Android_-_Building_a_ListView_with_an_OnClick_Position
+ * 
  */
 
 package com.ag.masters.placebase.handlers;
@@ -20,7 +23,6 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
@@ -28,27 +30,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ag.masters.placebase.R;
+import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.model.UserStoryObject;
 
 
 public class UserPlaceAdapter extends BaseAdapter {
 	
-	private static ArrayList<UserStoryObject> stories;
+	private ArrayList<UserStoryObject> stories;
 
 	private LayoutInflater inflater;
 	private int layoutResourceId;
 	
 	DateHandler handler;
-
-
-	public UserPlaceAdapter(Context context, ArrayList<UserStoryObject> data, int layout) {
+	DatabaseHelper dbh;
+	Context mContext;
+	
+	private OnCustomClickListener mCallback; //this is our activity
+	
+	public UserPlaceAdapter(Context context, ArrayList<UserStoryObject> data, int layout, OnCustomClickListener callback) {
 		
 		stories = data;
 		inflater = LayoutInflater.from(context);
 		layoutResourceId = layout;
+		mContext = context;
 		
 		handler = new DateHandler();
+		this.mCallback = callback;
 
 	}
 
@@ -68,16 +76,19 @@ public class UserPlaceAdapter extends BaseAdapter {
 		return position;
 	}
 	
-	
+	public void setData(ArrayList<UserStoryObject> newStories) {
+		stories = newStories;
+	}
 	
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-
+	public View getView(final int position, View convertView, final ViewGroup parent) {
+		
 		View row = convertView;
 		ViewHolder holder = null;
 		
 		if (row == null) {
 			row = inflater.inflate(layoutResourceId, null);
+			
 			// assign views to holder
 			holder = new ViewHolder();
 			holder.img = (ImageView) row.findViewById(R.id.imgIcon);
@@ -92,6 +103,7 @@ public class UserPlaceAdapter extends BaseAdapter {
 			holder = (ViewHolder)row.getTag();
 		}
 
+		
 		// cache the current object
 		final UserStoryObject uso = stories.get(position);
 		
@@ -99,16 +111,10 @@ public class UserPlaceAdapter extends BaseAdapter {
 		// http://stackoverflow.com/questions/6116583/android-listview-custom-adapter-imagebutton
 		holder.delete.setFocusable(false);
 		holder.delete.setFocusableInTouchMode(false);
-		//holder.delete.setClickable(true);
 		
-		holder.delete.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Log.v("BUTTON", "button clicked for pos " + Integer.toString(uso.getId()));
-				deleteItem(uso.getId());
-			}
-		});
+		// set custom on Click Listener to the delete button--callback to activity
+		holder.delete.setOnClickListener(new CustomOnClickListener(mCallback, position));
+		
 		
 		// SET VALUES
 		// timestamp
@@ -142,12 +148,6 @@ public class UserPlaceAdapter extends BaseAdapter {
 		holder.mediaIcon.setImageDrawable(drawable);
 		
 		return row;
-	}
-	
-	private void deleteItem(int id) {
-		// run database function to delete the item
-		
-		// and remove it from the list (or refresh the list, or hide the row or whatever)
 	}
 	
 	/**

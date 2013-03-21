@@ -56,5 +56,8 @@
     <string name="i_sense_it">What do you sense?</string>
     <string name="title_activity_user_places">My Places</string>
     <string name="action_settings">Settings</string>
+    <string name="nostories">Your personal stories are collected here.</string> 
+    <string name="nostories2">Looks like you don\'t have any.</string>
+    <string name="nostories3">Time to scout a place to storytell.</string>
 
 </resources>

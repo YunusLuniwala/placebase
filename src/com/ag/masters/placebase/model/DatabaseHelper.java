@@ -25,6 +25,7 @@ import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
 
+
 /**
  * 
  * General DatabaseHelper to access databases.
@@ -348,6 +349,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.insert(TABLE_STORIES, null, values);
 		db.close();
     }
+    
+    // delete one story by its id
+ 	public void deleteStory(int id){
+ 		SQLiteDatabase db = this.getWritableDatabase();
+ 		int numDeleted = db.delete(TABLE_STORIES, STORIES_ID + " = ?", new String[] { Integer.toString(id)});
+ 	    Log.d("Delete Story: ","Row Number removed: " + numDeleted + " from Story: " );
+ 	    db.close();
+ 	}
 
     
     /** 

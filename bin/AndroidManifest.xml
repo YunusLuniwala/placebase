@@ -136,7 +136,8 @@
         </activity>
         <activity
             android:name="com.ag.masters.placebase.UserPlaces"
-            android:label="@string/title_activity_user_places" >
+            android:label="@string/title_activity_user_places" 
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

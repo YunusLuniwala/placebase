@@ -16,6 +16,41 @@
             android:layout_weight=".4" >
         </FrameLayout>
 
+        <LinearLayout
+            android:id="@+id/empty_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:gravity="center"
+                android:text="@string/nostories"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/nostories2" />
+
+            <TextView
+                android:id="@+id/TextView3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:gravity="center"
+                android:text="@string/nostories3"
+                android:textColor="#222222"
+                android:textSize="30sp" />
+
+        </LinearLayout>
+
         <FrameLayout
             android:id="@+id/user_list_container"
             android:layout_width="match_parent"
