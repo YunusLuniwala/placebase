@@ -163,12 +163,18 @@ public class UserPlaces extends Activity {
 				// cast it back to a UserStoryObject 
 				UserStoryObject fullObject = (UserStoryObject) o;
 				
-				Toast.makeText(UserPlaces.this, "You have chosen : " + " " + fullObject.getLat(), Toast.LENGTH_LONG).show();
+				//Toast.makeText(UserPlaces.this, "You have chosen : " + " " + fullObject.getLat(), Toast.LENGTH_SHORT).show();
 				
+				moveMapToLocation(fullObject.getLat(),fullObject.getLng());
 				//TODO: move the map to this object's geocoordinates
 			}
 
 		});
+	}
+	
+	private void moveMapToLocation(double lat, double lng) {
+		Toast.makeText(UserPlaces.this, "Move to : " + " " + lat + ", " + lng, Toast.LENGTH_SHORT).show();
+		
 	}
 	
 	private void setUpMapIfNeeded() {
