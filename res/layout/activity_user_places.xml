@@ -21,12 +21,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone" >
+            android:visibility="visible" >
 
             <TextView
                 android:id="@+id/textView1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_margin="20dp"
                 android:gravity="center"
                 android:text="@string/nostories"
@@ -36,7 +37,8 @@
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="left"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
                 android:text="@string/nostories2" />
 
         </LinearLayout>
