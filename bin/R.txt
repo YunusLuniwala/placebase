@@ -75,7 +75,6 @@ int drawable progressbar_3 0x7f020038
 int id TextView3 0x7f05005e
 int id accelY 0x7f050039
 int id accelZ 0x7f05003a
-int id action_settings 0x7f0500a4
 int id audio_stub 0x7f050086
 int id bg_marker 0x7f050011
 int id bgimage_launcher 0x7f050055
@@ -152,6 +151,7 @@ int id linearLayout1 0x7f050005
 int id login_instructions 0x7f050013
 int id login_title 0x7f050012
 int id logo 0x7f050056
+int id logout 0x7f0500a1
 int id map 0x7f050019
 int id mapHolder 0x7f050018
 int id map_view 0x7f050017
@@ -166,7 +166,6 @@ int id media_stubs 0x7f050038
 int id media_stubs_container 0x7f050085
 int id media_taste 0x7f05009d
 int id media_touch 0x7f05009e
-int id menu_settings 0x7f0500a1
 int id meta_geo 0x7f050097
 int id meta_timestamp 0x7f050096
 int id msgavailable 0x7f050063
@@ -189,7 +188,6 @@ int id recent_photo 0x7f050006
 int id recordBtnLayout 0x7f050028
 int id recordBtnLayout2 0x7f050027
 int id satellite 0x7f050002
-int id saved_spaces 0x7f0500a2
 int id scrollView1 0x7f05007e
 int id senses 0x7f05004c
 int id senses_title 0x7f050078
@@ -230,7 +228,7 @@ int id user_list_container 0x7f05005f
 int id user_listview 0x7f05006c
 int id user_map 0x7f05005a
 int id user_media_icon 0x7f05000c
-int id user_places 0x7f0500a3
+int id user_places 0x7f0500a2
 int id user_places_list 0x7f050084
 int id video_stub 0x7f050088
 int id video_view 0x7f0500a0
@@ -257,20 +255,8 @@ int layout view_image 0x7f030010
 int layout view_retrieve_comments 0x7f030011
 int layout view_retrieve_media 0x7f030012
 int layout view_video 0x7f030013
-int menu activity_caption 0x7f090000
-int menu activity_confirm_trace 0x7f090001
-int menu activity_login 0x7f090002
-int menu activity_main 0x7f090003
-int menu activity_map 0x7f090004
-int menu activity_new_user 0x7f090005
-int menu activity_perspective 0x7f090006
-int menu activity_retrieve_audio 0x7f090007
-int menu activity_retrieve_image 0x7f090008
-int menu activity_retrieve_video 0x7f090009
-int menu activity_sense 0x7f09000a
-int menu activity_video_player 0x7f09000b
-int menu main_menu 0x7f09000c
-int menu user_places 0x7f09000d
+int menu main_menu 0x7f090000
+int menu menu_basic 0x7f090001
 int string action_settings 0x7f060047
 int string app_name 0x7f060011
 int string auth_client_availability_notification_title 0x7f06000e
@@ -279,6 +265,7 @@ int string auth_client_requested_by_msg 0x7f060010
 int string begin_app 0x7f060016
 int string begin_journey 0x7f060015
 int string btn_done 0x7f060034
+int string cancel 0x7f06004c
 int string caption_hint 0x7f060033
 int string comment 0x7f060042
 int string comment_hint 0x7f060043
@@ -297,6 +284,7 @@ int string common_google_play_services_update_button 0x7f06000c
 int string common_google_play_services_update_text 0x7f060008
 int string common_google_play_services_update_title 0x7f060007
 int string common_signin_button_text_long 0x7f06000d
+int string confirm_logout 0x7f06004d
 int string confirm_recording 0x7f060027
 int string encounters 0x7f060044
 int string get_message 0x7f060024
@@ -307,7 +295,7 @@ int string jouney_distance 0x7f060030
 int string login 0x7f060017
 int string login_instructions 0x7f060019
 int string login_title 0x7f060018
-int string menu_settings 0x7f060012
+int string logout 0x7f060012
 int string nostories 0x7f060048
 int string nostories2 0x7f060049
 int string nostories3 0x7f06004a
@@ -346,6 +334,7 @@ int string title_section1 0x7f06003b
 int string title_section2 0x7f06003c
 int string title_section3 0x7f06003d
 int string user_stories 0x7f060022
+int string yes 0x7f06004b
 int style AppBaseTheme 0x7f080000
 int style AppTheme 0x7f080001
 int[] styleable MapAttrs { 0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003, 0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007, 0x7f010008, 0x7f010009, 0x7f01000a, 0x7f01000b, 0x7f01000c, 0x7f01000d }

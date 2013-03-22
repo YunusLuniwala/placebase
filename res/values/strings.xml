@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">PlaceBase</string>
-    <string name="menu_settings">Settings</string>
+    <string name="logout">Logout</string>
     <string name="hello_world">Hello world!</string>
     <string name="tagline">Sense your surroundings</string>
     <string name="begin_journey">journey here</string>
@@ -33,7 +33,7 @@
     <string name="story_confirm">Success.</string>
     <string name="story_confirm_addl">You left a trace.</string>
     <string name="jouney_distance">METERS AWAY</string>
-    <string name="title_activity_confirm_trace">ConfirmTrace</string>
+    <string name="title_activity_confirm_trace">Confirm Trace</string>
     <string name="title_activity_caption">Caption</string>
     <string name="caption_hint">What happened here?</string>
     <string name="btn_done">Next</string>
@@ -59,5 +59,9 @@
     <string name="nostories">Your personal stories are collected here.</string> 
     <string name="nostories2">Looks like you don\'t have any.</string>
     <string name="nostories3">Time to scout a place to storytell.</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_logout">Are you sure?</string>
+    
 
 </resources>

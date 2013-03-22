@@ -3,11 +3,11 @@ package com.ag.masters.placebase;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -63,6 +63,7 @@ import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
 import com.ag.masters.placebase.sqlite.StoryVideo;
 import com.ag.masters.placebase.sqlite.User;
+import com.ag.masters.placebase.view.LogoutDialogFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -877,14 +878,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	public boolean onOptionsItemSelected(MenuItem item) { 
 
 		switch(item.getItemId()) {
-		case R.id.saved_spaces:
-			Toast.makeText(this, "Saved Spaces", Toast.LENGTH_SHORT).show();
-			return true;
+
 		case R.id.user_places:
-			
 			Intent intent = new Intent(this, UserPlaces.class);
 			startActivity(intent);
 			return true;	
+		case R.id.logout:
+		// show dialog.
+		DialogFragment newFragment = new LogoutDialogFragment();
+		newFragment.show(getFragmentManager(), "logout");
+		return true;
 		}
 
 		return super.onOptionsItemSelected(item);

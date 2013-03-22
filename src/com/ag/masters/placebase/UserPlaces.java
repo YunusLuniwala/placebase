@@ -23,14 +23,17 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.app.DialogFragment;
+
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
+
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.OnCustomClickListener;
 import com.ag.masters.placebase.handlers.UserPlaceAdapter;
@@ -39,6 +42,7 @@ import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.model.UserStoryObject;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
+import com.ag.masters.placebase.view.LogoutDialogFragment;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -68,7 +72,9 @@ public class UserPlaces extends Activity implements OnCustomClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_user_places);
-
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		
 		dbh = new DatabaseHelper(this);
 		dbh.openDataBase();
 		// get user as SharedPreference
@@ -238,8 +244,33 @@ public class UserPlaces extends Activity implements OnCustomClickListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.user_places, menu);
+		getMenuInflater().inflate(R.menu.menu_basic, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case android.R.id.home:
+			// This is called when the home (Up) Button is pressed 
+			// in the Action Bar
+			Intent parentActivityIntent = new Intent (this, MapActivity.class);
+			parentActivityIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+			startActivity(parentActivityIntent);
+			finish();
+			return true;
+		case R.id.logout:
+			// show dialog.
+			DialogFragment newFragment = new LogoutDialogFragment();
+			newFragment.show(getFragmentManager(), "logout");
+			return true;
+		}
+		
+		
+			
+		
+		return super.onOptionsItemSelected(item);
+		
 	}
 	
 	@Override
@@ -251,11 +282,32 @@ public class UserPlaces extends Activity implements OnCustomClickListener {
 
 	@Override
 	public void OnCustomClick(View aView, int position) {
-		// TODO Auto-generated method stub
 		//Toast.makeText(this, "CALLBACK is good", Toast.LENGTH_SHORT).show();
 		// delete the record from the database
 		UserStoryObject uso = stories.get(position);
-		dbh.deleteStory(uso.getId());
+		int id = uso.getId();
+		int mediaType = uso.getMedia();
+		// delete the story
+		dbh.deleteStory(id);
+		// also, for this story...delete all:
+		// comments:
+		dbh.deleteComment(id);
+		// encounters:
+		dbh.deleteEncounter(id);
+		// and media: (check what type)
+		switch(mediaType) {
+		case Global.IMAGE_CAPTURE:
+			dbh.deleteImage(id);
+			break;
+		case Global.VIDEO_CAPTURE:
+			dbh.deleteVideo(id);
+			break;
+		case Global.AUDIO_CAPTURE:
+			dbh.deleteAudio(id);
+			break;
+		}
+		
+		
 		// refresh the dataset
 		stories = assembleData();
 		adapter.setData(stories);

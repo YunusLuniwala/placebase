@@ -204,7 +204,6 @@ containing a value of this type.
         public static final int TextView3=0x7f05005e;
         public static final int accelY=0x7f050039;
         public static final int accelZ=0x7f05003a;
-        public static final int action_settings=0x7f0500a4;
         public static final int audio_stub=0x7f050086;
         public static final int bg_marker=0x7f050011;
         public static final int bgimage_launcher=0x7f050055;
@@ -281,6 +280,7 @@ containing a value of this type.
         public static final int login_instructions=0x7f050013;
         public static final int login_title=0x7f050012;
         public static final int logo=0x7f050056;
+        public static final int logout=0x7f0500a1;
         public static final int map=0x7f050019;
         public static final int mapHolder=0x7f050018;
         public static final int map_view=0x7f050017;
@@ -295,7 +295,6 @@ containing a value of this type.
         public static final int media_stubs_container=0x7f050085;
         public static final int media_taste=0x7f05009d;
         public static final int media_touch=0x7f05009e;
-        public static final int menu_settings=0x7f0500a1;
         public static final int meta_geo=0x7f050097;
         public static final int meta_timestamp=0x7f050096;
         public static final int msgavailable=0x7f050063;
@@ -318,7 +317,6 @@ containing a value of this type.
         public static final int recordBtnLayout=0x7f050028;
         public static final int recordBtnLayout2=0x7f050027;
         public static final int satellite=0x7f050002;
-        public static final int saved_spaces=0x7f0500a2;
         public static final int scrollView1=0x7f05007e;
         public static final int senses=0x7f05004c;
         public static final int senses_title=0x7f050078;
@@ -359,7 +357,7 @@ containing a value of this type.
         public static final int user_listview=0x7f05006c;
         public static final int user_map=0x7f05005a;
         public static final int user_media_icon=0x7f05000c;
-        public static final int user_places=0x7f0500a3;
+        public static final int user_places=0x7f0500a2;
         public static final int user_places_list=0x7f050084;
         public static final int video_stub=0x7f050088;
         public static final int video_view=0x7f0500a0;
@@ -390,20 +388,8 @@ containing a value of this type.
         public static final int view_video=0x7f030013;
     }
     public static final class menu {
-        public static final int activity_caption=0x7f090000;
-        public static final int activity_confirm_trace=0x7f090001;
-        public static final int activity_login=0x7f090002;
-        public static final int activity_main=0x7f090003;
-        public static final int activity_map=0x7f090004;
-        public static final int activity_new_user=0x7f090005;
-        public static final int activity_perspective=0x7f090006;
-        public static final int activity_retrieve_audio=0x7f090007;
-        public static final int activity_retrieve_image=0x7f090008;
-        public static final int activity_retrieve_video=0x7f090009;
-        public static final int activity_sense=0x7f09000a;
-        public static final int activity_video_player=0x7f09000b;
-        public static final int main_menu=0x7f09000c;
-        public static final int user_places=0x7f09000d;
+        public static final int main_menu=0x7f090000;
+        public static final int menu_basic=0x7f090001;
     }
     public static final class string {
         public static final int action_settings=0x7f060047;
@@ -420,6 +406,7 @@ containing a value of this type.
         public static final int begin_app=0x7f060016;
         public static final int begin_journey=0x7f060015;
         public static final int btn_done=0x7f060034;
+        public static final int cancel=0x7f06004c;
         public static final int caption_hint=0x7f060033;
         public static final int comment=0x7f060042;
         public static final int comment_hint=0x7f060043;
@@ -477,6 +464,7 @@ containing a value of this type.
         find the service-side assets. [CHAR LIMIT=25] 
          */
         public static final int common_signin_button_text_long=0x7f06000d;
+        public static final int confirm_logout=0x7f06004d;
         public static final int confirm_recording=0x7f060027;
         public static final int encounters=0x7f060044;
         public static final int get_message=0x7f060024;
@@ -487,7 +475,7 @@ containing a value of this type.
         public static final int login=0x7f060017;
         public static final int login_instructions=0x7f060019;
         public static final int login_title=0x7f060018;
-        public static final int menu_settings=0x7f060012;
+        public static final int logout=0x7f060012;
         public static final int nostories=0x7f060048;
         public static final int nostories2=0x7f060049;
         public static final int nostories3=0x7f06004a;
@@ -526,6 +514,7 @@ containing a value of this type.
         public static final int title_section2=0x7f06003c;
         public static final int title_section3=0x7f06003d;
         public static final int user_stories=0x7f060022;
+        public static final int yes=0x7f06004b;
     }
     public static final class style {
         /** 

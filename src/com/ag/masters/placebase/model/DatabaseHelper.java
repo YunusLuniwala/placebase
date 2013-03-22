@@ -398,8 +398,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	    
 	    Log.d("Inserting...", "Inserting into " + TABLE_PHOTOS);
 	    db.insert(TABLE_PHOTOS, null, values);
-		
-		db.close();
+
+	    db.close();
+    }
+
+    // delete StoryImage with this Story id
+    public void deleteImage(int storyId){
+    	SQLiteDatabase db = this.getWritableDatabase();
+    	int numDeleted = db.delete(TABLE_PHOTOS, PHOTOS_STORY + " = ?", new String[] { Integer.toString(storyId)});
+    	Log.d("Delete Image: ","Row Number removed: " + numDeleted + " from StoryId: " + storyId );
+    	db.close();
     }
     
  // return one StoryImage from Story _id
@@ -451,6 +459,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.close();
     }
     
+    // delete StoryVideo with this Story id
+ 	public void deleteVideo(int storyId){
+ 		SQLiteDatabase db = this.getWritableDatabase();
+ 		int numDeleted = db.delete(TABLE_VIDEOS, VIDEOS_STORY + " = ?", new String[] { Integer.toString(storyId)});
+ 	    Log.d("Delete Video: ","Row Number removed: " + numDeleted + " from StoryId: " + storyId );
+ 	    db.close();
+ 	}
     
     // return one Video from Story _id
     public StoryVideo getStoryVideo(int storyId) {
@@ -496,6 +511,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	    db.close();
     }
 
+    // delete StoryAudio with this Story id
+  	public void deleteAudio(int storyId){
+  		SQLiteDatabase db = this.getWritableDatabase();
+  		int numDeleted = db.delete(TABLE_AUDIO, AUDIO_STORY + " = ?", new String[] { Integer.toString(storyId)});
+  	    Log.d("Delete Audio: ","Row Number removed: " + numDeleted + " from StoryId: " + storyId );
+  	    db.close();
+  	}
+  	
     // return one StoryAudio from Story _id
     public StoryAudio getStoryAudio(int storyId) {
     	SQLiteDatabase db = this.getReadableDatabase();
@@ -557,6 +580,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.insert(TABLE_COMMENTS, null, values);
 		db.close();
 		Log.i("DATABASE", "new comment added to database for story" + Integer.toString(storyId));
+	}
+  
+  	// delete comment with this Story id
+	public void deleteComment(int storyId){
+		SQLiteDatabase db = this.getWritableDatabase();
+		int numDeleted = db.delete(TABLE_COMMENTS, COMMENTS_STORY + " = ?", new String[] { Integer.toString(storyId)});
+	    Log.d("Delete Comments: ","Row Number removed: " + numDeleted + " from StoryId: " + storyId );
+	    db.close();
 	}
   
   
@@ -670,6 +701,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	   db.insert(TABLE_ENCOUNTERS, null, values);
 	   db.close();
    }
+   
+   // delete Encounter with this Story id
+	public void deleteEncounter(int storyId){
+		SQLiteDatabase db = this.getWritableDatabase();
+		int numDeleted = db.delete(TABLE_ENCOUNTERS, ENCOUNTERS_STORY + " = ?", new String[] { Integer.toString(storyId)});
+	    Log.d("Delete Encounters: ","Row Number removed: " + numDeleted + " from StoryId: " + storyId );
+	    db.close();
+	}
 
    // return number of Encounter for a Story
    public int getEncounterCountForStory(int storyId){

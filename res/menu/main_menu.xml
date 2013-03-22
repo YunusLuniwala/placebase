@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
-        android:id="@+id/menu_settings"
+        android:id="@+id/logout"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/menu_settings"/>
-    
-    <item android:id="@+id/saved_spaces"
-        android:icon="@drawable/ic_action_savedspaces"
-        android:title="@string/saved_spaces"
-        android:orderInCategory="10"
-        android:showAsAction="always" />
+        android:title="@string/logout"/>
     
     <item android:id="@+id/user_places"
         android:icon="@drawable/ic_action_mytraces"

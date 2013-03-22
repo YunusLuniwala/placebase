@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.model.Global;
 
 public class StartActivity extends Activity {
 
@@ -36,6 +38,16 @@ public class StartActivity extends Activity {
 			mDatabaseHelper.openDataBase();
 		}catch(SQLException sqle){
 			throw sqle;
+		}
+		
+		// if there is a user logged in
+		// skip straight to the map screen
+		SharedPreferences settings = getSharedPreferences(Global.PREFS, 0);
+		int tempUser = settings.getInt("user", -1);
+		if(tempUser != -1) {
+			Intent intent = new Intent(this, MapActivity.class);
+			startActivity(intent);
+			finish();
 		}
 
 
