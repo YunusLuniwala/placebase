@@ -10,6 +10,25 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
+        <TextView
+            android:id="@+id/title_record_sense"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="@string/recordsense_title" />
+
+        <TextView
+            android:id="@+id/testInterval"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:gravity="left"
+            android:paddingLeft="10dp"
+            android:text="@string/recordsense_instructions"
+            android:textSize="22sp" />
+
         <LinearLayout
             android:id="@+id/senses"
             android:layout_width="match_parent"
@@ -18,124 +37,163 @@
             android:layout_weight=".9"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/title_record_sense"
-                style="?android:attr/listSeparatorTextViewStyle"
+            <TableLayout
+                android:id="@+id/_table_senses"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_marginBottom="5dp"
-                android:text="@string/recordsense_title" />
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_weight=".8" >
 
-            <TextView
-                android:id="@+id/testInterval"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/recordsense_instructions" />
+                <TableRow
+                    android:id="@+id/tableRow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp" >
+
+                    <ImageButton
+                        android:id="@+id/btn_record_hear"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/btn_sense_bg_false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sense_hear" />
+
+                    <TextView
+                        android:id="@+id/txt_hear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="left|center"
+                        android:text="@string/hear"
+                        android:textSize="30sp"
+                        android:textStyle="italic|bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp" >
+
+                    <ImageButton
+                        android:id="@+id/btn_record_see"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/btn_sense_bg_false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sense_see" />
+
+                    <TextView
+                        android:id="@+id/txt_see"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="left|center"
+                        android:text="@string/see"
+                        android:textSize="30sp"
+                        android:textStyle="italic|bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp" >
+
+                    <ImageButton
+                        android:id="@+id/btn_record_smell"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/btn_sense_bg_false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sense_smell" />
+                    <TextView
+                        android:id="@+id/txt_smell"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="center"
+                        android:text="@string/smell"
+                        android:textSize="30sp"
+                        android:textStyle="italic|bold" />
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="5dp" >
+
+                    <ImageButton
+                        android:id="@+id/btn_record_touch"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/btn_sense_bg_false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sense_touch" />
+
+                    <TextView
+                        android:id="@+id/txt_touch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="left|center"
+                        android:text="@string/touch"
+                        android:textSize="30sp"
+                        android:textStyle="italic|bold" />
+
+                </TableRow>
+
+                <TableRow
+                    android:id="@+id/tableRow5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp" >
+
+                    <ImageButton
+                        android:id="@+id/btn_record_taste"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:background="@drawable/btn_sense_bg_false"
+                        android:cropToPadding="false"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_sense_taste" />
+                    <TextView
+                        android:id="@+id/txt_taste"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:gravity="left|center"
+                        android:text="@string/taste"
+                        android:textSize="30sp"
+                        android:textStyle="italic|bold" />
+                </TableRow>
+            </TableLayout>
 
             <RelativeLayout
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/bg_sensecircle"
-                android:paddingBottom="10dp"
-                android:paddingTop="15dp" >
-
-                <ImageButton
-                    android:id="@+id/btn_record_hear"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="75dp"
-                    android:background="@drawable/btn_sense_bg_false"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sense_hear" />
-
-                <ImageButton
-                    android:id="@+id/btn_record_see"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="130dp"
-                    android:layout_marginTop="45dp"
-                    android:background="@drawable/btn_sense_bg_false"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sense_see" />
-
-                <ImageButton
-                    android:id="@+id/btn_record_smell"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="95dp"
-                    android:layout_marginTop="100dp"
-                    android:background="@drawable/btn_sense_bg_false"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sense_smell" />
-
-                <ImageButton
-                    android:id="@+id/btn_record_touch"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginTop="30dp"
-                    android:background="@drawable/btn_sense_bg_false"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sense_touch" />
-
-                <ImageButton
-                    android:id="@+id/btn_record_taste"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_marginLeft="30dp"
-                    android:layout_marginTop="90dp"
-                    android:background="@drawable/btn_sense_bg_false"
-                    android:cropToPadding="false"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_sense_taste" />
-
-            </RelativeLayout>
-
-            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:background="#33b5e5"
-                android:orientation="horizontal" >
+                android:layout_height="0dp"
+                android:layout_weight=".2" >
 
                 <Button
-                    android:id="@+id/btn_toPerspective2"
-                    android:layout_width="0dp"
+                    android:id="@+id/btn_done_senses"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight=".7"
-                    android:background="@android:color/transparent"
-                    android:text="next"
-                    android:textAlignment="center"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textSize="80sp"
-                    android:visibility="visible" />
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="5dp"
+                    android:text="@string/btn_done" />
 
-                <ImageButton
-                    android:id="@+id/btn_toPerspective"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight=".3"
-                    android:adjustViewBounds="true"
-                    android:background="@android:color/transparent"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/ic_chevron_forward" />
-
-            </LinearLayout>
-
+            </RelativeLayout>
         </LinearLayout>
 
-        
-
-          <RelativeLayout
+        <RelativeLayout
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -165,9 +223,7 @@
                     android:layout_height="wrap_content"
                     android:src="@drawable/progressbar_2" />
             </LinearLayout>
-
         </RelativeLayout>
-
     </LinearLayout>
 
 </RelativeLayout>

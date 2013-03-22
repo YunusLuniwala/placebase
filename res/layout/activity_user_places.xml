@@ -36,18 +36,8 @@
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="left"
                 android:text="@string/nostories2" />
-
-            <TextView
-                android:id="@+id/TextView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="30dp"
-                android:gravity="center"
-                android:text="@string/nostories3"
-                android:textColor="#222222"
-                android:textSize="30sp" />
 
         </LinearLayout>
 
