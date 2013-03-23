@@ -1120,10 +1120,13 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	private float calculateBearingToPerspective() {
 		if(myCurrentLocation != null) {
-			bearingToPerspective = bearing - targetStory.getBearing();
-			bearingToPerspective = bearingToPerspective >= 0 ? bearingToPerspective: bearingToPerspective + 360;
-			// Round to a whole number
-			bearingToPerspective = Math.round(bearingToTarget);
+			// normalize story's perspective values so they range from 0-360
+			float storyBearing = targetStory.getBearing();
+			storyBearing = storyBearing >= 0 ? storyBearing: storyBearing + 360;
+			// and round to a whole number
+			storyBearing = Math.round(storyBearing);
+			
+			bearingToPerspective = bearing - storyBearing;
 			// spit out a value from -180 to 0 , and 0 - 180
 			bearingToPerspective = bearingToPerspective >= 180 ? -(360 - bearingToPerspective): bearingToPerspective;
 
@@ -1150,6 +1153,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			// and round to a whole number
 			bearing = Math.round(bearing);
 		}
+		
+		testAzimuth.setText(Double.toString(bearing));
 
 		if(journeyMode == 1) {
 			updateJourneyMode();
@@ -1408,7 +1413,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				int compensation = display.getRotation() * 90;                          
 				azimuth = azimuth+compensation;
 
-				testAzimuth.setText(Double.toString(azimuth));
+				//testAzimuth.setText(Double.toString(azimuth));
 				
 				setDeviceBearing(azimuth);
 
