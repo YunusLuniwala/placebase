@@ -90,14 +90,6 @@ public class PerspectiveActivity extends Activity implements
 			}else {
 				throw new RuntimeException("SenseActivity: story passed was null");
 			}
-//			// get the user object
-//			User tempUser = data.getParcelable("user");
-//			if (tempUser != null) {
-//				// and save into a global var
-//				user = tempUser;
-//			}else {
-//				throw new RuntimeException("SenseActivity: user passed was null");
-//			}
 		}
 
 		if(story != null) {
@@ -234,12 +226,6 @@ public class PerspectiveActivity extends Activity implements
 		} else {
 			Log.v(getClass().getSimpleName(), "GPS is null");
 		}
-		
-
-		//Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-		// TODO resize this image and save it to the database instead of the raw data.
-		
-		
 		
 		// set up the target to save the image
 	    Uri uri = getContentResolver().insert(Media.EXTERNAL_CONTENT_URI, values);

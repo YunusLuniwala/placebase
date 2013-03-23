@@ -8,4 +8,27 @@ public class Global {
 	
 	public static final String PREFS = "MyPrefsFile";
 	
+	public static final String formatDaysForUI(int numDays) {
+		String thisInterval;
+		switch (numDays) {
+		case 0:
+			thisInterval = "today";
+			break;
+		case 1:
+			thisInterval = Integer.toString(numDays) + " day ago";
+			break;
+		default:
+			thisInterval = Integer.toString(numDays) + " days ago";
+			break;
+		}
+		return thisInterval;
+	}
+	
+	public static final String formatGeoForUI(double lat, double lng) {
+		String s = "(" + Double.toString(lat) + ", " + Double.toString(lng) + ")";
+		return s;
+	}
+
+
 }
+

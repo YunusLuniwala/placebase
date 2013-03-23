@@ -1598,17 +1598,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// handle String formation based on authored date
 				int interval = myDateHandler.getDaysAgo(timeStamp);
 
-				switch (interval) {
-				case 0:
-					thisInterval = "today";
-					break;
-				case 1:
-					thisInterval = Integer.toString(interval) + " day ago";
-					break;
-				default:
-					thisInterval = Integer.toString(interval) + " days ago";
-					break;
-				}
+				thisInterval = Global.formatDaysForUI(interval);
+				
 			} else {
 				thisInterval = "";
 				Toast.makeText(MapActivity.this, "timeStamp is null", Toast.LENGTH_SHORT).show();

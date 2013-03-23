@@ -33,7 +33,7 @@
                     android:paddingBottom="25dp"
                     android:text="@string/sign_up_instructions"
                     android:textColor="#ffffff"
-                    android:textSize="15sp" />
+                    android:textSize="25sp" />
 
             </LinearLayout>
 

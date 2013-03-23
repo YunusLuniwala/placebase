@@ -119,17 +119,14 @@ public class UserPlaceAdapter extends BaseAdapter {
 		// SET VALUES
 		// timestamp
 		int daysAgo = handler.getDaysAgo(uso.getTimestamp());
-		if(daysAgo > 0) {
-			String s = Integer.toString(daysAgo) + " days ago";
-			holder.daysTxt.setText(s);		
-		} else {
-			holder.daysTxt.setText("today");
-		}
+		String s = Global.formatDaysForUI(daysAgo);
+		holder.daysTxt.setText(s);
 		// perspective image
 		Bitmap bitmap = BitmapFactory.decodeFile(uso.getPerspective());
 		holder.img.setImageBitmap(bitmap);
 		// geocoordinates
-		holder.geoTxt.setText("(" + Double.toString(uso.getLat()) + ", " + Double.toString(uso.getLng()) + ")");
+		String geo = Global.formatGeoForUI(uso.getLat(), uso.getLng());
+		holder.geoTxt.setText(geo);
 		// encounters
 		holder.encounterTxt.setText(Integer.toString(uso.getEncounters()));
 		// comments

@@ -9,8 +9,8 @@
     <string name="login">Login</string>
     <string name="login_title">Good to see you</string>
     <string name="login_instructions">Enter your username and password</string>
-    <string name="sign_up_title">Join</string>
-    <string name="sign_up_instructions">PlaceBase lets you record and retrieve geotagged messages. Get personal with the spaces around you where people have stood before.</string>
+    <string name="sign_up_title">Join the community</string>
+    <string name="sign_up_instructions">Placebase lets you record and retrieve geotagged messages to get personal with the places where others have stood before.</string>
     <string name="sign_up_username">Select a username</string>
     <string name="sign_up_password">Enter a password</string>
     <string name="sign_up_btn">Create New Account</string>

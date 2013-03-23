@@ -3,18 +3,23 @@ package com.ag.masters.placebase;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.UserActivity;
 import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
 
 public class Login extends Activity {
@@ -22,6 +27,7 @@ public class Login extends Activity {
 	Button btn_login;
 	EditText username;
 	EditText password;
+
 	
 	private static int GET_ACCOUNT = 2;
 	
@@ -29,8 +35,30 @@ public class Login extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
-	
 		
+		
+		// show latest story (perspective image)
+		DatabaseHelper dbh = new DatabaseHelper(this);
+		Story s = dbh.getLatestStory();
+		if (s != null) {
+			
+			ImageView bg = (ImageView) findViewById(R.id.bg_login);
+			TextView geo = (TextView) findViewById(R.id.geo_login_txt);
+			TextView date = (TextView) findViewById(R.id.date_login_txt);
+			
+			Bitmap bitmap = BitmapFactory.decodeFile(s.getPerspectiveUri());
+			bg.setImageBitmap(bitmap);
+			
+			DateHandler handler = new DateHandler();
+			int numDays = handler.getDaysAgo(s.getTimestamp());
+			
+			User bgUser = dbh.getUser(s.getUser());
+			String bgUserName = bgUser.getName();
+			date.setText("Left " + Global.formatDaysForUI(numDays) + " by " + bgUserName);
+			
+			geo.setText(Global.formatGeoForUI(s.getLat(), s.getLng()));
+
+		}
 		
 		username = (EditText) findViewById(R.id.form_username);
 		password = (EditText) findViewById(R.id.form_password);

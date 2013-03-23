@@ -379,6 +379,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return storyId;
     }
     
+    public Story getLatestStory() {
+    	Story story = null;
+    	
+    	SQLiteDatabase db = this.getReadableDatabase();
+    	
+    	String selectQuery = "SELECT * FROM " + TABLE_STORIES;
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		if(cursor.moveToLast()) {
+			story = new Story();
+			story.setId(Integer.parseInt(cursor.getString(0)));
+			story.setUser(cursor.getInt(1));
+			story.setMedia(cursor.getInt(2));
+			story.setHear(cursor.getInt(3));
+			story.setSee(cursor.getInt(4));
+			story.setSmell(cursor.getInt(5));
+			story.setTaste(cursor.getInt(6));
+			story.setTouch(cursor.getInt(7));
+			story.setLat(cursor.getDouble(8));
+			story.setLng(cursor.getDouble(9));
+			story.setBearing(cursor.getFloat(10));
+			story.setTimestamp(cursor.getString(11));
+			story.setPerspectiveUri(cursor.getString(12));
+		}
+    	cursor.close();
+    	db.close();
+		
+    	return story;
+    }
+    
     
 	/**
 	 * 
@@ -802,6 +832,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.close();
 		return user;
 	}
+	
 	
 	// update User's login date
 	public int updateUserLoginDate(User user) {
