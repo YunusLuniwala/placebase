@@ -46,7 +46,6 @@
             android:theme="@android:style/Theme.Holo.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -83,17 +82,7 @@
             android:name="com.ag.masters.placebase.VideoPlayer"
             android:label="@string/title_activity_video_player" >
         </activity>
-        <activity
-            android:name="com.ag.masters.placebase.SenseActivity"
-            android:configChanges="orientation"
-            android:label="@string/confirm_recording"
-            android:noHistory="true"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
+        
         <activity
             android:name="com.ag.masters.placebase.ConfirmTrace"
             android:configChanges="orientation"

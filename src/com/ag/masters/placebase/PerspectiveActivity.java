@@ -9,6 +9,8 @@ package com.ag.masters.placebase;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -34,12 +36,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.model.Global;
@@ -55,7 +55,7 @@ public class PerspectiveActivity extends Activity implements
 
 	private CameraView cameraView;
     private LocationManager myLocationManager;
-    private ImageButton pictureButton;
+    private Button pictureButton;
     private View overlay;
     
 	// device sensor (accelerometer and magnetic field)
@@ -134,8 +134,10 @@ public class PerspectiveActivity extends Activity implements
 		});
 
 		
+		setUpSenseBtns();
+		
 		cameraView = (CameraView) this.findViewById(R.id.view_preview);
-		pictureButton = (ImageButton) this.findViewById(R.id.btn_takePhoto);
+		pictureButton = (Button) this.findViewById(R.id.btn_takePhoto);
 		pictureButton.setOnClickListener(this);
 		//pictureButton.setEnabled(false); // start the button disabled until we have a location fix
 		
@@ -176,6 +178,79 @@ public class PerspectiveActivity extends Activity implements
 		super.onPause();
 		myLocationManager.removeUpdates((LocationListener) this);
 		mySensorManager.unregisterListener(this);
+	}
+	
+	private void setUpSenseBtns() {
+		final ImageButton btnHear = (ImageButton) findViewById(R.id.btn_record_hear);
+		final ImageButton btnSee = (ImageButton) findViewById(R.id.btn_record_see);
+		final ImageButton btnSmell = (ImageButton) findViewById(R.id.btn_record_smell);
+		final ImageButton btnTaste = (ImageButton) findViewById(R.id.btn_record_taste);
+		final ImageButton btnTouch = (ImageButton) findViewById(R.id.btn_record_touch);
+		
+		List<ImageButton> imageButtons = new ArrayList<ImageButton>();
+		imageButtons.add(btnHear);
+		imageButtons.add(btnSee);
+		imageButtons.add(btnSmell);
+		imageButtons.add(btnTaste);
+		imageButtons.add(btnTouch);
+		
+		for(int i = 0; i < imageButtons.size(); i ++) {
+			imageButtons.get(i).setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					if(v == btnHear) {
+						if(story.getHear() == 0) {
+							btnHear.setBackgroundResource(R.drawable.btn_sense_bg_true);
+							story.setHear(1);
+						} else {
+							btnHear.setBackgroundResource(R.drawable.btn_sense_bg_false);
+							story.setHear(0);
+						}
+						Log.i("SENSE ACTIVITY", "Hear btn clicked");
+					} else if (v == btnSee) {
+						if(story.getSee() == 0) {
+							btnSee.setBackgroundResource(R.drawable.btn_sense_bg_true);
+							story.setSee(1);
+						} else {
+							btnSee.setBackgroundResource(R.drawable.btn_sense_bg_false);
+							story.setSee(0);
+						}
+						Log.i("SENSE ACTIVITY", "See btn clicked");
+					} else if  (v == btnSmell) {
+						if(story.getSmell() == 0) {
+							btnSmell.setBackgroundResource(R.drawable.btn_sense_bg_true);
+							story.setSmell(1);
+						} else {
+							btnSmell.setBackgroundResource(R.drawable.btn_sense_bg_false);
+							story.setSmell(0);
+						}
+						Log.i("SENSE ACTIVITY", "Smell btn clicked");
+					} else if  (v == btnTaste) {
+						if(story.getTaste() == 0) {
+							btnTaste.setBackgroundResource(R.drawable.btn_sense_bg_true);
+							story.setTaste(1);
+						} else {
+							btnTaste.setBackgroundResource(R.drawable.btn_sense_bg_false);
+							story.setTaste(0);
+						}
+						Log.i("SENSE ACTIVITY", "Taste btn clicked");
+					} else if (v == btnTouch) {
+						if(story.getTouch() == 0) {
+							btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_true);
+							story.setTouch(1);
+						} else {
+							btnTouch.setBackgroundResource(R.drawable.btn_sense_bg_false);
+							story.setTouch(0);
+						}
+						Log.i("SENSE ACTIVITY", "Touch btn clicked");
+					}
+					
+				}
+			});
+		}
+		
+		
 	}
 	
 	@Override

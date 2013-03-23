@@ -32,7 +32,7 @@ import android.widget.Toast;
 import com.ag.masters.placebase.R;
 import com.ag.masters.placebase.RetrieveMedia;
 import com.ag.masters.placebase.handlers.DateHandler;
-import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;

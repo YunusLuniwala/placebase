@@ -4,7 +4,7 @@
     android:id="@+id/map_view"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:gravity="right"
     android:visibility="visible"
     tools:context=".MapActivity" >
 
@@ -40,9 +40,9 @@
 
                 <ImageView
                     android:id="@+id/user_media_icon"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:cropToPadding="true"
+                    android:layout_alignParentStart="true"
                     android:scaleType="center"
                     android:src="@drawable/bg_closetab" />
 
@@ -51,12 +51,15 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
                     android:layout_centerHorizontal="true"
                     android:layout_centerInParent="false"
                     android:layout_marginBottom="3dp"
+                    android:layout_marginLeft="50dp"
                     android:background="@android:color/transparent"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_close" />
+
             </RelativeLayout>
 
             <LinearLayout
@@ -96,7 +99,8 @@
                         android:background="@android:color/transparent"
                         android:cropToPadding="false"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_mute" />
+                        android:src="@drawable/ic_mute"
+                        android:visibility="gone" />
 
                     <RelativeLayout
                         android:id="@+id/block_distance"
@@ -131,7 +135,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_gravity="center"
-                        android:layout_weight=".40" >
+                        android:layout_weight=".40"
+                        android:gravity="center_vertical" >
 
                         <ImageView
                             android:id="@+id/ic_alignment"
@@ -139,16 +144,6 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:src="@drawable/ic_align_false" />
-
-                        <TextView
-                            android:id="@+id/journey_bearing"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignRight="@+id/ic_alignment"
-                            android:layout_centerVertical="true"
-                            android:text="Large Text"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:visibility="gone" />
 
                         <FrameLayout
                             android:id="@+id/container_compass"
@@ -259,66 +254,86 @@
         android:id="@+id/testDelete"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/bottomBar"
         android:layout_alignParentRight="true"
         android:background="@android:color/darker_gray"
-        android:visibility="gone" >
+        android:gravity="right"
+        android:visibility="visible" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/testMyLocation"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/testAzimuth"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="bearing to Perspective"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/testTargetBearing"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/journey_perspective"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
 
-            <TextView
-                android:id="@+id/testTargetDistance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="bearing To Target"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/testTargetLat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/journey_bearing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
 
-            <TextView
-                android:id="@+id/testTargetLng"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
+                android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/testJourneyMode"
+                    android:id="@+id/textView3"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="TargetBearing"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/testPitch"
+                    android:id="@+id/testTargetBearing"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="target" />
 
                 <TextView
-                    android:id="@+id/testRoll"
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Device Azimuth"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/testAzimuth"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="device" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
             </LinearLayout>
 
             <LinearLayout
@@ -331,22 +346,26 @@
                     android:id="@+id/testInterval"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Accelerometer" />
+                    android:text="Accelerometer"
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/media_stubs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:id="@+id/accelX"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="accelX" />
 
                 <TextView
                     android:id="@+id/accelY"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="accelY" />
 
                 <TextView
                     android:id="@+id/accelZ"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="accelZ" />
             </LinearLayout>
 
             <LinearLayout
@@ -359,22 +378,27 @@
                     android:id="@+id/perspective_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Geomagnetic" />
+                    android:text="Geomagnetic"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/geoX"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="geoX" />
 
                 <TextView
                     android:id="@+id/geoY"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="geoY" />
 
                 <TextView
                     android:id="@+id/geoZ"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="geoZ" />
+
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

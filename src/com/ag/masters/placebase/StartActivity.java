@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 
 public class StartActivity extends Activity {
 

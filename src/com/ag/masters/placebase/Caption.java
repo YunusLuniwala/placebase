@@ -88,9 +88,9 @@ public class Caption extends Activity {
 				String mCaption = caption.getText().toString();
 				image.setCaption(mCaption);
 				
-				Intent intent = new Intent(Caption.this, SenseActivity.class);
+				Intent intent = new Intent(Caption.this, PerspectiveActivity.class);
 				// add parcels to Intent 
-				intent.putExtra("image", image);
+				intent.putExtra("media", image);
 				intent.putExtra("story", story);
 				//intent.putExtra("user", user);
 				// launch senses activity

@@ -30,9 +30,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ag.masters.placebase.R;
-import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
 import com.ag.masters.placebase.model.UserStoryObject;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 
 
 public class UserPlaceAdapter extends BaseAdapter {

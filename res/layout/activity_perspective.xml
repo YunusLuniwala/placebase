@@ -10,98 +10,160 @@
         android:layout_height="match_parent"
         android:orientation="vertical" >
 
-<LinearLayout
-    android:id="@+id/perspective"
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight=".9"
-    android:background="#33b5e5"
-    android:orientation="vertical" >
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".3"
+            android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/perspective_title"
+                android:id="@+id/title_record_sense"
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/recordsense_title" />
+
+            <TextView
+                android:id="@+id/accelX"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:text="@string/record_senses"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/testInterval"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:text="@string/perspective_title" />
+                android:gravity="left"
+                android:paddingLeft="10dp"
+                android:text="@string/recordsense_instructions"
+                android:textSize="20sp"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:id="@+id/senses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_weight=".9"
+                android:orientation="horizontal" >
+
+                <ImageButton
+                    android:id="@+id/btn_record_hear"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/btn_sense_bg_false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_hear" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_see"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/btn_sense_bg_false"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_see" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_smell"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/btn_sense_bg_false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_smell" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_touch"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/btn_sense_bg_false"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_touch" />
+
+                <ImageButton
+                    android:id="@+id/btn_record_taste"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/btn_sense_bg_false"
+                    android:cropToPadding="false"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_sense_taste" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/perspective"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".6"
+            android:background="#222222"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:paddingTop="10dp"
+                android:text="@string/record_direction"
+                android:textColor="#ffffff" />
 
             <TextView
                 android:id="@+id/perspective_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:padding="5dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:gravity="left"
                 android:paddingBottom="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
                 android:text="@string/perspective_instructions"
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="250dp" >
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
 
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:background="#000000"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:paddingTop="5dp" >
-
-                    <com.ag.masters.placebase.view.CameraView
-                        android:id="@+id/view_preview"
-                        android:layout_width="228dp"
-                        android:layout_height="182dp" />
-                </RelativeLayout>
+                <com.ag.masters.placebase.view.CameraView
+                    android:id="@+id/view_preview"
+                    android:layout_width="128dp"
+                    android:layout_height="82dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="false"
+                    android:padding="5dp" />
 
                 <ImageView
                     android:id="@+id/user_media_icon"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="top"
-                    android:paddingTop="30dp"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/bg_perspective" />
 
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="120dp" >
-
-                <TextView
-                    android:id="@+id/perspective_body2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="0dp"
-                    android:background="#000000"
-                    android:gravity="center"
-                    android:padding="5dp"
-                    android:text="@string/perspective_instructions2"
-                    android:textColor="#ffffff"
-                    android:textSize="18sp" />
-
-                <ImageButton
-                    android:id="@+id/btn_takePhoto"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="15dp"
-                    android:layout_weight=".3"
-                    android:background="@android:color/transparent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/btn_white" />
-
-            </FrameLayout>
-
+            </RelativeLayout>
         </LinearLayout>
 
-         <RelativeLayout
+        <Button
+            android:id="@+id/btn_takePhoto"
+            style="@style/AppBaseTheme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/capture" />
+
+        <RelativeLayout
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -129,9 +191,8 @@
                     android:id="@+id/user_media_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/progressbar_3" />
+                    android:src="@drawable/progressbar_2" />
             </LinearLayout>
-
         </RelativeLayout>
 
     </LinearLayout>

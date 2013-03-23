@@ -8,7 +8,7 @@ import android.database.SQLException;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 import com.ag.masters.placebase.sqlite.User;
 
 

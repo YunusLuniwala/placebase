@@ -20,7 +20,7 @@ import android.view.Menu;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.ag.masters.placebase.model.DatabaseHelper;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 import com.ag.masters.placebase.sqlite.Encounter;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;

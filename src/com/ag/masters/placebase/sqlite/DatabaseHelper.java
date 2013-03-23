@@ -1,4 +1,4 @@
-package com.ag.masters.placebase.model;
+package com.ag.masters.placebase.sqlite;
 
 
 
@@ -18,12 +18,6 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.ag.masters.placebase.sqlite.Encounter;
-import com.ag.masters.placebase.sqlite.Story;
-import com.ag.masters.placebase.sqlite.StoryAudio;
-import com.ag.masters.placebase.sqlite.StoryImage;
-import com.ag.masters.placebase.sqlite.StoryVideo;
-import com.ag.masters.placebase.sqlite.User;
 
 
 /**

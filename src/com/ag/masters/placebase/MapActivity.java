@@ -56,8 +56,8 @@ import android.widget.Toast;
 
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.SDImageLoader;
-import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.StoryAudio;
 import com.ag.masters.placebase.sqlite.StoryImage;
@@ -107,19 +107,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	// target information
 	private Marker targetMarker = null;			// story marker
 	private static Location targetLocation;
-	private static float targetBearing = 0;
-	private static float targetDistance = 0;
+	private static float bearingToTarget = 0;
+	private static float bearingToPerspective = 0; 
+	private static float distanceToTarget= 0;
+	// the story behind it 
+	private Story targetStory;
 	
 	private CircleOptions myCircleOptions;
 	private Circle circle;
 
 	// print out test variables to screen
-	private TextView testMyLocation;
-	private TextView testJourneyMode;
-	private TextView testTargetLat;
-	private TextView testTargetLng;
 	private TextView testTargetBearing;
-	private TextView testTargetDistance;
+	private TextView testBearingToPerspective;
 	private TextView testGeoX;
 	private TextView testGeoY;
 	private TextView testGeoZ;
@@ -127,9 +126,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private TextView testAccelY;
 	private TextView testAccelZ;
 	private TextView testAzimuth;
-	private TextView testPitch;
-	private TextView testRoll;
-	private TextView thisBearing;
 
 	// device location services (GPS)
 	private LocationManager myLocationManager;
@@ -158,7 +154,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	static final float ALPHA = 0.2f;
 	protected float[] accelVals;
-
+	protected float[] geomagVals;
+	protected float[] lowPassOrientVals;
 	double azimuth = 0;
 	float bearing = 0; // normalized whole number for raw sensor azimuth input
 
@@ -260,33 +257,25 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		myDateHandler = new DateHandler();
 
 		// testPrintouts. Delete when done
-		testMyLocation = (TextView) findViewById(R.id.testMyLocation);
+		
 		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
-		testJourneyMode = (TextView) findViewById(R.id.testJourneyMode);
-		testTargetLat = (TextView) findViewById(R.id.testTargetLat);
-		testTargetLng = (TextView) findViewById(R.id.testTargetLng);
-		testTargetDistance = (TextView) findViewById(R.id.testTargetDistance);
+		testBearingToPerspective = (TextView) findViewById(R.id.journey_perspective);
 		testGeoX = (TextView) findViewById(R.id.geoX);
 		testGeoY = (TextView) findViewById(R.id.geoY);
 		testGeoZ = (TextView) findViewById(R.id.geoZ);
-		testAccelX = (TextView) findViewById(R.id.media_stubs);
+		testAccelX = (TextView) findViewById(R.id.accelX);
 		testAccelY = (TextView) findViewById(R.id.accelY);
 		testAccelZ = (TextView) findViewById(R.id.accelZ);
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
-		testPitch = (TextView) findViewById(R.id.testPitch);
-		testRoll = (TextView) findViewById(R.id.testRoll);
 
-		
-
-		//testGeoX.setText("0.00");
-		//testGeoY.setText("0.00");
-		//testGeoZ.setText("0.00");
-		//testAccelX.setText("0.00");
-		//testAccelY.setText("0.00");
-		//testAccelZ.setText("0.00");
+		testGeoX.setText("0.00");
+		testGeoY.setText("0.00");
+		testGeoZ.setText("0.00");
+		testAccelX.setText("0.00");
+		testAccelY.setText("0.00");
+		testAccelZ.setText("0.00");
 		testAzimuth.setText("0.00");
-		//testPitch.setText("0.00");
-		//testRoll.setText("0.00");
+
 		
 
 		myCriteria = new Criteria();
@@ -546,7 +535,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 			// create new Intent for video, audio (not photo)
 			// so we can add parcels to it.
-			Intent startSenses = new Intent(MapActivity.this, SenseActivity.class);
+			Intent startSenses = new Intent(MapActivity.this, PerspectiveActivity.class);
 
 			// also check to see that the request code is OK
 			switch(requestCode) {
@@ -609,7 +598,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				story.setMedia(Global.VIDEO_CAPTURE);
 
 				// pass in StoryVideo parcel
-				startSenses.putExtra("video", video);
+				startSenses.putExtra("media", video);
 				// pass in Story parcel
 				startSenses.putExtra("story", story);
 				// start SensesActivity
@@ -642,7 +631,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 					story.setMedia(Global.AUDIO_CAPTURE);
 
 					// pass in StoryAudio parcel
-					startSenses.putExtra("audio", audio);
+					startSenses.putExtra("media", audio);
 					// pass in Story parcel
 					startSenses.putExtra("story", story);
 					//startSenses.putExtra("user", user);
@@ -936,13 +925,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// start rotating again
 		rotateView = true;
 		
-		// it's true! We're journeying!
+		// set journeyMode to true
 		journeyMode = 1;
 		isInfoWindowShowing = false;
 		
 		// TODO: here... move the map!
 		
-		updateJourneyBlockImage(targetMarker);
+		updateTargetStory(targetMarker);
+		enterJourneyMode();
 		updateJourneyMode(); // also called onLocationChanged()
 
 	}
@@ -974,12 +964,39 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 	}
 
-	private void updateJourneyBlockImage(Marker marker) {
+	private void updateTargetStory(Marker marker) {
 		getStoryFromMarker(marker);
-		Story thisStory = getStoryFromMarker(marker);
-		photo.setImageBitmap(BitmapFactory.decodeFile(thisStory.getPerspectiveUri())); 
+		targetStory = getStoryFromMarker(marker);
+		photo.setImageBitmap(BitmapFactory.decodeFile(targetStory.getPerspectiveUri())); 
 	}
 
+	private void enterJourneyMode() {
+		// hide journey Block
+		if(journeyBlock.getVisibility() == View.INVISIBLE) { 
+
+			// called when we FIRST enter journey mode
+			journeyBlock.setVisibility(View.VISIBLE); // change for animation?
+
+			targetMarker.hideInfoWindow();
+
+
+			// create the bounding box that will contain both
+			// the target and the device location
+			LatLngBounds.Builder builder = new LatLngBounds.Builder();
+			builder.include(myMarker.getPosition());
+			builder.include(targetMarker.getPosition());
+			LatLngBounds targetView = builder.build();
+			// set boundaries so myLocation and the destination marker are both visible on the screen
+			rotateView = false;
+			CameraUpdate update = CameraUpdateFactory.newLatLngBounds(targetView, 100);
+			mMap.animateCamera(update, enableAnimation);
+
+
+		}
+		// set the value of the story's orientation
+		testTargetBearing.setText(Float.toString(targetStory.getBearing()));
+	}
+	
 	/** 
 	 * While in journey mode
 	 * 
@@ -993,74 +1010,54 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		boolean isInfoWindowShowing = false;
 		boolean isWithinRange = false;
 		boolean isWithinBearing = false;
-		//btnGetMessage.setEnabled(false); // UNCOMMENT ME AFTER TESTING
+		boolean isWithinPerspective = false;
+		//btnGetMessage.setEnabled(false); // UNCOMMENT AFTER TESTING
 
+		// EXIT JOURNEY MODE
 		if (journeyMode != 1) {
-			// exit journey mode
+			// TODO: expand map to full screen
 			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
-			
-			//expand(findViewById(R.id.mapHolder), false);
 			
 			if(circle != null) {
 				circle.remove();
 			}
 			removeMyLocationMarker();
 		} else {
-			// enter journey mode
-			// shrink map height
-			View map = findViewById(R.id.mapHolder);
-			//map.invalidate();
-			// TODO: change the height of the map to be shorter. 
-
-			//map.layout(0, map.getHeight()/2, r, b) map.getHeight()
+		// ENTER JOURNEY MODE
 			
-			if(journeyBlock.getVisibility() == View.INVISIBLE) { 
-				
-				// called when we FIRST enter journey mode
-				journeyBlock.setVisibility(View.VISIBLE); // change for animation?
-				
-				//expand(findViewById(R.id.mapHolder), true);
-				
-				targetMarker.hideInfoWindow();
-				
-				
-				// create the bounding box that will contain both
-				// the target and the device location
-				LatLngBounds.Builder builder = new LatLngBounds.Builder();
-				builder.include(myMarker.getPosition());
-				builder.include(targetMarker.getPosition());
-				LatLngBounds targetView = builder.build();
-				// set boundaries so myLocation and the destination marker are both visible on the screen
-				rotateView = false;
-				CameraUpdate update = CameraUpdateFactory.newLatLngBounds(targetView, 100);
-				mMap.animateCamera(update, enableAnimation);
-				
-				
-			}
+			// TODO: shrink map 
 
 			// calculate new values for bearing and distance to target
 			calculateDistanceToTarget();
 			calculateBearingToTarget();
-			// convert the float to int for display
-			int intDistance = (int)targetDistance;
-			// update Views with new values for bearing and distance
-			journeyBearing.setText(Float.toString(targetBearing));
+			calculateBearingToPerspective();
 			
-			journeyDistance.setText(Integer.toString(intDistance));
+			// convert the float to int for display
+			journeyDistance.setText(Integer.toString((int)distanceToTarget));
+			// update Views with new values for bearing and distance
+			journeyBearing.setText(Float.toString(bearingToTarget));
+			
 			// rotate the compass to reflect device bearing to target
-			compass.setRotation(targetBearing);
-
+			// NO! NO! NO! This is the user's bearing to the target, not their alignment with the author's perspective
+			//compass.setRotation(bearingToTarget);
+			compass.setRotation(bearingToPerspective);
+			
+			
+			if (bearingToPerspective >= -(TARGET_BEARING) && bearingToPerspective <= TARGET_BEARING) {
+				isWithinPerspective = true;
+			}
+			
 			// if device bearing is within the target range
-			if (targetBearing >= -(TARGET_BEARING) && targetBearing <= TARGET_BEARING) {
+			if (bearingToTarget >= -(TARGET_BEARING) && bearingToTarget <= TARGET_BEARING) {
 				isWithinBearing = true;
 			}
 
-			if (targetDistance <= TARGET_RANGE) {
+			if (distanceToTarget <= TARGET_RANGE) {
 				isWithinRange = true;
 			}
 
 			// change icon to reflect true or false alignment
-			if (isWithinBearing == true) {
+			if (isWithinPerspective == true) {
 				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_true));
 			} else {
 				alignmentIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_align_false));
@@ -1073,7 +1070,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				journeyDistance.setTextColor(Color.BLACK);
 			}
 
-			if (isWithinRange && isWithinBearing) {
+			if (isWithinRange && isWithinPerspective) {
 				btnGetMessage.setEnabled(true);
 			}
 		}
@@ -1087,10 +1084,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	private float calculateDistanceToTarget() {
 		if(myCurrentLocation != null) {
-			targetDistance = myCurrentLocation.distanceTo(targetLocation);
+			distanceToTarget = myCurrentLocation.distanceTo(targetLocation);
 			// round to a whole number
-			targetDistance = Math.round(targetDistance);
-			return targetDistance;
+			distanceToTarget = Math.round(distanceToTarget);
+			return distanceToTarget;
 
 		} else return 0;
 	}
@@ -1104,19 +1101,40 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	private float calculateBearingToTarget() {
 		if(myCurrentLocation != null) {
-			targetBearing = myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
-			targetBearing = bearing - targetBearing;
-			targetBearing = targetBearing >= 0 ? targetBearing: targetBearing + 360;
+			bearingToTarget= myCurrentLocation.bearingTo(targetLocation); // This is insufficient. Need to use actual sensor bearing
+			bearingToTarget = bearing - bearingToTarget;
+			bearingToTarget = bearingToTarget >= 0 ? bearingToTarget: bearingToTarget + 360;
 			// Round to a whole number
-			targetBearing = Math.round(targetBearing);
+			bearingToTarget = Math.round(bearingToTarget);
 			// spit out a value from -180 to 0 , and 0 - 180
-			targetBearing = targetBearing >= 180 ? -(360 - targetBearing): targetBearing;
+			bearingToTarget = bearingToTarget >= 180 ? -(360 - bearingToTarget): bearingToTarget;
 
-			return targetBearing;
+			return bearingToTarget;
 		}
 		else return 0;
 	}
 
+	/**
+	 * 
+	 * @return float, the device's bearing to the author's (storied in Story object)
+	 */
+	private float calculateBearingToPerspective() {
+		if(myCurrentLocation != null) {
+			bearingToPerspective = bearing - targetStory.getBearing();
+			bearingToPerspective = bearingToPerspective >= 0 ? bearingToPerspective: bearingToPerspective + 360;
+			// Round to a whole number
+			bearingToPerspective = Math.round(bearingToTarget);
+			// spit out a value from -180 to 0 , and 0 - 180
+			bearingToPerspective = bearingToPerspective >= 180 ? -(360 - bearingToPerspective): bearingToPerspective;
+
+			testBearingToPerspective.setText(Float.toString(bearingToPerspective));
+			
+			return bearingToPerspective;
+			
+		}
+		else return 0;
+	}
+	
 	/**
 	 * update global bearing (for device) based onSensorChanged()
 	 * @param azimuth
@@ -1347,23 +1365,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// Gets the value of the sensor that has been changed
 		switch (event.sensor.getType()) {  
 		case Sensor.TYPE_ACCELEROMETER:
-			accelVals = event.values.clone();
-			accelVals = lowPass(event.values, accelVals);
+			accelVals = lowPass(event.values.clone(), accelVals);
 
 			//gravity = event.values.clone();
 			gravity = accelVals;
 
 			//test
-			/*testAccelX.setText(Float.toString(gravity[0]));
+			testAccelX.setText(Float.toString(gravity[0]));
 			testAccelY.setText(Float.toString(gravity[1]));
-			testAccelZ.setText(Float.toString(gravity[2]));*/
+			testAccelZ.setText(Float.toString(gravity[2]));
 			break;
 		case Sensor.TYPE_MAGNETIC_FIELD:
-			geomag = event.values.clone();
+			
+			geomagVals = lowPass(event.values.clone(), geomagVals);
+			
+			//geomag = event.values.clone();
+			geomag = geomagVals;
+			
 			// test
-			/*testGeoX.setText(Float.toString(gravity[0]));
-			testGeoY.setText(Float.toString(gravity[1]));
-			testGeoZ.setText(Float.toString(gravity[2]));*/
+			testGeoX.setText(Float.toString(geomag[0]));
+			testGeoY.setText(Float.toString(geomag[1]));
+			testGeoZ.setText(Float.toString(geomag[2]));
 			break;
 		}
 
@@ -1374,15 +1396,20 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			boolean success = SensorManager.getRotationMatrix(inR, I, gravity, geomag);
 			if (success) {
 				SensorManager.getOrientation(inR, orientVals);
-				azimuth = Math.toDegrees(orientVals[0]);
+				lowPassOrientVals = lowPass(orientVals, lowPassOrientVals);
+				azimuth = Math.toDegrees(lowPassOrientVals[0]);
+				
+				//azimuth = Math.toDegrees(orientVals[0]);
 				//pitch = Math.toDegrees(orientVals[1]);
 				//roll = Math.toDegrees(orientVals[2]);
-
+				
 				// compensate for different screen orientations
 				Display display = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 				int compensation = display.getRotation() * 90;                          
 				azimuth = azimuth+compensation;
 
+				testAzimuth.setText(Double.toString(azimuth));
+				
 				setDeviceBearing(azimuth);
 
 			}
@@ -1395,7 +1422,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 * @see http://developer.android.com/reference/android/hardware/Sensor.html#TYPE_ACCELEROMETER
 	 */
 	protected float[] lowPass( float[] input, float[] output ) {
-		if ( output == null ) return input;
+		if ( output == null )  {
+			return input;
+		}
 
 		for ( int i=0; i<input.length; i++ ) {
 			output[i] = output[i] + ALPHA * (input[i] - output[i]);
@@ -1598,7 +1627,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				// handle String formation based on authored date
 				int interval = myDateHandler.getDaysAgo(timeStamp);
 
-				thisInterval = Global.formatDaysForUI(interval);
+				thisInterval = "Posted " + Global.formatDaysForUI(interval);
 				
 			} else {
 				thisInterval = "";

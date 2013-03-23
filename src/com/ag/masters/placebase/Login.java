@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import com.ag.masters.placebase.handlers.DateHandler;
 import com.ag.masters.placebase.handlers.UserActivity;
-import com.ag.masters.placebase.model.DatabaseHelper;
 import com.ag.masters.placebase.model.Global;
+import com.ag.masters.placebase.sqlite.DatabaseHelper;
 import com.ag.masters.placebase.sqlite.Story;
 import com.ag.masters.placebase.sqlite.User;
 
