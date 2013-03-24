@@ -6,7 +6,6 @@ import java.util.List;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.Context;
@@ -36,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
@@ -53,6 +53,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,7 +77,6 @@ import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -87,8 +88,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.support.v4.app.FragmentActivity;
-
 
 public class MapActivity extends FragmentActivity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
@@ -99,8 +98,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private static final int TARGET_RANGE = 5;
 
 	private static final String MAP_FRAGMENT_TAG = "map";
+	private RelativeLayout mapHolder;
 	private SupportMapFragment mMapFragment;
 	private GoogleMap mMap;	
+	
 	private DatabaseHelper dbh;
 
 	private List<Story> allStories;
@@ -192,15 +193,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	ImageView alignmentIcon;
 	ImageView photo;
 
-	// Animation
-	private ObjectAnimator slideUpHalfway;
-	private ObjectAnimator slideDown;
 
 	// hard reference to saved URIs to use onActivityResult
 	private Uri mCaptureImageUri;
 	private Uri mCaptureVideoUri;
 
-	ViewStub stubRecord;
+
 
 
 	//------------------------------------------------------------------------------------------
@@ -293,21 +291,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
 
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		addMapFragment();
 		
-		// It isn't possible to set a fragment's id programmatically so we set a tag instead and
-        // search for it using that.
-		mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
-		// We only create a fragment if it doesn't already exist.
-        if (mMapFragment == null) {
-            // To programmatically add the map, we first create a SupportMapFragment.
-            mMapFragment = SupportMapFragment.newInstance();
-
-            // Then we add it using a FragmentTransaction.
-            FragmentTransaction fragmentTransaction =
-                    getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.mapHolder, mMapFragment, MAP_FRAGMENT_TAG);
-            fragmentTransaction.commit();
-        }
+		
 		
         setUpMapIfNeeded();
         
@@ -486,7 +472,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// inflate journey block with place-based information
 		ViewStub journeyStub = (ViewStub) findViewById(R.id.stub_journey);
 		journeyBlock = (LinearLayout) journeyStub.inflate();
-		journeyBlock.setVisibility(View.VISIBLE);
+
 	}
 	
 	/** 
@@ -753,7 +739,42 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 
 
+	private void addMapFragment() {
+		// It isn't possible to set a fragment's id programmatically so we set a tag instead and
+        // search for it using that.
+		mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
+		// We only create a fragment if it doesn't already exist.
+        if (mMapFragment == null) {
+            // To programmatically add the map, we first create a SupportMapFragment.
+            mMapFragment = SupportMapFragment.newInstance();
 
+            // Then we add it using a FragmentTransaction.
+            FragmentTransaction fragmentTransaction =
+                    getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.mapHolder, mMapFragment, MAP_FRAGMENT_TAG);
+            fragmentTransaction.commit();
+        }
+        
+	}
+	
+	/**
+	 * change the height of the map when in journey mode
+	 * @param val
+	 */
+	private void displayJourneyMap(boolean val) {
+		if (val == true) {
+			RelativeLayout mapHolder = (RelativeLayout) findViewById(R.id.mapHolder);
+			RelativeLayout.LayoutParams params = (LayoutParams) mapHolder.getLayoutParams();
+			params.height = screenHeight/3 + 110;
+			mapHolder.setLayoutParams(params);
+			
+		} else {
+			RelativeLayout mapHolder = (RelativeLayout) findViewById(R.id.mapHolder);
+			RelativeLayout.LayoutParams params = (LayoutParams) mapHolder.getLayoutParams();
+			params.height = screenHeight;
+			mapHolder.setLayoutParams(params);
+		}
+	}
 	//------------------------------------------------------------------------------------------
 	// create an marker icon at runtime to show location and type of the story
 	// http://stackoverflow.com/questions/11740362/merge-two-bitmaps-in-android?rq=1
@@ -982,7 +1003,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		// TODO: here... move the map!
 		
-		
 		updateTargetStory(targetMarker);
 		enterJourneyMode();
 		updateJourneyMode(); // also called in onLocationChanged()
@@ -1026,10 +1046,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// hide journey Block
 		 
 			// animate the view to show it
-			
+			displayJourneyMap(true);
 			slideUp(journeyBlock);
-			
-			
 			// called when we FIRST enter journey mode
 			//journeyBlock.setVisibility(View.VISIBLE); // change for animation?
 
@@ -1044,7 +1062,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			LatLngBounds targetView = builder.build();
 			// set boundaries so myLocation and the destination marker are both visible on the screen
 			rotateView = false;
-			CameraUpdate update = CameraUpdateFactory.newLatLngBounds(targetView, 100);
+			CameraUpdate update = CameraUpdateFactory.newLatLngBounds(targetView, 200);
 			mMap.animateCamera(update, enableAnimation);
 
 
@@ -1072,7 +1090,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		// EXIT JOURNEY MODE
 		if (journeyMode != 1) {
-			// TODO: expand map to full screen
+			// expand map to full screen
+			displayJourneyMap(false);
 			// animate the view to hide it
 			if(isInfoWindowShowing != true) {
 				slideDown(journeyBlock);
