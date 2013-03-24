@@ -36,6 +36,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -43,16 +44,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,6 +76,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -86,7 +87,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapActivity extends Activity 
+import android.support.v4.app.FragmentActivity;
+
+
+public class MapActivity extends FragmentActivity 
 implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener, LocationSource, LocationListener, SensorEventListener {
 
 	public static final int ZOOM_LEVEL = 16;
@@ -94,6 +98,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private static final int TARGET_BEARING = 20;
 	private static final int TARGET_RANGE = 5;
 
+	private static final String MAP_FRAGMENT_TAG = "map";
+	private SupportMapFragment mMapFragment;
 	private GoogleMap mMap;	
 	private DatabaseHelper dbh;
 
@@ -119,6 +125,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private Circle circle;
 
 	// print out test variables to screen
+	private TextView testJourneyMode;
 	private TextView testTargetBearing;
 	private TextView testBearingToPerspective;
 	private TextView testGeoX;
@@ -171,12 +178,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	// Media Record Buttons
 	private ImageButton btnRecordMedia;
-	private LinearLayout layoutRecordMedia2;
+	private LinearLayout layoutRecordMedia;
 	private boolean isRecordOptionsShowing;
 	private boolean isInfoWindowShowing;
 	
 	// journey Block Views
-	RelativeLayout journeyBlock;
+	LinearLayout journeyBlock;
 	Button btnGetMessage;
 	ImageButton btnCloseJourneyPanel;
 	TextView journeyBearing;
@@ -237,11 +244,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			}
 		}
 
-
-		setUpMapIfNeeded();
-		
+		// set up views
 		setUpRecordingBlock();
-		
+		setUpJourneyBlock();
 		
 		
 		// define a callback for animateCamera
@@ -264,7 +269,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		myDateHandler = new DateHandler();
 
 		// testPrintouts. Delete when done
-		
+		testJourneyMode = (TextView) findViewById(R.id.testJourneyMode); 
 		testTargetBearing = (TextView) findViewById(R.id.testTargetBearing);
 		testBearingToPerspective = (TextView) findViewById(R.id.journey_perspective);
 		testGeoX = (TextView) findViewById(R.id.geoX);
@@ -275,6 +280,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAccelZ = (TextView) findViewById(R.id.accelZ);
 		testAzimuth = (TextView) findViewById(R.id.testAzimuth);
 
+		testJourneyMode.setText("0");
 		testGeoX.setText("0.00");
 		testGeoY.setText("0.00");
 		testGeoZ.setText("0.00");
@@ -283,20 +289,35 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		testAccelZ.setText("0.00");
 		testAzimuth.setText("0.00");
 
-		
-
 		myCriteria = new Criteria();
 		myCriteria.setAccuracy(Criteria.ACCURACY_FINE);
 
 		mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		
+		// It isn't possible to set a fragment's id programmatically so we set a tag instead and
+        // search for it using that.
+		mMapFragment = (SupportMapFragment)getSupportFragmentManager().findFragmentByTag(MAP_FRAGMENT_TAG);
+		// We only create a fragment if it doesn't already exist.
+        if (mMapFragment == null) {
+            // To programmatically add the map, we first create a SupportMapFragment.
+            mMapFragment = SupportMapFragment.newInstance();
 
+            // Then we add it using a FragmentTransaction.
+            FragmentTransaction fragmentTransaction =
+                    getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.mapHolder, mMapFragment, MAP_FRAGMENT_TAG);
+            fragmentTransaction.commit();
+        }
+		
+        setUpMapIfNeeded();
+        
 		// initialize the state of media recording
 		isRecordOptionsShowing = false;
 		// the Info Window is not showing to start
 		isInfoWindowShowing = false;
 
 		// define views in journey block
-		journeyBlock = (RelativeLayout) findViewById(R.id.journeyblock);
+		//journeyBlock = (LinearLayout) findViewById(R.id.journeyblock);
 		journeyBearing = (TextView) findViewById(R.id.journey_bearing); // change to an ImageView of the Bearing Icon
 		journeyDistance = (TextView) findViewById(R.id.journey_distance);
 		btnGetMessage = (Button) findViewById(R.id.journey_claim);
@@ -315,6 +336,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 				updateJourneyMode();
 			}
 		});
+		
 		// check that we are not in journey mode,
 		// and hide the journey block if we are not.
 		if(journeyMode != 1) {
@@ -330,10 +352,12 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			public void onClick(View v) {
 				// the recording options are showing. we need to hide them
 				if(isRecordOptionsShowing) {
-					hideMediaButtons();
+					slideDown((ViewGroup)layoutRecordMedia);
+					isRecordOptionsShowing = false;
 				}
 				else { // the recording options are hidden we need to show them
-					showMediaButtons();
+					slideUp((ViewGroup)layoutRecordMedia);
+					isRecordOptionsShowing = true;
 				}
 			}
 
@@ -454,6 +478,18 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 
 	/** 
+	 * Inflate Journey Block viewStub
+	 * view_journey_block.xml
+	 * 
+	 */
+	private void setUpJourneyBlock() {
+		// inflate journey block with place-based information
+		ViewStub journeyStub = (ViewStub) findViewById(R.id.stub_journey);
+		journeyBlock = (LinearLayout) journeyStub.inflate();
+		journeyBlock.setVisibility(View.VISIBLE);
+	}
+	
+	/** 
 	 * Inflate Recording viewStub
 	 * view_record_block.xml
 	 * 
@@ -461,8 +497,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void setUpRecordingBlock() {
 		// inflate view stub for record buttons
 		ViewStub recordStub = (ViewStub) findViewById(R.id.stub_record);
-		layoutRecordMedia2 = (LinearLayout) recordStub.inflate();
-		layoutRecordMedia2.setVisibility(View.INVISIBLE);
+		layoutRecordMedia = (LinearLayout) recordStub.inflate();
+		layoutRecordMedia.setVisibility(View.INVISIBLE);
 		// load content into TextView from a file
 		// http://android-er.blogspot.com/2010/07/display-text-file-in-resraw_01.html
 		TextView recordingTips = (TextView)findViewById(R.id.recording_tips);
@@ -776,8 +812,8 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private void setUpMapIfNeeded() {
 		// Do a null check to confirm that we have not already instantiated the map.
 		if (mMap == null) {
-			mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-					.getMap();
+			// Try to obtain the map from the SupportMapFragment.
+            mMap = mMapFragment.getMap();
 			// Check if we were successful in obtaining the map.
 			if (mMap != null) {
 				// The Map is verified. It is now safe to manipulate the map.
@@ -842,30 +878,30 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 
 	//------------------------------------------------------------------------------------------
-	private void showMediaButtons() {
-		layoutRecordMedia2.setVisibility(View.VISIBLE);
+	private void slideUp(ViewGroup view) {
+
+		view.setVisibility(View.VISIBLE);
 		PropertyValuesHolder makeVisible = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
 		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (0));
 
 		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia2, makeVisible, slideUpHalfway)
+		.ofPropertyValuesHolder(view, makeVisible, slideUpHalfway)
 		.setDuration(400)
 		.start();
 
-		isRecordOptionsShowing = true;
+		
 	}
 	//------------------------------------------------------------------------------------------
-	private void hideMediaButtons() {
+	private void slideDown(ViewGroup view) {
 
 		PropertyValuesHolder makeInvisible = PropertyValuesHolder.ofFloat("alpha", 1f,0f);
 		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", 0, screenHeight);
 
 		ObjectAnimator
-		.ofPropertyValuesHolder(layoutRecordMedia2, makeInvisible, slideDown)
+		.ofPropertyValuesHolder(view, makeInvisible, slideDown)
 		.setDuration(700)
 		.start();
 
-		isRecordOptionsShowing = false;
 	}
 
 	//------------------------------------------------------------------------------------------
@@ -931,7 +967,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// store marker as global
 		targetMarker = marker;
 
-		// store Location in a global var
+		// store Location in a global variable
 		LatLng target = marker.getPosition();
 		targetLocation = new Location("Target");
 		targetLocation.setLatitude(target.latitude);
@@ -946,9 +982,10 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		
 		// TODO: here... move the map!
 		
+		
 		updateTargetStory(targetMarker);
 		enterJourneyMode();
-		updateJourneyMode(); // also called onLocationChanged()
+		updateJourneyMode(); // also called in onLocationChanged()
 
 	}
 
@@ -963,16 +1000,16 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// exit strategy: hide the media buttons if they are showing
 		if(isRecordOptionsShowing == true) {
 			//Toast.makeText(getApplicationContext(), "map was clicked", Toast.LENGTH_LONG).show();
-			hideMediaButtons();
+			slideDown((ViewGroup) layoutRecordMedia);
 		}
 		
 		if(isInfoWindowShowing == true) {
 			// start rotating again
 			rotateView = true;
-			updateJourneyMode();
 			if(circle != null) {
 				circle.remove();
 			}
+			updateJourneyMode();
 			
 		}
 		Log.v("MAP", "MAP CLICKED. isInfoWindowShowing = " + Boolean.toString(isInfoWindowShowing));
@@ -987,10 +1024,14 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	private void enterJourneyMode() {
 		// hide journey Block
-		if(journeyBlock.getVisibility() == View.INVISIBLE) { 
-
+		 
+			// animate the view to show it
+			
+			slideUp(journeyBlock);
+			
+			
 			// called when we FIRST enter journey mode
-			journeyBlock.setVisibility(View.VISIBLE); // change for animation?
+			//journeyBlock.setVisibility(View.VISIBLE); // change for animation?
 
 			targetMarker.hideInfoWindow();
 
@@ -1007,7 +1048,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			mMap.animateCamera(update, enableAnimation);
 
 
-		}
+		
 		// set the value of the story's orientation
 		testTargetBearing.setText(Float.toString(targetStory.getBearing()));
 	}
@@ -1021,8 +1062,9 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	 */
 	private void updateJourneyMode() {
 
+		testJourneyMode.setText(Integer.toString(journeyMode));
 		// note: update journeyMode before calling this function
-		boolean isInfoWindowShowing = false;
+		
 		boolean isWithinRange = false;
 		boolean isWithinBearing = false;
 		boolean isWithinPerspective = false;
@@ -1031,16 +1073,19 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		// EXIT JOURNEY MODE
 		if (journeyMode != 1) {
 			// TODO: expand map to full screen
-			journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
-			
+			// animate the view to hide it
+			if(isInfoWindowShowing != true) {
+				slideDown(journeyBlock);
+				//journeyBlock.setVisibility(View.INVISIBLE); // change for animation?
+			}
 			if(circle != null) {
 				circle.remove();
 			}
 			removeMyLocationMarker();
-		} else {
+			boolean isInfoWindowShowing = false;
+		
 		// ENTER JOURNEY MODE
-			
-			// TODO: shrink map 
+		} else {
 
 			// calculate new values for bearing and distance to target
 			calculateDistanceToTarget();
@@ -1048,12 +1093,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 			calculateBearingToPerspective();
 			
 			// convert the float to int for display
-			journeyDistance.setText(Integer.toString((int)distanceToTarget));
 			// update Views with new values for bearing and distance
-			journeyBearing.setText(Float.toString(bearingToTarget));
+			journeyDistance.setText(Integer.toString((int)distanceToTarget));
+			//journeyBearing.setText(Float.toString(bearingToTarget));
 			
 			// rotate the compass to reflect device bearing to target
-			// NO! NO! NO! This is the user's bearing to the target, not their alignment with the author's perspective
 			//compass.setRotation(bearingToTarget);
 			compass.setRotation(bearingToPerspective);
 			
