@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#88000000"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Leave a trace"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#ffffff"
+                android:textSize="30sp"
+                android:textStyle="italic" />
+
+            <TextView
+                android:id="@+id/recording_tips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textColor="#44eeeeee"
+                android:textSize="24sp"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/recordBtnLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_alignParentBottom="true"
+            android:visibility="visible" >
+
+            <RelativeLayout
+                android:id="@+id/recordBtnLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="top|center_horizontal" >
+
+                <ImageButton
+                    android:id="@+id/btnVideo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="50dp"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/btn_white"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_record_video" />
+
+                <ImageButton
+                    android:id="@+id/btnAudio"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toRightOf="@id/btnVideo"
+                    android:background="@drawable/btn_white"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_record_audio" />
+
+                <ImageButton
+                    android:id="@+id/btnPhoto"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="50dp"
+                    android:layout_toRightOf="@id/btnAudio"
+                    android:background="@drawable/btn_white"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_record_photo" />
+            </RelativeLayout>
+        </FrameLayout>
+
+    </RelativeLayout>
+</LinearLayout>

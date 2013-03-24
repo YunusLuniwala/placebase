@@ -43,6 +43,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
+import android.view.ViewStub;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -50,6 +51,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -169,7 +171,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 	// Media Record Buttons
 	private ImageButton btnRecordMedia;
-	private FrameLayout layoutRecordMedia2;
+	private LinearLayout layoutRecordMedia2;
 	private boolean isRecordOptionsShowing;
 	private boolean isInfoWindowShowing;
 	
@@ -191,7 +193,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	private Uri mCaptureImageUri;
 	private Uri mCaptureVideoUri;
 
-
+	ViewStub stubRecord;
 
 
 	//------------------------------------------------------------------------------------------
@@ -237,6 +239,11 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 
 		setUpMapIfNeeded();
+		
+		setUpRecordingBlock();
+		
+		
+		
 		// define a callback for animateCamera
 		// when we have finished an animation, resume rotation
 		enableAnimation = new CancelableCallback() {
@@ -315,7 +322,7 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		}
 
 		// define media buttons and layouts as globals
-		layoutRecordMedia2 = (FrameLayout) findViewById(R.id.recordBtnLayout2);
+		//layoutRecordMedia2 = (FrameLayout) findViewById(R.id.recordBtnLayout2);
 		btnRecordMedia = (ImageButton) findViewById(R.id.btnRecordMain);
 		// http://stackoverflow.com/questions/4969689/android-animation-xml-issues
 		btnRecordMedia.setOnClickListener(new OnClickListener() {
@@ -381,13 +388,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 
 		super.onResume();
 		setUpMapIfNeeded();
-		// mMap.clear();
-		//setUpMap();
-		//allStories.clear();
-		// refresh the marker view
-		
-				
-		
 
 		myLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 		//Register for location updates using a Criteria, and a callback on the specified looper thread.
@@ -425,7 +425,6 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		mMap.setMyLocationEnabled(false);
 		mMap.setLocationSource(null);
 		
-		//dbh.close();
 	}
 
 
@@ -452,6 +451,22 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 		} else {
 			super.onBackPressed();
 		}
+	}
+
+	/** 
+	 * Inflate Recording viewStub
+	 * view_record_block.xml
+	 * 
+	 */
+	private void setUpRecordingBlock() {
+		// inflate view stub for record buttons
+		ViewStub recordStub = (ViewStub) findViewById(R.id.stub_record);
+		layoutRecordMedia2 = (LinearLayout) recordStub.inflate();
+		layoutRecordMedia2.setVisibility(View.INVISIBLE);
+		// load content into TextView from a file
+		// http://android-er.blogspot.com/2010/07/display-text-file-in-resraw_01.html
+		TextView recordingTips = (TextView)findViewById(R.id.recording_tips);
+		recordingTips.setText(Global.readTxt(R.raw.tips, this));
 	}
 	
 	/**
@@ -827,27 +842,27 @@ implements OnMarkerClickListener, OnInfoWindowClickListener, OnMapClickListener,
 	}
 
 	//------------------------------------------------------------------------------------------
-	public void showMediaButtons() {
+	private void showMediaButtons() {
 		layoutRecordMedia2.setVisibility(View.VISIBLE);
 		PropertyValuesHolder makeVisible = PropertyValuesHolder.ofFloat("alpha", 0f,1f);
-		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (screenHeight-500));
+		PropertyValuesHolder slideUpHalfway = PropertyValuesHolder.ofFloat("translationY", screenHeight, (0));
 
 		ObjectAnimator
 		.ofPropertyValuesHolder(layoutRecordMedia2, makeVisible, slideUpHalfway)
-		.setDuration(200)
+		.setDuration(400)
 		.start();
 
 		isRecordOptionsShowing = true;
 	}
 	//------------------------------------------------------------------------------------------
-	public void hideMediaButtons() {
+	private void hideMediaButtons() {
 
 		PropertyValuesHolder makeInvisible = PropertyValuesHolder.ofFloat("alpha", 1f,0f);
-		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", (screenHeight-500), screenHeight);
+		PropertyValuesHolder slideDown = PropertyValuesHolder.ofFloat("translationY", 0, screenHeight);
 
 		ObjectAnimator
 		.ofPropertyValuesHolder(layoutRecordMedia2, makeInvisible, slideDown)
-		.setDuration(200)
+		.setDuration(700)
 		.start();
 
 		isRecordOptionsShowing = false;

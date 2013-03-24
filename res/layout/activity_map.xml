@@ -2,7 +2,7 @@
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map_view"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="right"
     android:visibility="visible"
@@ -178,55 +178,12 @@
         </LinearLayout>
     </RelativeLayout>
 
-      <FrameLayout
-          android:id="@+id/recordBtnLayout2"
-          android:layout_width="wrap_content"
-          android:layout_height="300dp"
-          android:layout_centerHorizontal="true"
-          android:background="@drawable/bg_recordcircle"
-          android:visibility="invisible" >
-
-        <RelativeLayout
-            android:id="@+id/recordBtnLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|center_horizontal" >
-
-            <ImageButton
-                android:id="@+id/btnVideo"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="50dp"
-                android:adjustViewBounds="true"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_video" />
-
-            <ImageButton
-                android:id="@+id/btnAudio"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginTop="20dp"
-                android:layout_toRightOf="@id/btnVideo"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_audio" />
-
-            <ImageButton
-                android:id="@+id/btnPhoto"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="50dp"
-                android:layout_toRightOf="@id/btnAudio"
-                android:background="@drawable/btn_white"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_record_photo" />
-        </RelativeLayout>
-
-    </FrameLayout>
-    
+    <ViewStub
+        android:id="@+id/stub_record"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inflatedId="@+id/recordBlock"
+        android:layout="@layout/view_record_block" />
       
     <LinearLayout
         android:id="@+id/bottomBar"
@@ -315,7 +272,7 @@
                     android:text="target" />
 
                 <TextView
-                    android:id="@+id/textView1"
+                    android:id="@+id/recording_tips"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Device Azimuth"
